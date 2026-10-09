@@ -1,0 +1,13 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.vercel/
+.idea/
+
+# Preferências pessoais do Claude Code (não versionar)
+CLAUDE.local.md
+# Transcrição bruta da conversa de criação (contexto local para o Claude Code)
+docs/CONVERSA.md

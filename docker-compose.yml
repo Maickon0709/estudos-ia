@@ -1,0 +1,33 @@
+# API:     docker compose up --build api        -> http://localhost:8000/health
+# Testes:  docker compose --profile testes run --rm testes
+services:
+  api:
+    build:
+      context: .
+      target: producao
+    env_file: .env
+    ports:
+      - "8000:8000"
+
+  # Postgres descartável só para os testes de integração do SQL.
+  db-teste:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    profiles: ["testes"]
+
+  testes:
+    build:
+      context: .
+      target: testes
+    environment:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@db-teste:5432/postgres
+    depends_on:
+      db-teste:
+        condition: service_healthy
+    profiles: ["testes"]

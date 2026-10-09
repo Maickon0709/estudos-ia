@@ -1,0 +1,104 @@
+"""Valida o que a IA devolve ao gerar e ao corrigir exercícios.
+
+Funções puras. Tudo que não passa nas regras é descartado; se nada sobra,
+a operação falha sem gravar nada.
+"""
+import re
+
+from app.core.errors import IAIndisponivelError
+from app.services.proposta_parser import extrair_json
+
+TIPOS = ("multipla_escolha", "discursiva")
+LETRAS = "ABCDE"
+MIN_OPCOES, MAX_OPCOES = 2, 5
+ENUNCIADO_MAX = 1000
+OPCAO_MAX = 300
+GABARITO_MAX = 1000
+EXPLICACAO_MAX = 1000
+FEEDBACK_MAX = 1000
+
+_PREFIXO_OPCAO = re.compile(r"^\(?[A-Ea-e][\)\.\-:]\s+")
+_LETRA = re.compile(r"^\s*(?:letra\s+)?\(?([A-Ea-e])(?:\)|\.|:|\s|$)", re.IGNORECASE)
+
+
+def letra(valor, quantidade_opcoes: int) -> str | None:
+    """'B', 'b', 'B)', '(b)', 'Letra B' -> 'B' (se existir entre as opções)."""
+    if not isinstance(valor, str):
+        return None
+    achou = _LETRA.match(valor)
+    if not achou:
+        return None
+    escolhida = achou.group(1).upper()
+    return escolhida if LETRAS.index(escolhida) < quantidade_opcoes else None
+
+
+def montar_exercicios(dados: dict, nivel: str, quantidade: int, fontes: list[dict]) -> list[dict]:
+    itens = dados.get("exercicios")
+    if not isinstance(itens, list):
+        raise IAIndisponivelError("A IA devolveu os exercícios num formato inválido. Tente novamente.")
+
+    exercicios = []
+    for item in itens:
+        if len(exercicios) == quantidade:
+            break
+        convertido = _converter(item, nivel, fontes)
+        if convertido is not None:
+            exercicios.append(convertido)
+
+    if not exercicios:
+        raise IAIndisponivelError("A IA não gerou nenhum exercício válido. Tente novamente.")
+    return exercicios
+
+
+def interpretar_correcao(texto) -> dict:
+    dados = extrair_json(texto)
+    if not isinstance(dados.get("correta"), bool):
+        raise IAIndisponivelError("A IA não conseguiu corrigir a resposta. Tente novamente.")
+    return {"correta": dados["correta"], "feedback": _texto(dados.get("feedback"), FEEDBACK_MAX)}
+
+
+# ---------- internos ----------
+def _converter(item, nivel: str, fontes: list[dict]) -> dict | None:
+    if not isinstance(item, dict) or item.get("tipo") not in TIPOS:
+        return None
+    enunciado = _texto(item.get("enunciado"), ENUNCIADO_MAX)
+    if not enunciado:
+        return None
+
+    opcoes = None
+    if item["tipo"] == "multipla_escolha":
+        opcoes = _opcoes(item.get("opcoes"))
+        if opcoes is None:
+            return None
+        gabarito = letra(item.get("gabarito"), len(opcoes))
+    else:
+        gabarito = _texto(item.get("gabarito"), GABARITO_MAX)
+    if not gabarito:
+        return None
+
+    return {
+        "nivel": nivel,
+        "tipo": item["tipo"],
+        "enunciado": enunciado,
+        "opcoes": opcoes,
+        "gabarito": gabarito,
+        "explicacao": _texto(item.get("explicacao"), EXPLICACAO_MAX) or None,
+        "fontes": fontes,
+    }
+
+
+def _opcoes(bruto) -> list[str] | None:
+    if not isinstance(bruto, list) or not MIN_OPCOES <= len(bruto) <= MAX_OPCOES:
+        return None
+    opcoes = [_PREFIXO_OPCAO.sub("", _texto(o, OPCAO_MAX)) for o in bruto]
+    if any(not o for o in opcoes):
+        return None
+    if len({o.casefold() for o in opcoes}) != len(opcoes):
+        return None  # alternativas repetidas
+    return opcoes
+
+
+def _texto(valor, limite: int) -> str:
+    if not isinstance(valor, str):
+        return ""
+    return " ".join(valor.split())[:limite]

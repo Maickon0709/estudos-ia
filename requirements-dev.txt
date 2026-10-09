@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest>=8.0
+# Só para os testes de integração do SQL (tests/integracao), que rodam
+# quando TEST_DATABASE_URL aponta para um Postgres 15+.
+psycopg[binary]>=3.1

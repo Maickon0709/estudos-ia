@@ -1,0 +1,15 @@
+# Segredos nunca entram na imagem (vêm do env_file na hora de rodar).
+.env
+.env.*
+!.env.example
+
+.git
+.github
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+.idea
+.vscode
+.vercel
