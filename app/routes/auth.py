@@ -94,6 +94,71 @@ def login():
     return _resposta_logada(resposta.session)
 
 
+AVISO_RECUPERACAO = "Se esse e-mail tiver uma conta, enviamos um link para criar uma senha nova. Confira também o spam."
+
+# O Supabase responde em inglês; o usuário do site lê em português.
+_MENSAGENS_REDEFINIR = {
+    "weak_password": "Senha fraca. Use pelo menos 6 caracteres, misturando letras e números.",
+    "same_password": "A senha nova precisa ser diferente da antiga.",
+}
+
+
+@bp.post("/esqueci")
+def esqueci():
+    """Pede ao Supabase o e-mail de recuperação.
+
+    A resposta é SEMPRE a mesma, exista a conta ou não: assim ninguém usa esta rota para descobrir
+    quais e-mails têm cadastro (enumeração de usuários). Nem o limite de envio é revelado, porque
+    ele só dispara para contas que existem.
+    """
+    exigir_cabecalho_csrf()
+    corpo = request.get_json(silent=True) or {}
+    email = (corpo.get("email") or "").strip()
+    if not email or "@" not in email or len(email) > 254:
+        raise ValidacaoError("Informe um e-mail válido.")
+    try:
+        anon_client().auth.reset_password_for_email(email)
+    except AuthApiError as exc:
+        current_app.logger.warning(
+            "Supabase recusou o e-mail de recuperação: status=%s codigo=%s", exc.status, exc.code
+        )
+    return jsonify({"mensagem": AVISO_RECUPERACAO})
+
+
+@bp.post("/redefinir")
+def redefinir():
+    """Troca a senha com o código do link do e-mail e já deixa a pessoa logada (cookies HttpOnly).
+
+    O link do e-mail traz um token_hash de uso único; quem o confere com o Supabase é esta rota,
+    então o token nunca vira sessão no JavaScript da página.
+    """
+    exigir_cabecalho_csrf()
+    corpo = request.get_json(silent=True) or {}
+    token_hash = corpo.get("token_hash")
+    senha = corpo.get("senha") or ""
+    if not isinstance(token_hash, str) or not 8 <= len(token_hash) <= 256:
+        raise ValidacaoError("Link inválido. Peça um novo e-mail de recuperação.")
+    if not isinstance(senha, str) or len(senha) < 6:
+        raise ValidacaoError("A senha precisa ter pelo menos 6 caracteres.")
+
+    cliente = anon_client()
+    try:
+        sessao = cliente.auth.verify_otp({"token_hash": token_hash, "type": "recovery"}).session
+    except AuthApiError as exc:
+        raise ValidacaoError("Este link expirou ou já foi usado. Peça um novo e-mail de recuperação.") from exc
+    if sessao is None:
+        raise ValidacaoError("Este link expirou ou já foi usado. Peça um novo e-mail de recuperação.")
+
+    try:
+        # verify_otp guardou a sessão no cliente: update_user troca a senha DESTA conta.
+        cliente.auth.update_user({"password": senha})
+    except AuthApiError as exc:
+        raise ValidacaoError(
+            _MENSAGENS_REDEFINIR.get(exc.code, "Não foi possível trocar a senha. Tente novamente.")
+        ) from exc
+    return _resposta_logada(sessao)
+
+
 @bp.post("/renovar")
 def renovar():
     """Troca o token vencido por um novo usando o cookie de renovação (também HttpOnly)."""

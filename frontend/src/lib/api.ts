@@ -150,6 +150,11 @@ export const api = {
   cadastrar: (nome: string, email: string, senha: string, aceiteTermos: boolean) =>
     pedir<{ logado: true } | { mensagem: string }>('POST', '/auth/cadastro', { nome, email, senha, aceite_termos: aceiteTermos }),
   entrar: (email: string, senha: string) => pedir<{ logado: true }>('POST', '/auth/login', { email, senha }),
+  /** Pede o e-mail de recuperação. A resposta é sempre a mesma, exista a conta ou não. */
+  esqueciSenha: (email: string) => pedir<{ mensagem: string }>('POST', '/auth/esqueci', { email }),
+  /** Troca a senha com o código do link do e-mail; a API já devolve a sessão em cookie HttpOnly. */
+  redefinirSenha: (tokenHash: string, senha: string) =>
+    pedir<{ logado: true }>('POST', '/auth/redefinir', { token_hash: tokenHash, senha }),
   sair: async () => {
     await pedir('POST', '/auth/sair').catch(() => undefined) // mesmo offline, a tela sai
     definirLogado(false)

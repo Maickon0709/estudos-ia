@@ -81,7 +81,7 @@ quando precisar do contexto exato de um pedido do Maickon.
 - Roadmap do back-end completo: auth, categorias, chat, pesquisa verificada, propostas com
   confirmação atômica, trilha e checklist, exercícios por nível, correção, trilha adaptativa,
   revisão espaçada, painel, CI e Docker.
-- ~669 testes: 600 unitários + 69 de SQL em Postgres real.
+- ~690 testes: 621 unitários + 69 de SQL em Postgres real.
 - Repositório no GitHub (`Maickon0709/estudos-ia`); o CI passou, inclusive o build real do Docker.
 - **Testado ao vivo em 09/10/2026** contra o Supabase, a Groq e o Tavily reais: cadastro, login,
   RLS entre dois usuários, chat, pesquisa, proposta, confirmação (com clique duplo recusado),
@@ -137,6 +137,10 @@ quando precisar do contexto exato de um pedido do Maickon.
   Depois (mesmo dia, PR #5): fundo animado na página toda, demo animada no hero e "escolha como estudar" interativa.
   Paleta final: **preto, branco e vermelho claro** (o índigo + ciano foi rejeitado por "cara de vibe coded"), sem
   linhas entre as seções e com fotos do Unsplash por matéria (`public/imagens`, créditos no README).
+- Recuperação de senha (10/10/2026): `POST /auth/esqueci` (resposta sempre igual: sem enumeração de usuários) e
+  `POST /auth/redefinir` (`verify_otp` com `token_hash` de uso único + `update_user`, devolve cookies). Página
+  `/redefinir-senha` e "Esqueci minha senha" no `/entrar`. O e-mail sai pelo SMTP do Brevo configurado no Supabase,
+  com modelo em português cujo link é `{{ .SiteURL }}/redefinir-senha?token_hash={{ .TokenHash }}&type=recovery`.
 - **No ar em https://estudosia.vercel.app** (10/10/2026): site + API na mesma origem, cabeçalhos de segurança
   ativos (CSP, X-Frame-Options, HSTS). `VITE_SITE_URL` criada em produção. O endereço antigo
   `estudos-ia-zeta.vercel.app` continua no projeto. Todo merge na `main` publica em produção.
