@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
-// Grade de pontos que foge do cursor e acende na cor de destaque (inspirada no Dot Grid do React Bits).
+// Grade de pontos que foge do cursor e acende em índigo → ciano (inspirada no Dot Grid do React Bits).
 // Canvas 2D puro: sem WebGL e sem dependência nova. Só anima enquanto há movimento e a grade está na tela;
-// com "reduzir movimento" desenha a grade parada.
+// com "reduzir movimento" desenha a grade parada. `fixo` cobre a janela inteira, atrás da página toda.
 
 const ESPACO = 26
 const RAIO = 1.3
@@ -25,15 +25,24 @@ function rgbDe(cor: string, reserva: [number, number, number]): [number, number,
   return [r, g, b]
 }
 
-function coresDoTema(): { base: [number, number, number]; destaque: [number, number, number] } {
+type Rgb = [number, number, number]
+
+function coresDoTema(): { base: Rgb; meio: Rgb; ponta: Rgb } {
   const estilo = getComputedStyle(document.documentElement)
   return {
-    base: rgbDe(estilo.getPropertyValue('--muted-foreground').trim(), [120, 125, 135]),
-    destaque: rgbDe(estilo.getPropertyValue('--primary').trim(), [193, 98, 63]),
+    base: rgbDe(estilo.getPropertyValue('--muted-foreground').trim(), [120, 125, 150]),
+    meio: rgbDe(estilo.getPropertyValue('--primary').trim(), [79, 70, 229]),
+    ponta: rgbDe(estilo.getPropertyValue('--destaque').trim(), [6, 182, 212]),
   }
 }
 
-export function FundoPontos({ className }: { className?: string }) {
+/** Mistura base → índigo → ciano conforme o ponto se aproxima do cursor (t de 0 a 1). */
+function corDoPonto(c: ReturnType<typeof coresDoTema>, t: number): Rgb {
+  const [de, para, k] = t < 0.5 ? [c.base, c.meio, t * 2] : [c.meio, c.ponta, (t - 0.5) * 2]
+  return [de[0] + (para[0] - de[0]) * k, de[1] + (para[1] - de[1]) * k, de[2] + (para[2] - de[2]) * k]
+}
+
+export function FundoPontos({ className, fixo = false }: { className?: string; fixo?: boolean }) {
   const tela = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -41,6 +50,7 @@ export function FundoPontos({ className }: { className?: string }) {
     const ctx = canvas?.getContext('2d')
     if (!canvas || !ctx) return
     const parado = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const opacidadeBase = fixo ? 0.16 : 0.28
 
     let pontos: Ponto[] = []
     let cores = coresDoTema()
@@ -68,8 +78,6 @@ export function FundoPontos({ className }: { className?: string }) {
     function desenhar(): boolean {
       ctx!.clearRect(0, 0, largura, altura)
       let mexendo = false
-      const [br, bg, bb] = cores.base
-      const [dr, dg, db] = cores.destaque
       for (const p of pontos) {
         let alvoX = 0
         let alvoY = 0
@@ -91,7 +99,8 @@ export function FundoPontos({ className }: { className?: string }) {
         if (Math.abs(p.dx - alvoX) > 0.05 || Math.abs(p.dy - alvoY) > 0.05 || Math.abs(p.brilho - alvoBrilho) > 0.01)
           mexendo = true
         const t = p.brilho
-        ctx!.fillStyle = `rgba(${br + (dr - br) * t},${bg + (dg - bg) * t},${bb + (db - bb) * t},${0.28 + 0.62 * t})`
+        const [r, g, b] = corDoPonto(cores, t)
+        ctx!.fillStyle = `rgba(${r},${g},${b},${opacidadeBase + ((fixo ? 0.7 : 0.95) - opacidadeBase) * t})`
         ctx!.beginPath()
         ctx!.arc(p.x + p.dx, p.y + p.dy, RAIO + t * 1.4, 0, Math.PI * 2)
         ctx!.fill()
@@ -146,7 +155,13 @@ export function FundoPontos({ className }: { className?: string }) {
       window.removeEventListener('pointermove', aoMover)
       document.removeEventListener('pointerleave', aoSair)
     }
-  }, [])
+  }, [fixo])
 
-  return <canvas ref={tela} aria-hidden className={cn('pointer-events-none absolute inset-0 size-full', className)} />
+  return (
+    <canvas
+      ref={tela}
+      aria-hidden
+      className={cn('pointer-events-none inset-0 size-full', fixo ? 'fixed h-svh w-screen' : 'absolute', className)}
+    />
+  )
 }
