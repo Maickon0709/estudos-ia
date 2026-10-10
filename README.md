@@ -225,7 +225,7 @@ build do front, função Python (`api/index.py`, até 60 s), roteamento (`/api/*
 2. Em **Environment Variables** (Production), cadastre:
    `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `GROQ_API_KEY`, `GROQ_MODEL`, `TAVILY_API_KEY` e
    `YOUTUBE_API_KEY` (opcional).
-3. **Deploy.** Com o endereço final em mãos (ex.: `https://estudos-ia.vercel.app`), crie também
+3. **Deploy.** Com o endereço final em mãos (este projeto: `https://estudosia.vercel.app`), crie também
    `VITE_SITE_URL` com ele e faça um **Redeploy**: o build passa a gerar `sitemap.xml` e as URLs
    absolutas da imagem de compartilhamento.
 4. No Supabase, rode as migrações na ordem (seção acima) se ainda não rodou.

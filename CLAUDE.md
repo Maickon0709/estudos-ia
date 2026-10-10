@@ -94,7 +94,7 @@ quando precisar do contexto exato de um pedido do Maickon.
   (categoria "10" = Música; "crase na língua portuguesa" trouxe o clipe da banda Lingua Ignota).
 - Front-end completo (login, categorias, chat, proposta → confirmação, trilha com checklist,
   exercícios por nível, revisões e painel), testado de ponta a ponta no Edge headless contra a API
-  e as chaves reais, com a CSP de produção ligada e um teste de XSS. Ainda sem deploy.
+  e as chaves reais, com a CSP de produção ligada e um teste de XSS.
 - Segunda rodada (10/10/2026): página inicial pública (React Bits: Aurora, SpotlightCard…), tela
   "Hoje" com calendário de calor e meta semanal, chat ao vivo (SSE) com markdown seguro, "Não entendi",
   trilha como mapa, confete, modo escuro, flashcards, simulado cronometrado, cronômetro de foco,
@@ -122,13 +122,20 @@ quando precisar do contexto exato de um pedido do Maickon.
 - Decisões: sem banner de cookies (os cookies da sessão são estritamente necessários) (o site não usa cookies; o armazenamento local é só o essencial);
   analytics fica para o deploy (preferir uma opção sem cookies, como Vercel Web Analytics ou Umami,
   e atualizar a Política de Privacidade).
-- Materiais do aluno (branch `documentos`, 10/10/2026): PDF, .docx, .pptx, .txt e .md viram texto
+- Materiais do aluno (PR #2, na `main` em 10/10/2026; migração 008 já aplicada no Supabase): PDF, .docx, .pptx, .txt e .md viram texto
   (`services/extrator.py`, só o texto é guardado), trechos (`services/trechos.py`, nunca atravessam página) e
   busca textual em português sem acento (`buscar_trechos()`, migração 008). O chat injeta os 5 melhores trechos
-  e devolve `fontes` (arquivo + página); aba "Materiais" na categoria. **Falta testar ao vivo** (rodar a 008).
+  e devolve `fontes` (arquivo + página); aba "Materiais" na categoria. **Falta testar ao vivo** com um PDF de verdade.
+- Vercel: projeto `estudosia` (id `prj_FuEzjgR4HwYtu7mpj7siBQyh81QA`, time `team_LVmGzHejuXCOFFbP7SMlAdx9`),
+  ligado ao GitHub (os PRs geram deploy de preview). O conector da Vercel no Claude funciona (reautorizado).
+  Publicar em produção (redeploy) fica com o Maickon: o modo automático bloqueia.
+- GitHub CLI instalado (`C:\Program Files\GitHub CLI\gh.exe`, logado). No `!` do Claude Code o shell é bash:
+  `"/c/Program Files/GitHub CLI/gh.exe" ...`. O merge fica com o Maickon (o modo automático bloqueia).
+- **No ar em https://estudosia.vercel.app** (10/10/2026): site + API na mesma origem, cabeçalhos de segurança
+  ativos (CSP, X-Frame-Options, HSTS). `VITE_SITE_URL` criada em produção. O endereço antigo
+  `estudos-ia-zeta.vercel.app` continua no projeto. Todo merge na `main` publica em produção.
 
 ## Próximos passos sugeridos
 
-1. Deploy (Vercel) do site e da API, aplicando `cabecalhos-seguranca.json`.
-2. Cache de pesquisas (o limite por usuário já existe: `LIMITE_*_DIA`, migração 007).
-3. Endurecer escritas e leituras sensíveis com funções `SECURITY DEFINER` (ver "Limites conhecidos" no README).
+1. Cache de pesquisas (o limite por usuário já existe: `LIMITE_*_DIA`, migração 007).
+2. Endurecer escritas e leituras sensíveis com funções `SECURITY DEFINER` (ver "Limites conhecidos" no README).
