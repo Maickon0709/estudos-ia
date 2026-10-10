@@ -131,6 +131,9 @@ quando precisar do contexto exato de um pedido do Maickon.
   Publicar em produção (redeploy) fica com o Maickon: o modo automático bloqueia.
 - GitHub CLI instalado (`C:\Program Files\GitHub CLI\gh.exe`, logado). No `!` do Claude Code o shell é bash:
   `"/c/Program Files/GitHub CLI/gh.exe" ...`. O merge fica com o Maickon (o modo automático bloqueia).
+- Landing animada (10/10/2026): grade de pontos interativa no hero, faixa de números, linha do tempo que se
+  desenha com o scroll, tour em 3D que se endireita, bento com brilho, comparação "chat de IA x Estudos IA",
+  FAQ com o limite grátis (60/30/6) e área de arrastar e soltar na aba Materiais. Detalhes em `frontend/DESIGN.md`.
 - **No ar em https://estudosia.vercel.app** (10/10/2026): site + API na mesma origem, cabeçalhos de segurança
   ativos (CSP, X-Frame-Options, HSTS). `VITE_SITE_URL` criada em produção. O endereço antigo
   `estudos-ia-zeta.vercel.app` continua no projeto. Todo merge na `main` publica em produção.

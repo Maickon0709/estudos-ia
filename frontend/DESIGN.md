@@ -38,11 +38,17 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
 - Cada seção com um layout diferente (lista dividida, linha do tempo, tour, bento assimétrico).
 - No máximo um rótulo pequeno acima de título a cada três seções.
 - Um texto só para a mesma ação ("Criar conta grátis").
+- Números e comparações só com dados verdadeiros do produto (conferidos no código). Sem depoimento inventado.
 
 ## Movimento
 
 - Motivado: entrada de página/aba (`.surgir`), cascata em listas (`.cascata`), tour que avança sozinho.
 - Botões afundam de leve ao clicar. Tudo desligado com `prefers-reduced-motion`.
+- Interativo na landing (inspirado no React Bits e no 21st.dev, recolorido para terracota):
+  `FundoPontos` (grade que foge do cursor, canvas 2D, pausa fora da tela), `TelaInclinada` (tour que se
+  endireita com a rolagem), linha do tempo que se desenha com o scroll, `CartaoBrilho` (luz e borda que
+  seguem o mouse, leve inclinação) e `CountUp` nos números. Efeitos de mouse ignoram toque.
+- Sem WebGL nem biblioteca nova: só `motion`, `gsap` (já instalados), CSS e canvas.
 
 ## Voz
 
