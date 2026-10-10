@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Dumbbell, Layers, PartyPopper, Play } from 'lucide-react'
+import { Dumbbell, Layers, PartyPopper, Play } from '@/lib/icones'
 import { useState } from 'react'
 import { Baralho } from '@/components/Baralho'
 import { Carregando, Erro, Vazio } from '@/components/Estados'

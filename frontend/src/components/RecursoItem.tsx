@@ -1,4 +1,4 @@
-import { BadgeCheck, CircleHelp, ExternalLink, FileText, ListVideo, PlayCircle } from 'lucide-react'
+import { BadgeCheck, CircleHelp, ExternalLink, FileText, ListVideo, PlayCircle } from '@/lib/icones'
 import { Badge } from '@/components/ui/badge'
 import { duracao } from '@/lib/formatos'
 import { LINK_EXTERNO, urlSegura } from '@/lib/seguranca'

@@ -1,4 +1,4 @@
-import { CircleAlert, Loader2 } from 'lucide-react'
+import { CircleAlert, Loader2 } from '@/lib/icones'
 import type { ReactNode } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'

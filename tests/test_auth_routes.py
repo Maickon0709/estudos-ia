@@ -79,3 +79,17 @@ def test_cadastro_envia_a_versao_dos_termos(client, monkeypatch):
                                                     "nome": "Ana", "aceite_termos": True})
     assert resposta.status_code == 201
     assert falso.auth.pedidos[0]["options"]["data"] == {"nome": "Ana", "termos_versao": rotas_auth.TERMOS_VERSAO}
+
+
+def test_motivo_desconhecido_do_supabase_vai_para_o_log(client, monkeypatch, caplog):
+    erro = AuthApiError("Invalid API key", 401, None)
+    with caplog.at_level("WARNING"):
+        resposta = cadastrar(client, monkeypatch, erro)
+    assert resposta.status_code == 400
+    assert "Invalid API key" in caplog.text and "a@b.com" not in caplog.text  # sem dados do usuário
+
+
+def test_motivo_conhecido_nao_polui_o_log(client, monkeypatch, caplog):
+    with caplog.at_level("WARNING"):
+        cadastrar(client, monkeypatch, AuthApiError("User already registered", 422, "user_already_exists"))
+    assert "Supabase recusou" not in caplog.text

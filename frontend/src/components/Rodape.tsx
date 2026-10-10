@@ -1,4 +1,4 @@
-import { CodeXml } from 'lucide-react'
+import { CodeXml } from '@/lib/icones'
 import { Link } from 'react-router'
 import { LINK_EXTERNO } from '@/lib/seguranca'
 

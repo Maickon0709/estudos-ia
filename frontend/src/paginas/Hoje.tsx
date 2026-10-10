@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowRight, CalendarDays, Flame, Layers, Library, RotateCcw, Target } from 'lucide-react'
+import { ArrowRight, CalendarDays, Flame, Layers, Library, RotateCcw, Target } from '@/lib/icones'
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { toast } from 'sonner'
@@ -58,11 +58,11 @@ export function PaginaHoje() {
             <Flame className={cn('size-4', h.estudou_hoje ? 'text-primary' : 'text-muted-foreground')} /> Sequência
           </CardHeader>
           <CardContent>
-            <p className="font-heading text-4xl font-semibold">
+            <p className="font-heading text-4xl font-semibold tabular-nums">
               <CountUp to={h.sequencia_dias} duration={1} /> <span className="text-lg font-normal">{h.sequencia_dias === 1 ? 'dia' : 'dias'}</span>
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {h.estudou_hoje ? 'Você já estudou hoje. Mandou bem!' : 'Estude hoje para não perder a sequência.'}
+              {h.estudou_hoje ? 'Você já estudou hoje.' : 'Estude hoje para não perder a sequência.'}
             </p>
           </CardContent>
         </Card>
@@ -76,11 +76,11 @@ export function PaginaHoje() {
           <CardContent className="flex flex-col gap-3">
             <div className="flex gap-6">
               <div>
-                <p className="font-heading text-4xl font-semibold"><CountUp to={h.revisoes_pendentes} duration={1} /></p>
+                <p className="font-heading text-4xl font-semibold tabular-nums"><CountUp to={h.revisoes_pendentes} duration={1} /></p>
                 <p className="text-xs text-muted-foreground">exercícios</p>
               </div>
               <div>
-                <p className="font-heading text-4xl font-semibold"><CountUp to={h.flashcards_pendentes} duration={1} /></p>
+                <p className="font-heading text-4xl font-semibold tabular-nums"><CountUp to={h.flashcards_pendentes} duration={1} /></p>
                 <p className="flex items-center gap-1 text-xs text-muted-foreground"><Layers className="size-3" /> flashcards</p>
               </div>
             </div>
@@ -149,12 +149,12 @@ function MetaSemana({ h }: { h: Hoje }) {
       <CardContent className="flex flex-col gap-2">
         {meta?.dias_por_semana ? (
           <>
-            <p className="font-heading text-4xl font-semibold">
+            <p className="font-heading text-4xl font-semibold tabular-nums">
               {h.semana.dias_estudados}<span className="text-lg font-normal text-muted-foreground">/{meta.dias_por_semana} dias</span>
             </p>
             <Progress value={pctDias} aria-label="Dias estudados na semana" />
             <p className="text-xs text-muted-foreground">
-              {cumpriu ? 'Meta de dias cumprida! 🎉' : `Faltam ${meta.dias_por_semana - h.semana.dias_estudados} dia(s).`}
+              {cumpriu ? 'Meta de dias cumprida.' : `Faltam ${meta.dias_por_semana - h.semana.dias_estudados} dia(s).`}
               {meta.minutos_por_semana ? ` · ${h.semana.minutos}/${meta.minutos_por_semana} min de foco` : ''}
             </p>
           </>

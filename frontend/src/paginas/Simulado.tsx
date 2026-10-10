@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, CircleCheck, CircleX, Clock, Send, Trophy } from 'lucide-react'
+import { ArrowLeft, CircleCheck, CircleX, Clock, Send, Trophy } from '@/lib/icones'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { Carregando, Erro } from '@/components/Estados'
@@ -153,7 +153,7 @@ function Prova({ s }: { s: Simulado }) {
 function Resultado({ s }: { s: Simulado }) {
   const acertos = s.acertos ?? 0
   const pct = Math.round((100 * acertos) / s.total)
-  const mensagem = pct >= 80 ? 'Excelente! Você domina esse conteúdo.' : pct >= 50 ? 'Bom caminho! Revise os erros abaixo.' : 'Hora de reforçar: veja as explicações abaixo.'
+  const mensagem = pct >= 80 ? 'Você domina esse conteúdo.' : pct >= 50 ? 'Bom caminho. Revise os erros abaixo.' : 'Hora de reforçar: veja as explicações abaixo.'
   const duracao = s.finalizado_em ? Math.round((new Date(s.finalizado_em).getTime() - new Date(s.iniciado_em).getTime()) / 1000) : 0
 
   return (

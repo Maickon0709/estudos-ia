@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Camera, Check, Pencil, Trash2, X } from 'lucide-react'
+import { Camera, Check, Pencil, Trash2, X } from '@/lib/icones'
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { toast } from 'sonner'
 import { Avatar } from '@/components/Avatar'

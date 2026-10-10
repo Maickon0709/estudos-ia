@@ -2,12 +2,13 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/geist-mono";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: 'Fraunces Variable', Georgia, serif;
+    --font-heading: 'Geist Variable', system-ui, sans-serif;
+    --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
     --font-sans: 'Geist Variable', sans-serif;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
@@ -51,78 +52,81 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Tema "Warm indie SaaS" — decisões em frontend/DESIGN.md */
+/* Tema "Terracota + Ardósia" (decisões em frontend/DESIGN.md).
+   Neutros frios de uma família só (ardósia), um único destaque (terracota). */
 :root {
-    --background: oklch(0.985 0.012 80);      /* creme papel */
-    --foreground: oklch(0.27 0.025 50);       /* marrom café */
-    --card: oklch(0.997 0.006 85);
-    --card-foreground: oklch(0.27 0.025 50);
-    --popover: oklch(0.997 0.006 85);
-    --popover-foreground: oklch(0.27 0.025 50);
-    --primary: oklch(0.60 0.15 42);           /* terracota */
-    --primary-foreground: oklch(0.99 0.01 80);
-    --secondary: oklch(0.95 0.025 75);        /* areia */
-    --secondary-foreground: oklch(0.32 0.03 50);
-    --muted: oklch(0.955 0.018 78);
-    --muted-foreground: oklch(0.50 0.03 55);
-    --accent: oklch(0.93 0.045 70);           /* pêssego claro */
-    --accent-foreground: oklch(0.32 0.04 45);
-    --destructive: oklch(0.56 0.19 27);
-    --border: oklch(0.90 0.022 75);
-    --input: oklch(0.88 0.025 75);
-    --ring: oklch(0.60 0.15 42);
-    --chart-1: oklch(0.60 0.15 42);           /* terracota */
-    --chart-2: oklch(0.62 0.10 150);          /* sálvia */
-    --chart-3: oklch(0.72 0.13 80);           /* mostarda */
-    --chart-4: oklch(0.52 0.08 250);          /* azul ardósia */
-    --chart-5: oklch(0.55 0.06 50);
-    --sucesso: oklch(0.55 0.11 150);
-    --sucesso-suave: oklch(0.95 0.04 150);
-    --radius: 0.9rem;
-    --sidebar: oklch(0.97 0.015 78);
-    --sidebar-foreground: oklch(0.27 0.025 50);
-    --sidebar-primary: oklch(0.60 0.15 42);
-    --sidebar-primary-foreground: oklch(0.99 0.01 80);
-    --sidebar-accent: oklch(0.93 0.045 70);
-    --sidebar-accent-foreground: oklch(0.32 0.04 45);
-    --sidebar-border: oklch(0.90 0.022 75);
-    --sidebar-ring: oklch(0.60 0.15 42);
+    --background: oklch(0.985 0.003 250);     /* quase branco, levemente frio */
+    --foreground: oklch(0.22 0.018 262);      /* tinta ardósia, nunca preto puro */
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.22 0.018 262);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.22 0.018 262);
+    --primary: oklch(0.585 0.148 40);         /* terracota */
+    --primary-foreground: oklch(0.99 0.004 60);
+    --secondary: oklch(0.955 0.006 255);
+    --secondary-foreground: oklch(0.3 0.02 262);
+    --muted: oklch(0.96 0.005 255);
+    --muted-foreground: oklch(0.49 0.02 258);
+    --accent: oklch(0.955 0.022 45);          /* tinta suave da terracota (hover, seleção) */
+    --accent-foreground: oklch(0.38 0.09 38);
+    --destructive: oklch(0.55 0.2 25);
+    --border: oklch(0.915 0.008 255);
+    --input: oklch(0.88 0.01 255);
+    --ring: oklch(0.585 0.148 40);
+    --chart-1: oklch(0.585 0.148 40);         /* terracota */
+    --chart-2: oklch(0.5 0.06 255);           /* ardósia */
+    --chart-3: oklch(0.72 0.12 75);           /* âmbar */
+    --chart-4: oklch(0.62 0.09 160);          /* sálvia */
+    --chart-5: oklch(0.7 0.02 255);
+    --sucesso: oklch(0.55 0.12 155);
+    --sucesso-suave: oklch(0.955 0.035 155);
+    --sombra: 222 47% 11%;                    /* sombras tingidas de ardósia, não preto */
+    --radius: 0.75rem;
+    --sidebar: oklch(0.97 0.004 255);
+    --sidebar-foreground: oklch(0.22 0.018 262);
+    --sidebar-primary: oklch(0.585 0.148 40);
+    --sidebar-primary-foreground: oklch(0.99 0.004 60);
+    --sidebar-accent: oklch(0.955 0.022 45);
+    --sidebar-accent-foreground: oklch(0.38 0.09 38);
+    --sidebar-border: oklch(0.915 0.008 255);
+    --sidebar-ring: oklch(0.585 0.148 40);
 }
 
 .dark {
-    --background: oklch(0.21 0.015 50);
-    --foreground: oklch(0.94 0.015 80);
-    --card: oklch(0.25 0.018 50);
-    --card-foreground: oklch(0.94 0.015 80);
-    --popover: oklch(0.25 0.018 50);
-    --popover-foreground: oklch(0.94 0.015 80);
-    --primary: oklch(0.70 0.14 45);
-    --primary-foreground: oklch(0.20 0.02 50);
-    --secondary: oklch(0.30 0.02 50);
-    --secondary-foreground: oklch(0.94 0.015 80);
-    --muted: oklch(0.30 0.02 50);
-    --muted-foreground: oklch(0.72 0.025 70);
-    --accent: oklch(0.33 0.035 50);
-    --accent-foreground: oklch(0.94 0.015 80);
+    --background: oklch(0.165 0.012 262);
+    --foreground: oklch(0.95 0.005 255);
+    --card: oklch(0.205 0.014 262);
+    --card-foreground: oklch(0.95 0.005 255);
+    --popover: oklch(0.215 0.014 262);
+    --popover-foreground: oklch(0.95 0.005 255);
+    --primary: oklch(0.7 0.135 45);
+    --primary-foreground: oklch(0.18 0.02 40);
+    --secondary: oklch(0.255 0.014 262);
+    --secondary-foreground: oklch(0.92 0.006 255);
+    --muted: oklch(0.255 0.014 262);
+    --muted-foreground: oklch(0.71 0.018 258);
+    --accent: oklch(0.29 0.04 42);
+    --accent-foreground: oklch(0.93 0.03 55);
     --destructive: oklch(0.68 0.18 25);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.70 0.14 45);
-    --chart-1: oklch(0.70 0.14 45);
-    --chart-2: oklch(0.70 0.10 150);
-    --chart-3: oklch(0.78 0.12 80);
-    --chart-4: oklch(0.65 0.08 250);
-    --chart-5: oklch(0.65 0.05 50);
-    --sucesso: oklch(0.70 0.12 150);
-    --sucesso-suave: oklch(0.32 0.05 150);
-    --sidebar: oklch(0.25 0.018 50);
-    --sidebar-foreground: oklch(0.94 0.015 80);
-    --sidebar-primary: oklch(0.70 0.14 45);
-    --sidebar-primary-foreground: oklch(0.20 0.02 50);
-    --sidebar-accent: oklch(0.33 0.035 50);
-    --sidebar-accent-foreground: oklch(0.94 0.015 80);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.70 0.14 45);
+    --border: oklch(1 0 0 / 9%);
+    --input: oklch(1 0 0 / 14%);
+    --ring: oklch(0.7 0.135 45);
+    --chart-1: oklch(0.7 0.135 45);
+    --chart-2: oklch(0.72 0.05 255);
+    --chart-3: oklch(0.8 0.11 80);
+    --chart-4: oklch(0.72 0.09 160);
+    --chart-5: oklch(0.55 0.02 255);
+    --sucesso: oklch(0.72 0.12 155);
+    --sucesso-suave: oklch(0.3 0.05 155);
+    --sombra: 225 40% 3%;
+    --sidebar: oklch(0.205 0.014 262);
+    --sidebar-foreground: oklch(0.95 0.005 255);
+    --sidebar-primary: oklch(0.7 0.135 45);
+    --sidebar-primary-foreground: oklch(0.18 0.02 40);
+    --sidebar-accent: oklch(0.29 0.04 42);
+    --sidebar-accent-foreground: oklch(0.93 0.03 55);
+    --sidebar-border: oklch(1 0 0 / 9%);
+    --sidebar-ring: oklch(0.7 0.135 45);
 }
 
 @layer base {
@@ -140,8 +144,16 @@
     scrollbar-gutter: stable;
     }
   h1, h2, h3 {
-    @apply font-heading tracking-tight;
+    @apply font-heading;
+    font-weight: 620;
+    letter-spacing: -0.028em;
+    text-wrap: balance;
     }
+  p { text-wrap: pretty; }
+  /* Números alinham em colunas (contadores, cronômetro, notas) */
+  .tabular-nums, .font-mono { font-variant-numeric: tabular-nums; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 }
 /* ---------- Movimento (transições de página, abas e listas) ----------
    Leve e rápido: ajuda a perceber a mudança sem atrasar o uso. Quem pede
@@ -180,3 +192,22 @@
 
 /* Barra de progresso do tour automático da landing */
 @keyframes progresso { from { width: 0; } to { width: 100%; } }
+
+/* ---------- Superfícies ---------- */
+/* Sombra tingida de ardósia (não preto) para o que realmente flutua */
+.sombra-suave { box-shadow: 0 1px 2px hsl(var(--sombra) / 0.06), 0 8px 24px -12px hsl(var(--sombra) / 0.18); }
+.sombra-alta { box-shadow: 0 1px 2px hsl(var(--sombra) / 0.08), 0 24px 48px -20px hsl(var(--sombra) / 0.35); }
+
+/* Grão sutil: quebra a chapa digital dos fundos grandes (svg em data:, liberado na CSP) */
+.textura { position: relative; isolation: isolate; }
+.textura::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0.35;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.13  0 0 0 0 0.15  0 0 0 0 0.2  0 0 0 0.09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.dark .textura::before { opacity: 0.5; mix-blend-mode: screen; }
+
+/* Grade pontilhada discreta para áreas de destaque */
+.pontilhado {
+  background-image: radial-gradient(color-mix(in oklch, var(--foreground) 12%, transparent) 1px, transparent 1px);
+  background-size: 18px 18px;
+}

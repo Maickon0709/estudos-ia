@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Download, GraduationCap, LogOut, ShieldCheck, Trash2, UserRound } from 'lucide-react'
+import { Download, GraduationCap, LogOut, ShieldCheck, Trash2, UserRound } from '@/lib/icones'
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { toast } from 'sonner'
@@ -18,7 +18,7 @@ import { definirLogado } from '@/lib/sessao'
 import { useTitulo } from '@/lib/titulo'
 
 function data(iso: string | null) {
-  return iso ? new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : '—'
+  return iso ? new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Não informado'
 }
 
 export function PaginaConta() {

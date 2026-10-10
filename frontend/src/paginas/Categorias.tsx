@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowRight, FolderPlus, Library, RotateCcw } from 'lucide-react'
+import { ArrowRight, FolderPlus, Library, RotateCcw } from '@/lib/icones'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { toast } from 'sonner'

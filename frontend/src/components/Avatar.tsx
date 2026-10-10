@@ -14,7 +14,7 @@ export function Avatar({ className, tamanho = 'sm' }: { className?: string; tama
   const { conta, url } = useFotoDePerfil()
   const inicial = (conta?.nome || conta?.email || '?').trim().charAt(0).toUpperCase()
   const classe = cn(
-    'grid shrink-0 place-items-center overflow-hidden rounded-full bg-accent font-semibold text-accent-foreground',
+    'grid shrink-0 place-items-center overflow-hidden rounded-[30%] bg-accent font-semibold text-accent-foreground',
     tamanho === 'lg' ? 'size-24 text-3xl' : 'size-8 text-sm',
     className,
   )

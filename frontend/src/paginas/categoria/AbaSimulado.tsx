@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { ArrowRight, ClipboardCheck, Clock, Play } from 'lucide-react'
+import { ArrowRight, ClipboardCheck, Clock, Play } from '@/lib/icones'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Carregando, Erro } from '@/components/Estados'

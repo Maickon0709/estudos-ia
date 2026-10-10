@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, ChartColumn, Dumbbell, MessageCircle, Route, Trash2 } from 'lucide-react'
+import { ArrowLeft, ChartColumn, Dumbbell, MessageCircle, Route, Trash2 } from '@/lib/icones'
 import { Suspense, lazy, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { toast } from 'sonner'

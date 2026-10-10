@@ -3,7 +3,7 @@
 O token NUNCA vai no corpo da resposta: ele é gravado em cookies HttpOnly
 (veja app/core/auth.py), que o JavaScript da página não consegue ler.
 """
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, current_app, g, jsonify, request
 from supabase_auth.errors import AuthApiError
 
 from app.core.auth import (
@@ -65,6 +65,12 @@ def cadastro():
             "options": {"data": {"nome": nome, "termos_versao": TERMOS_VERSAO}},
         })
     except AuthApiError as exc:
+        if exc.code not in _MENSAGENS_CADASTRO:
+            # Motivo desconhecido (ex.: chave do Supabase inválida): vai para os logs do servidor,
+            # sem dados do usuário nem chaves, para o problema aparecer no painel da Vercel.
+            current_app.logger.warning(
+                "Supabase recusou o cadastro: status=%s codigo=%s mensagem=%s", exc.status, exc.code, exc.message
+            )
         raise ValidacaoError(
             _MENSAGENS_CADASTRO.get(exc.code, "Não foi possível criar a conta. Tente novamente.")
         ) from exc

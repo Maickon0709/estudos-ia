@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { CalendarCheck, Flame, ListChecks, RotateCcw, Timer, TrendingDown } from 'lucide-react'
+import { CalendarCheck, Flame, ListChecks, RotateCcw, Timer, TrendingDown } from '@/lib/icones'
 import { useState, type ReactNode } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import CountUp from '@/components/CountUp'
@@ -143,7 +143,7 @@ function Numero({ icone, rotulo, valor, sufixo, detalhe }: {
         {icone} {rotulo}
       </CardHeader>
       <CardContent>
-        <p className="font-heading text-4xl font-semibold">
+        <p className="font-heading text-4xl font-semibold tabular-nums">
           <NumeroAnimado valor={valor} />{sufixo}
         </p>
         {detalhe && <p className="mt-1 text-xs text-muted-foreground">{detalhe}</p>}

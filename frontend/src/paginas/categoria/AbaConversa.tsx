@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { BookOpen, Bot, Check, CircleHelp, Compass, MessageCircle, Route, Send, X, type LucideIcon } from 'lucide-react'
+import { BookOpen, Check, CircleHelp, Compass, MessageCircle, Route, Send, X, type Icone as LucideIcon } from '@/lib/icones'
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { toast } from 'sonner'
 import { Carregando, Erro, Trabalhando, Vazio } from '@/components/Estados'
-import { Markdown } from '@/components/Markdown'
+import { Bolha } from '@/components/Bolha'
 import { Dica } from '@/components/Tutorial'
 import { RecursoItem } from '@/components/RecursoItem'
 import { Badge } from '@/components/ui/badge'
@@ -16,7 +16,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
 import { LIMITES } from '@/lib/seguranca'
 import type { Mensagem, Proposta } from '@/lib/tipos'
-import { cn } from '@/lib/utils'
 
 type Props = { categoriaId: string; aoConfirmar: () => void }
 
@@ -144,28 +143,6 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
   )
 }
 
-function Bolha({ mensagem, escrevendo = false }: { mensagem: Pick<Mensagem, 'papel' | 'conteudo'>; escrevendo?: boolean }) {
-  const usuario = mensagem.papel === 'user'
-  return (
-    <div className={cn('flex gap-3', usuario && 'flex-row-reverse')}>
-      {!usuario && (
-        <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
-          <Bot className="size-4" />
-        </span>
-      )}
-      <div
-        className={cn(
-          'max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
-          usuario ? 'rounded-tr-sm bg-primary whitespace-pre-wrap text-primary-foreground' : 'rounded-tl-sm bg-secondary',
-        )}
-      >
-        {/* Mensagem do estudante: texto puro. Da IA: markdown seguro (sem HTML e sem links). */}
-        {usuario ? mensagem.conteudo : <Markdown texto={mensagem.conteudo} />}
-        {escrevendo && <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-primary align-text-bottom" aria-hidden />}
-      </div>
-    </div>
-  )
-}
 
 function DialogoObjetivo({ categoriaId, aberto, aoMudar }: { categoriaId: string; aberto: boolean; aoMudar: (v: boolean) => void }) {
   const queryClient = useQueryClient()
@@ -215,7 +192,7 @@ function PropostaCard({ proposta, categoriaId, aoConfirmar }: { proposta: Propos
       acao === 'confirmar' ? api.confirmarProposta(proposta.id) : api.rejeitarProposta(proposta.id),
     onSuccess: (_, acao) => {
       queryClient.setQueryData(['propostas', categoriaId], [])
-      toast.success(acao === 'confirmar' ? 'Trilha criada! Bons estudos.' : 'Proposta descartada.')
+      toast.success(acao === 'confirmar' ? 'Trilha criada. Ela já está na aba Trilha.' : 'Proposta descartada.')
       if (acao === 'confirmar') {
         queryClient.invalidateQueries({ queryKey: ['trilhas', categoriaId] })
         aoConfirmar()

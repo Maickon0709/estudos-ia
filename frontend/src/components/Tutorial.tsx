@@ -1,7 +1,7 @@
 import {
   ArrowLeft, ArrowRight, Camera, Dumbbell, FolderPlus, Lightbulb, MessageCircle, Moon, PartyPopper,
   RotateCcw, Timer, X,
-} from 'lucide-react'
+} from '@/lib/icones'
 import { useState, useSyncExternalStore, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
@@ -37,7 +37,7 @@ export function reverTutorial() {
 const PASSOS: { icone: typeof Lightbulb; titulo: string; onde: string; texto: ReactNode }[] = [
   {
     icone: PartyPopper,
-    titulo: 'Boas-vindas ao Estudos IA!',
+    titulo: 'Boas-vindas ao Estudos IA',
     onde: 'Leva um minuto',
     texto: 'Vamos mostrar rapidinho onde fica cada coisa. Dá para pular e rever depois na página Conta.',
   },

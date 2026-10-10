@@ -1,4 +1,4 @@
-import { BookOpenText } from 'lucide-react'
+import { BookOpenText } from '@/lib/icones'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { BotaoTema, Layout } from '@/components/Layout'

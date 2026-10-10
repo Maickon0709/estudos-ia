@@ -1,4 +1,4 @@
-import { Compass } from 'lucide-react'
+import { Compass } from '@/lib/icones'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { useTitulo } from '@/lib/titulo'

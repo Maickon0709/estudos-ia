@@ -1,7 +1,7 @@
 import {
   ArrowRight, BadgeCheck, CalendarDays, ClipboardCheck, Dumbbell, FolderPlus, Layers, MessageCircle,
   Moon, RotateCcw, Route, Target, Timer, UserRound,
-} from 'lucide-react'
+} from '@/lib/icones'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { PaginaPublica } from '@/components/PaginaPublica'

@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { CalendarClock, CircleCheck, CircleHelp, CircleX, Lightbulb, Sparkles, Trophy } from 'lucide-react'
+import { CalendarClock, CircleCheck, CircleHelp, CircleX, Lightbulb, Sparkles, Trophy } from '@/lib/icones'
 import { useState } from 'react'
 import { Markdown } from '@/components/Markdown'
 import { Badge } from '@/components/ui/badge'
@@ -17,10 +17,12 @@ type Props = {
   exercicio: Pick<Exercicio, 'tipo' | 'enunciado' | 'opcoes' | 'nivel'>
   numero?: number
   onCorrigido?: (correcao: Correcao) => void
+  /** Vitrine da landing: mostra uma resposta já corrigida, sem chamar a API. */
+  demonstracao?: { escolha: number; correcao: Correcao }
 }
 
-export function ExercicioCartao({ exercicioId, exercicio, numero, onCorrigido }: Props) {
-  const [escolha, setEscolha] = useState<number | null>(null)
+export function ExercicioCartao({ exercicioId, exercicio, numero, onCorrigido, demonstracao }: Props) {
+  const [escolha, setEscolha] = useState<number | null>(demonstracao?.escolha ?? null)
   const [texto, setTexto] = useState('')
   const multipla = exercicio.tipo === 'multipla_escolha'
 
@@ -29,7 +31,7 @@ export function ExercicioCartao({ exercicioId, exercicio, numero, onCorrigido }:
       api.responder(exercicioId, multipla ? LETRAS[escolha ?? 0] : texto.trim()),
     onSuccess: (correcao) => onCorrigido?.(correcao),
   })
-  const correcao = responder.data
+  const correcao = demonstracao?.correcao ?? responder.data
   const pronto = multipla ? escolha !== null : texto.trim().length > 0
   const letraCerta = correcao && multipla ? LETRAS.indexOf(correcao.gabarito) : -1
 
@@ -95,7 +97,7 @@ export function ExercicioCartao({ exercicioId, exercicio, numero, onCorrigido }:
         )}
         {responder.isError && <p className="text-sm text-destructive">{responder.error.message}</p>}
         {correcao && <Resultado correcao={correcao} multipla={multipla} />}
-        {correcao && <NaoEntendi exercicioId={exercicioId} />}
+        {correcao && !demonstracao && <NaoEntendi exercicioId={exercicioId} />}
       </CardFooter>
     </Card>
   )
@@ -106,7 +108,7 @@ function Resultado({ correcao, multipla }: { correcao: Correcao; multipla: boole
     <div className="flex flex-col gap-2 rounded-xl bg-secondary/60 p-4 text-sm">
       <p className={cn('flex items-center gap-2 font-semibold', correcao.correta ? 'text-sucesso' : 'text-destructive')}>
         {correcao.correta ? <CircleCheck className="size-4" /> : <CircleX className="size-4" />}
-        {correcao.correta ? 'Você acertou!' : multipla ? `Errou. A certa é a ${correcao.gabarito}.` : 'Ainda não foi dessa vez.'}
+        {correcao.correta ? 'Correto' : multipla ? `Errou. A certa é a ${correcao.gabarito}.` : 'Ainda não'}
       </p>
       <p className="whitespace-pre-wrap text-secondary-foreground">{correcao.feedback}</p>
       {!multipla && (

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Coffee, Pause, Play, RotateCcw, Save, Timer } from 'lucide-react'
+import { Coffee, Pause, Play, RotateCcw, Save, Timer } from '@/lib/icones'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -90,7 +90,7 @@ export function Cronometro() {
           void salvar(alvo, 'foco', estado).then((ok) => {
             if (ok) {
               comemorar()
-              toast.success('Foco concluído! Que tal uma pausa de 5 minutos?')
+              toast.success('Foco concluído. Hora de uma pausa de 5 minutos.')
             }
           })
           atualizar({ ...INICIAL, modo: 'pausa', categoriaId: estado.categoriaId })

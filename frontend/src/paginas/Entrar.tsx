@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { BadgeCheck, BookOpenText, Route, Sparkles } from 'lucide-react'
+import { BadgeCheck, BookOpenText, Route, Sparkles } from '@/lib/icones'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import BlurText from '@/components/BlurText'
@@ -77,7 +77,7 @@ export function PaginaEntrar() {
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
-      <section className="flex flex-col justify-center gap-8 bg-secondary/60 px-8 py-12 lg:px-16">
+      <section className="textura pontilhado flex flex-col justify-center gap-8 bg-secondary/70 px-8 py-12 lg:px-16">
         <Link to="/" aria-label="Estudos IA: início" className="flex w-fit items-center gap-2 font-heading text-lg font-semibold">
           <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
             <BookOpenText className="size-4" />

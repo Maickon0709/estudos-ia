@@ -154,6 +154,7 @@ export const api = {
   },
   /** Confere com o servidor se o cookie de sessão ainda vale (renova se preciso). */
   verificarSessao: async () => {
+    if (!estaLogado()) return // visitante: não há sessão para conferir (evita 401 à toa)
     try {
       await pedir('GET', '/auth/sessao')
       definirLogado(true)

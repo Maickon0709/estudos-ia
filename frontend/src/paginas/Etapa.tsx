@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Dumbbell, Layers, Lock, Play, Sparkles } from 'lucide-react'
+import { ArrowLeft, Dumbbell, Layers, Lock, Play, Sparkles } from '@/lib/icones'
 import { useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { toast } from 'sonner'

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, CircleCheck, Dumbbell, Layers, RotateCcw, Route } from 'lucide-react'
+import { ArrowRight, CircleCheck, Dumbbell, Layers, RotateCcw, Route } from '@/lib/icones'
 import { Link } from 'react-router'
 import { Carregando, Erro, Vazio } from '@/components/Estados'
 import { Dica } from '@/components/Tutorial'

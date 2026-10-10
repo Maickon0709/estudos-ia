@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Check, PartyPopper, RotateCcw, Undo2 } from 'lucide-react'
+import { Check, PartyPopper, RotateCcw, Undo2 } from '@/lib/icones'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -40,7 +40,7 @@ export function Baralho({ cartoes, aoTerminar }: { cartoes: Cartao[]; aoTerminar
     return (
       <div className="flex flex-col items-center gap-3 rounded-2xl border bg-card px-6 py-10 text-center">
         <PartyPopper className="size-8 text-primary" />
-        <h3 className="text-xl font-semibold">Sessão concluída!</h3>
+        <h3 className="text-xl font-semibold">Sessão concluída</h3>
         <p className="text-sm text-muted-foreground">
           Você lembrou de {lembrados} de {fila.length} {fila.length === 1 ? 'cartão' : 'cartões'}. Os que você esqueceu voltam amanhã.
         </p>
@@ -55,7 +55,7 @@ export function Baralho({ cartoes, aoTerminar }: { cartoes: Cartao[]; aoTerminar
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
         <span>Cartão {indice + 1} de {fila.length}</span>
         <Progress value={(100 * indice) / fila.length} className="flex-1" aria-label="Progresso da sessão" />
-        {proxima && <span>{proxima === 'dominado' ? 'Último: dominado!' : `Último volta em ${diaMes(proxima)}`}</span>}
+        {proxima && <span>{proxima === 'dominado' ? 'Último: dominado' : `Último volta em ${diaMes(proxima)}`}</span>}
       </div>
 
       <button
@@ -92,7 +92,7 @@ export function Baralho({ cartoes, aoTerminar }: { cartoes: Cartao[]; aoTerminar
   )
 }
 
-function Face({ children, rotulo, dica, verso = false }: { children: string; rotulo: string; dica?: string; verso?: boolean }) {
+export function Face({ children, rotulo, dica, verso = false }: { children: string; rotulo: string; dica?: string; verso?: boolean }) {
   return (
     <div
       className={cn(

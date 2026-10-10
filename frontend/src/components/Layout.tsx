@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { BookOpenText, House, Library, Moon, RotateCcw, Sun } from 'lucide-react'
+import { BookOpenText, House, Library, Moon, RotateCcw, Sun } from '@/lib/icones'
 import type { ReactNode } from 'react'
 import { Link, NavLink } from 'react-router'
 import { Avatar } from '@/components/Avatar'
@@ -72,7 +72,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </nav>
           <Cronometro />
           <BotaoTema />
-          <NavLink to="/conta" aria-label="Sua conta" title="Sua conta" className="hidden rounded-full ring-offset-2 ring-offset-background sm:block [&.active]:ring-2 [&.active]:ring-primary">
+          <NavLink to="/conta" aria-label="Sua conta" title="Sua conta" className="hidden rounded-[30%] ring-offset-2 ring-offset-background sm:block [&.active]:ring-2 [&.active]:ring-primary">
             <Avatar />
           </NavLink>
         </div>
