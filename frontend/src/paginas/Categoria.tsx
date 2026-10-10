@@ -61,7 +61,7 @@ export function PaginaCategoria() {
           <AbaConversa categoriaId={categoriaId} aoConfirmar={() => irPara('trilha')} />
         </TabsContent>
         <TabsContent value="materiais">
-          <AbaMateriais categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} />
+          <AbaMateriais categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} montarTrilha={montarTrilha} />
         </TabsContent>
         <TabsContent value="trilha">
           <AbaTrilha categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} montarTrilha={montarTrilha} />

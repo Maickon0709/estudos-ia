@@ -15,6 +15,7 @@ from app.services.exercicio_parser import (
     limpar_reexplicacao,
     montar_exercicios,
 )
+from app.services.materiais_trilha import fontes_de_material
 from app.services.prompts import (
     mensagem_correcao,
     mensagem_exercicios,
@@ -68,13 +69,15 @@ class ExercicioService:
         fontes = [
             {"titulo": r["titulo"], "url": r["url"], "trecho": r.get("trecho")}
             for r in self._etapas.recursos(etapa["id"])
-        ]
+        ] + fontes_de_material(self._etapas, etapa["id"])
         resposta = self._llm.responder([
             {"role": "system", "content": prompt_exercicios()},
             {"role": "user", "content": mensagem_exercicios(
                 trilha.get("titulo", ""), etapa, nivel, quantidade, fontes)},
         ])
-        itens = montar_exercicios(extrair_json(resposta), nivel, quantidade, fontes)
+        # Cada exercício guarda de onde veio, mas não o texto inteiro do arquivo do aluno.
+        guardadas = [{k: v for k, v in f.items() if k != "conteudo"} for f in fontes]
+        itens = montar_exercicios(extrair_json(resposta), nivel, quantidade, guardadas)
         return [publico(e) for e in self._exercicios.criar_varios(etapa["id"], itens)]
 
     def listar(self, etapa_id: str, nivel=None) -> list[dict]:

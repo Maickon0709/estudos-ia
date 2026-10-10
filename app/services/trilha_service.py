@@ -24,10 +24,14 @@ class TrilhaService:
             raise NaoEncontradoError("Trilha não encontrada.")
 
         etapas = sorted(self._trilhas.etapas(trilha["id"]), key=lambda e: e["ordem"])
-        recursos = self._trilhas.recursos_das_etapas([e["id"] for e in etapas])
+        ids = [e["id"] for e in etapas]
         por_etapa: dict[str, list] = {}
-        for r in recursos:
+        for r in self._trilhas.recursos_das_etapas(ids):
             por_etapa.setdefault(r["etapa_id"], []).append(r)
+        # Partes dos arquivos do aluno (trilha montada com os materiais, migração 009).
+        materiais: dict[str, list] = {}
+        for m in self._trilhas.materiais_das_etapas(ids):
+            materiais.setdefault(m["etapa_id"], []).append(m)
 
         concluidas = sum(1 for e in etapas if e["status"] == "concluido")
         return {
@@ -37,7 +41,11 @@ class TrilhaService:
                 "total": len(etapas),
                 "pct": round(100 * concluidas / len(etapas), 1) if etapas else 0.0,
             },
-            "etapas": [{**e, "recursos": por_etapa.get(e["id"], [])} for e in etapas],
+            "etapas": [
+                {**e, "recursos": por_etapa.get(e["id"], []),
+                 "materiais": sorted(materiais.get(e["id"], []), key=lambda m: (m["nome"] or "", m["ordem_inicio"]))}
+                for e in etapas
+            ],
         }
 
     def atualizar_etapa(self, etapa_id: str, corpo) -> dict:

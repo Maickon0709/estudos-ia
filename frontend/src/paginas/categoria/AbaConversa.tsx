@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { BookOpen, Check, CircleHelp, Compass, Dumbbell, FileText, Lightbulb, MessageCircle, Route, Send, X, type Icone as LucideIcon } from '@/lib/icones'
-import { Fragment, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { BookOpen, Check, CircleHelp, Compass, Dumbbell, FileText, Lightbulb, MessageCircle, Route, Send, Sparkles, X, type Icone as LucideIcon } from '@/lib/icones'
+import { Fragment, useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router'
 import { toast } from 'sonner'
 import { Carregando, Erro, Trabalhando, Vazio } from '@/components/Estados'
 import { Bolha } from '@/components/Bolha'
 import { Dica } from '@/components/Tutorial'
+import { MaterialItem } from '@/components/MaterialItem'
 import { RecursoItem } from '@/components/RecursoItem'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
 import { LIMITES } from '@/lib/seguranca'
+import { cn } from '@/lib/utils'
 import type { AcaoChat, Fonte, Mensagem, Proposta } from '@/lib/tipos'
 
 type Props = { categoriaId: string; aoConfirmar: () => void }
@@ -200,7 +202,7 @@ function CartaoAcao({ acao, montar, treinarNoChat }: { acao: Exclude<AcaoChat, n
       </p>
       <p className="text-muted-foreground">
         {trilha
-          ? 'A tutora não cria a trilha pela conversa. Clique abaixo, confira o objetivo e gere a proposta: a plataforma busca vídeos e sites, confere cada link e você aprova antes de salvar. A trilha usa materiais da internet; seus arquivos continuam disponíveis aqui no chat.'
+          ? 'A tutora não cria a trilha pela conversa. Clique abaixo, confira o objetivo e escolha de onde vêm os materiais: “Tudo junto” usa seus arquivos e completa com vídeos e sites verificados; também dá para usar só os arquivos ou só a internet. Você aprova antes de salvar.'
           : 'Exercícios por nível, flashcards e simulados nascem das etapas de uma trilha confirmada. Sem trilha ainda? Monte uma, ou treine agora aqui no chat com perguntas uma de cada vez.'}
       </p>
       <div className="flex flex-wrap gap-2">
@@ -216,8 +218,18 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }
   categoriaId: string; aberto: boolean; aoMudar: (v: boolean) => void; objetivo: string; setObjetivo: (v: string) => void
 }) {
   const queryClient = useQueryClient()
+  const documentos = useQuery({ queryKey: ['documentos', categoriaId], queryFn: () => api.documentos(categoriaId), enabled: aberto })
+  const totalArquivos = documentos.data?.length ?? 0
+  // Quem já enviou arquivos começa com "Tudo junto" (arquivos + internet); dá para trocar.
+  const [escolhida, setEscolhida] = useState<Origem | null>(null)
+  const origem: Origem = escolhida ?? (totalArquivos > 0 ? 'misto' : 'internet')
   const gerar = useMutation({
-    mutationFn: () => api.gerarProposta(categoriaId, objetivo.trim()),
+    mutationFn: () => {
+      const alvo = objetivo.trim()
+      if (origem === 'misto') return api.gerarPropostaMisto(categoriaId, alvo)
+      if (origem === 'materiais') return api.gerarPropostaMateriais(categoriaId, alvo)
+      return api.gerarProposta(categoriaId, alvo)
+    },
     onSuccess: (proposta) => {
       queryClient.setQueryData(['propostas', categoriaId], [proposta])
       setObjetivo('')
@@ -231,10 +243,39 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }
         <DialogHeader>
           <DialogTitle>O que você quer aprender?</DialogTitle>
           <DialogDescription>
-            A plataforma pesquisa vídeos e sites reais, confere cada link e propõe uma trilha em etapas. Nada é salvo antes
-            de você confirmar. Depois de confirmada, ela fica na aba Trilha e libera os exercícios na aba Praticar.
+            A plataforma propõe uma trilha em etapas, do básico ao avançado. Nada é salvo antes de você confirmar. Depois de
+            confirmada, ela fica na aba Trilha e libera os exercícios na aba Praticar.
           </DialogDescription>
         </DialogHeader>
+        <div className="grid gap-2" role="radiogroup" aria-label="De onde vêm os materiais">
+          <OpcaoOrigem
+            ativa={origem === 'misto'}
+            desativada={totalArquivos === 0}
+            onClick={() => setEscolhida('misto')}
+            icone={<Sparkles className="size-4" />}
+            titulo="Tudo junto"
+            texto={totalArquivos > 0
+              ? 'Seus arquivos como base, mais vídeos e sites verificados para explicar de outro jeito e aprofundar.'
+              : 'Envie seus arquivos na aba Materiais para juntar com vídeos e sites.'}
+          />
+          <OpcaoOrigem
+            ativa={origem === 'materiais'}
+            desativada={totalArquivos === 0}
+            onClick={() => setEscolhida('materiais')}
+            icone={<FileText className="size-4" />}
+            titulo={totalArquivos > 0 ? `Só meus arquivos (${totalArquivos})` : 'Só meus arquivos'}
+            texto={totalArquivos > 0
+              ? 'Etapas com as partes dos seus PDFs e slides. Os exercícios usam o texto deles.'
+              : 'Envie PDFs, Word ou slides na aba Materiais para usar esta opção.'}
+          />
+          <OpcaoOrigem
+            ativa={origem === 'internet'}
+            onClick={() => setEscolhida('internet')}
+            icone={<Route className="size-4" />}
+            titulo="Só vídeos e sites"
+            texto="A plataforma pesquisa no YouTube e em sites confiáveis e confere cada link."
+          />
+        </div>
         <Textarea
           value={objetivo}
           onChange={(e) => setObjetivo(e.target.value)}
@@ -243,7 +284,15 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }
           placeholder="Ex.: dominar o uso da crase, do básico ao avançado"
           disabled={gerar.isPending}
         />
-        {gerar.isPending && <Trabalhando>Pesquisando materiais e montando a trilha… leva uns 10 segundos.</Trabalhando>}
+        {gerar.isPending && (
+          <Trabalhando>
+            {origem === 'materiais'
+              ? 'Organizando seus arquivos em etapas… leva uns 10 segundos.'
+              : origem === 'misto'
+                ? 'Pesquisando vídeos e sites e juntando com seus arquivos… leva uns 15 segundos.'
+                : 'Pesquisando materiais e montando a trilha… leva uns 10 segundos.'}
+          </Trabalhando>
+        )}
         {gerar.isError && <p className="text-sm text-destructive">{gerar.error.message}</p>}
         <DialogFooter>
           <Button onClick={() => gerar.mutate()} disabled={objetivo.trim().length < 3 || gerar.isPending}>
@@ -252,6 +301,29 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+type Origem = 'misto' | 'materiais' | 'internet'
+
+function OpcaoOrigem({ ativa, desativada = false, onClick, icone, titulo, texto }: {
+  ativa: boolean; desativada?: boolean; onClick: () => void; icone: ReactNode; titulo: string; texto: string
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={ativa}
+      disabled={desativada}
+      onClick={onClick}
+      className={cn(
+        'flex flex-col gap-1 rounded-xl border p-3 text-left text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+        ativa ? 'border-destaque bg-accent/50' : 'hover:border-foreground/30',
+      )}
+    >
+      <span className="flex items-center gap-2 font-medium">{icone} {titulo}</span>
+      <span className="text-xs text-muted-foreground">{texto}</span>
+    </button>
   )
 }
 
@@ -290,6 +362,7 @@ function PropostaCard({ proposta, categoriaId, aoConfirmar }: { proposta: Propos
                   <p className="font-medium">{etapa.titulo}</p>
                   {etapa.descricao && <p className="text-sm text-muted-foreground">{etapa.descricao}</p>}
                 </div>
+                {etapa.materiais?.map((m) => <MaterialItem key={`${m.documento_id}-${m.ordem_inicio}`} material={m} />)}
                 {etapa.recursos.map((r) => <RecursoItem key={r.url} recurso={r} />)}
               </div>
             </li>

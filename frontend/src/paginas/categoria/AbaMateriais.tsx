@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { FileText, MessageCircle, Trash2, Upload } from '@/lib/icones'
+import { FileText, MessageCircle, Route, Trash2, Upload } from '@/lib/icones'
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { toast } from 'sonner'
 import { Carregando, Erro, Trabalhando, Vazio } from '@/components/Estados'
@@ -11,7 +11,7 @@ import { api } from '@/lib/api'
 import type { Documento } from '@/lib/tipos'
 import { cn } from '@/lib/utils'
 
-type Props = { categoriaId: string; irParaConversa: () => void }
+type Props = { categoriaId: string; irParaConversa: () => void; montarTrilha: () => void }
 
 // O tipo de verdade é descoberto pela API pelo conteúdo; aqui só filtramos a janela de escolha.
 const ACEITOS = '.pdf,.docx,.pptx,.txt,.md,application/pdf'
@@ -20,7 +20,7 @@ const ROTULO: Record<Documento['tipo'], string> = {
   pdf: 'PDF', docx: 'Word', pptx: 'PowerPoint', txt: 'Texto', md: 'Markdown',
 }
 
-export function AbaMateriais({ categoriaId, irParaConversa }: Props) {
+export function AbaMateriais({ categoriaId, irParaConversa, montarTrilha }: Props) {
   const queryClient = useQueryClient()
   const chave = ['documentos', categoriaId]
   const arquivo = useRef<HTMLInputElement>(null)
@@ -95,8 +95,9 @@ export function AbaMateriais({ categoriaId, irParaConversa }: Props) {
         Depois de enviar, vá à aba Conversa e pergunte. Experimente: <strong>“Resuma meus materiais”</strong> para uma visão
         geral, <strong>“Explique a página 5 da aula 1”</strong> ou <strong>“O que é estudo de viabilidade?”</strong>. A tutora
         mostra de qual arquivo e página tirou a resposta. Ela não lê o arquivo inteiro de uma vez, só os trechos que combinam
-        com a pergunta. A trilha (aba Trilha) ainda usa vídeos e sites da internet, não os seus arquivos. Mantenha nesta
-        categoria só materiais do mesmo assunto: um PDF de outra matéria acaba misturado nas respostas.
+        com a pergunta. Quer estudar por etapas? Use <strong>Montar trilha com estes materiais</strong>: seus arquivos viram uma
+        trilha do básico ao avançado (dá para juntar com vídeos e sites verificados), com exercícios feitos do texto deles. Mantenha nesta categoria só materiais do mesmo
+        assunto: um PDF de outra matéria acaba misturado nas respostas.
       </Dica>
       <input ref={arquivo} type="file" accept={ACEITOS} className="hidden" onChange={aoEscolher} />
       {/* Área de soltar: também é um botão (teclado e toque abrem a janela de escolha) */}
@@ -170,9 +171,10 @@ export function AbaMateriais({ categoriaId, irParaConversa }: Props) {
               </li>
             ))}
           </ul>
-          <Button variant="outline" className="w-fit" onClick={irParaConversa}>
-            <MessageCircle /> Perguntar sobre os materiais
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={montarTrilha}><Route /> Montar trilha com estes materiais</Button>
+            <Button variant="outline" onClick={irParaConversa}><MessageCircle /> Perguntar sobre os materiais</Button>
+          </div>
         </>
       )}
     </div>

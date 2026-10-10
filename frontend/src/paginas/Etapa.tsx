@@ -7,6 +7,7 @@ import { Baralho } from '@/components/Baralho'
 import { Carregando, Erro, Trabalhando, Vazio } from '@/components/Estados'
 import { ExercicioCartao } from '@/components/ExercicioCartao'
 import { Dica } from '@/components/Tutorial'
+import { MaterialItem } from '@/components/MaterialItem'
 import { RecursoItem } from '@/components/RecursoItem'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -41,10 +42,13 @@ export function PaginaEtapa() {
         {etapa.descricao && <p className="text-muted-foreground">{etapa.descricao}</p>}
       </div>
 
-      {etapa.recursos.length > 0 && (
+      {(etapa.recursos.length > 0 || !!etapa.materiais?.length) && (
         <details className="group rounded-2xl border bg-card p-4">
-          <summary className="cursor-pointer text-sm font-medium">Materiais desta etapa ({etapa.recursos.length})</summary>
+          <summary className="cursor-pointer text-sm font-medium">
+            Materiais desta etapa ({etapa.recursos.length + (etapa.materiais?.length ?? 0)})
+          </summary>
           <div className="mt-3 flex flex-col gap-2">
+            {etapa.materiais?.map((m) => <MaterialItem key={`${m.documento_id}-${m.ordem_inicio}`} material={m} />)}
             {etapa.recursos.map((r) => <RecursoItem key={r.id ?? r.url} recurso={r} />)}
           </div>
         </details>

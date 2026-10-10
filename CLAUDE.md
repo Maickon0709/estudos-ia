@@ -63,7 +63,8 @@ quando precisar do contexto exato de um pedido do Maickon.
 ## Invariantes que não podem quebrar
 
 1. Nenhum link chega ao usuário sem verificação (LinkValidator ou YouTube Data API).
-2. A IA escolhe materiais **só pelo número**; não recebe URLs e nada que ela escreva vira link.
+2. A IA escolhe materiais **só pelo número**; não recebe URLs e nada que ela escreva vira link. Vale também para
+   as partes dos arquivos do aluno (trilha "Meus arquivos", `montar_payload_materiais`).
 3. Gabarito e explicação nunca saem antes da resposta (`COLUNAS_PUBLICAS` no repository + `publico()` no service).
 4. Múltipla escolha é corrigida no código, sem IA.
 5. Falha da IA ou da busca não grava nada pela metade.
@@ -84,7 +85,7 @@ quando precisar do contexto exato de um pedido do Maickon.
 - Roadmap do back-end completo: auth, categorias, chat, pesquisa verificada, propostas com
   confirmação atômica, trilha e checklist, exercícios por nível, correção, trilha adaptativa,
   revisão espaçada, painel, CI e Docker.
-- ~717 testes: 648 unitários + 69 de SQL em Postgres real.
+- ~759 testes: 677 unitários + 82 de SQL em Postgres real.
 - Repositório no GitHub (`Maickon0709/estudos-ia`); o CI passou, inclusive o build real do Docker.
 - **Testado ao vivo em 09/10/2026** contra o Supabase, a Groq e o Tavily reais: cadastro, login,
   RLS entre dois usuários, chat, pesquisa, proposta, confirmação (com clique duplo recusado),
@@ -108,7 +109,9 @@ quando precisar do contexto exato de um pedido do Maickon.
   `migrations/003_exercicios_revisoes.sql`, `migrations/004_flashcards_simulados_estudo.sql`,
   `migrations/005_consentimento_exclusao_conta.sql`, `migrations/006_foto_perfil.sql`,
   `migrations/007_limite_uso.sql` (sem a 007, toda rota de IA/pesquisa dá erro 500),
-  `migrations/008_documentos.sql` (materiais do aluno; sem a 008, o chat dá erro 500 ao buscar trechos).
+  `migrations/008_documentos.sql` (materiais do aluno; sem a 008, o chat dá erro 500 ao buscar trechos),
+  `migrations/009_trilha_materiais.sql` (trilha "Meus arquivos"; sem a 009, abrir QUALQUER trilha dá erro 500,
+  porque a leitura da trilha passa a consultar `etapa_materiais`: rode a 009 ANTES do deploy).
 - Ao vivo em 10/10/2026: migrações 004 e 005 já aplicadas no Supabase do Maickon; `/hoje`, `/conta`,
   aceite dos termos e **exclusão de conta** confirmados (login falha depois de excluir).
   Migrações 006 (foto de perfil) e 007 (limite de uso) aplicadas no Supabase em 10/10/2026
@@ -149,6 +152,14 @@ quando precisar do contexto exato de um pedido do Maickon.
   vídeos inventados e exercícios "prontos" que não existiam), e a aba Trilha ficou vazia. Agora: inventário de
   todos os arquivos + amostra do começo de cada um em perguntas gerais (`DocumentoService.contexto_para`),
   prompt mais firme, cartão "Montar trilha" no chat, passo a passo nas abas Trilha/Praticar e no guia.
+- Trilha "Meus arquivos" (10/10/2026, migração 009): `previa_trechos()` dá o começo de cada trecho; o back-end
+  agrupa em até 40 partes numeradas (`services/materiais_trilha.py`), a IA monta as etapas escolhendo partes pelo
+  número, e `confirmar_proposta` grava `etapa_materiais` (RLS: só arquivo do próprio aluno; erro `material_indisponivel`).
+  Exercícios e flashcards da etapa usam o texto das partes (`fontes_de_material`); o exercício guarda só o rótulo.
+  Rota `POST /categorias/<id>/propostas/materiais` (gasta "ia", não "pesquisa").
+  "Tudo junto" (`gerar_misto`, rota `/propostas/misto`, gasta "pesquisa"): até 30 partes dos arquivos + até 12
+  links verificados numa numeração ÚNICA (partes 1..N, links N+1..), a IA escolhe por número em "itens";
+  pesquisa = "nome da categoria: objetivo"; trilha sem nenhum arquivo do aluno é recusada.
 - **No ar em https://estudosia.vercel.app** (10/10/2026): site + API na mesma origem, cabeçalhos de segurança
   ativos (CSP, X-Frame-Options, HSTS). `VITE_SITE_URL` criada em produção. O endereço antigo
   `estudos-ia-zeta.vercel.app` continua no projeto. Todo merge na `main` publica em produção.

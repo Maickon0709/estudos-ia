@@ -7,6 +7,7 @@ lembrou -> intervalo cresce (3, 7, 15, 30 dias); esqueceu -> volta amanhã;
 from app.core.errors import NaoEncontradoError, ValidacaoError
 from app.core.validacao import hoje_brasil, validar_uuid
 from app.services.exercicio_parser import montar_flashcards
+from app.services.materiais_trilha import fontes_de_material
 from app.services.prompts import mensagem_flashcards, prompt_flashcards
 from app.services.proposta_parser import extrair_json
 from app.services.regras.revisao import proxima_revisao
@@ -30,7 +31,7 @@ class FlashcardService:
         fontes = [
             {"titulo": r["titulo"], "trecho": r.get("trecho")}
             for r in self._etapas.recursos(etapa["id"])
-        ]
+        ] + fontes_de_material(self._etapas, etapa["id"])
         resposta = self._llm.responder([
             {"role": "system", "content": prompt_flashcards()},
             {"role": "user", "content": mensagem_flashcards(trilha.get("titulo", ""), etapa, quantidade, fontes)},

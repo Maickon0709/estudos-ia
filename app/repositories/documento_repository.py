@@ -88,3 +88,7 @@ class DocumentoRepository:
             }
             for linha in linhas
         ]
+
+    def previa(self, categoria_id: str) -> list[dict]:
+        """O começo de cada trecho dos arquivos da categoria, em ordem (migração 009)."""
+        return self._client.rpc("previa_trechos", {"p_categoria_id": categoria_id}).execute().data or []

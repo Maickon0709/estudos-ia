@@ -34,7 +34,7 @@ const PASSOS: { icone: typeof Route; titulo: string; onde: string; texto: ReactN
     icone: Route,
     titulo: 'Aprove a trilha',
     onde: 'Botão “Montar trilha de estudo”',
-    texto: 'Clique em “Montar trilha de estudo”, abaixo do chat, e descreva seu objetivo. A plataforma pesquisa vídeos e sites, confere cada link e propõe etapas do básico ao avançado. Nada é criado antes de você clicar em Confirmar; aí a trilha aparece na aba “Trilha”.',
+    texto: 'Clique em “Montar trilha de estudo”, abaixo do chat, descreva seu objetivo e escolha a fonte: “Tudo junto” (seus PDFs e slides mais vídeos e sites verificados), “Só meus arquivos” ou “Só vídeos e sites”. Nada é criado antes de você clicar em Confirmar; aí a trilha aparece na aba “Trilha”.',
   },
   {
     icone: BadgeCheck,
@@ -80,7 +80,7 @@ const EXTRAS = [
 const PERGUNTAS = [
   ['A IA pode inventar links?', 'Não. A IA só escolhe materiais pelo número de uma lista que a plataforma já pesquisou e verificou; ela nem vê as URLs. Vídeos são confirmados na API oficial do YouTube.'],
   ['Pedi uma trilha no chat e a aba Trilha continua vazia. Por quê?', 'A tutora só conversa: ela não cria trilhas. Quando você pede uma, aparece um cartão com o botão “Montar trilha de estudo” logo abaixo da resposta. Clique nele (ou no botão abaixo do chat), confira o objetivo e confirme a proposta. Só então a trilha aparece na aba Trilha.'],
-  ['A trilha usa os PDFs que eu enviei?', 'Ainda não. A trilha é montada com vídeos e sites da internet, conferidos pela plataforma. Seus arquivos são usados na conversa: a tutora procura os trechos certos e diz de qual arquivo e página tirou a resposta.'],
+  ['A trilha pode usar os PDFs que eu enviei?', 'Pode. Ao montar a trilha, escolha “Tudo junto” (seus arquivos como base, mais vídeos e sites verificados para completar) ou “Só meus arquivos”. A IA organiza as partes dos seus PDFs e slides em etapas, do básico ao avançado, e os exercícios e flashcards de cada etapa usam o texto delas. “Só vídeos e sites” pesquisa apenas na internet.'],
   ['A tutora leu meus arquivos inteiros?', 'Não. A cada pergunta, ela recebe a lista de todos os arquivos e os trechos que mais combinam com o que você perguntou. Para uma visão geral, peça “resuma meus materiais”; para detalhes, pergunte sobre o tema.'],
   ['Preciso montar uma trilha para usar?', 'Não. Você pode estudar só pela conversa com a tutora. A trilha serve para organizar materiais e liberar exercícios, flashcards e simulados.'],
   ['Por que o nível intermediário está bloqueado?', 'Ele libera quando você acerta 80% de pelo menos 3 exercícios do básico, ou quando marca “já sei este conteúdo” na etapa.'],

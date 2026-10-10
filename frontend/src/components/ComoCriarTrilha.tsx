@@ -5,7 +5,7 @@ import { MessageCircle, Route } from '@/lib/icones'
 // pedir "faça uma trilha" no chat não cria nada; quem cria é o botão "Montar trilha de estudo".
 const PASSOS = [
   { titulo: 'Clique em "Montar trilha de estudo"', texto: 'O botão fica logo abaixo do chat, na aba Conversa.' },
-  { titulo: 'Escreva o objetivo', texto: 'Ex.: "ciclo de vida de sistemas, do básico ao avançado, para a prova". A plataforma busca vídeos e sites e confere cada link.' },
+  { titulo: 'Escreva o objetivo e escolha a fonte', texto: 'Ex.: "do básico ao avançado, para a prova". "Tudo junto" usa seus PDFs e slides e completa com vídeos e sites verificados; dá também para usar só um dos dois.' },
   { titulo: 'Revise e confirme a proposta', texto: 'Nada é salvo antes do seu ok. Confirmada, a trilha aparece aqui e libera os exercícios.' },
 ]
 
@@ -22,8 +22,8 @@ export function ComoCriarTrilha({ montarTrilha, irParaConversa }: { montarTrilha
         ))}
       </ol>
       <p className="max-w-xl text-center text-xs text-muted-foreground">
-        Pedir a trilha na conversa não cria nada: a tutora só conversa. A trilha usa materiais da internet; os arquivos que
-        você enviou na aba Materiais continuam disponíveis no chat.
+        Pedir a trilha na conversa não cria nada: a tutora só conversa. Com a trilha montada pelos seus arquivos, os
+        exercícios de cada etapa são gerados com o texto deles.
       </p>
       <div className="flex flex-wrap justify-center gap-2">
         <Button onClick={montarTrilha}><Route /> Montar trilha agora</Button>
