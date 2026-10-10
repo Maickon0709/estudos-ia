@@ -1,12 +1,14 @@
 """Exercícios por nível, correção e efeitos da resposta (adaptação + revisão).
 
-- Gerar: só no nível liberado pela trilha adaptativa; fontes = recursos da etapa.
+- Gerar: só no nível liberado pela trilha adaptativa; fontes = recursos e materiais da etapa.
+  A IA recebe as perguntas que a etapa já tem e o código ainda descarta as repetidas.
+- Completar simulado: gera as questões de múltipla escolha que faltam para o tamanho pedido.
 - Listar: nunca devolve gabarito nem explicação.
 - Responder: múltipla escolha é corrigida NO CÓDIGO (sem IA, sem custo, sem
   erro); discursiva é corrigida pela IA comparando com o gabarito. Depois, a
   função SQL grava tudo de forma atômica e as regras ajustam a etapa.
 """
-from app.core.errors import EstadoInvalidoError, NaoEncontradoError, ValidacaoError
+from app.core.errors import EstadoInvalidoError, IAIndisponivelError, NaoEncontradoError, ValidacaoError
 from app.core.validacao import hoje_brasil, validar_uuid
 from app.repositories.exercicio_repository import COLUNAS_PUBLICAS
 from app.services.exercicio_parser import (
@@ -14,6 +16,7 @@ from app.services.exercicio_parser import (
     letra,
     limpar_reexplicacao,
     montar_exercicios,
+    remover_repetidos,
 )
 from app.services.materiais_trilha import fontes_de_material
 from app.services.prompts import (
@@ -25,17 +28,37 @@ from app.services.prompts import (
     prompt_reexplicar,
 )
 from app.services.proposta_parser import extrair_json
-from app.services.regras.adaptacao import ORDEM_NIVEIS, avaliar, niveis_liberados
+from app.services.regras.adaptacao import (
+    LIMIAR_LIBERAR,
+    MIN_RESPOSTAS_LIBERAR,
+    ORDEM_NIVEIS,
+    avaliar,
+    niveis_liberados,
+    taxa,
+)
 from app.services.regras.revisao import proxima_revisao
 
-QUANTIDADE_PADRAO = 3
-QUANTIDADE_MAX = 5
+QUANTIDADE_PADRAO = 10
+QUANTIDADE_MAX = 10
 RESPOSTA_MAX = 2000
+MAX_GERACOES_SIMULADO = 2  # chamadas à IA para completar um simulado (cabe no tempo da função)
 _PUBLICAS = {c.strip() for c in COLUNAS_PUBLICAS.split(",")}
-_MOTIVO_BLOQUEIO = {
-    "intermediario": "Acerte pelo menos 80% de 3 ou mais exercícios do básico (ou marque \"já sei\" na etapa).",
-    "avancado": "Acerte pelo menos 80% de 3 ou mais exercícios do intermediário.",
-}
+_NOME_NIVEL = {"basico": "básico", "intermediario": "intermediário", "avancado": "avançado"}
+
+
+def motivo_bloqueio(nivel: str, niveis: dict) -> str:
+    """Por que o nível está bloqueado e quanto falta, com os números do aluno."""
+    anterior = ORDEM_NIVEIS[ORDEM_NIVEIS.index(nivel) - 1]
+    stats = niveis.get(anterior) or {}
+    feitas = int(stats.get("total") or 0)
+    pct = taxa(stats)
+    situacao = f"Você respondeu {feitas} de {MIN_RESPOSTAS_LIBERAR} questões do {_NOME_NIVEL[anterior]}"
+    situacao += f", com {round(pct)}% de acerto." if pct is not None else "."
+    extra = ' Ou marque "já sei" na etapa.' if nivel == "intermediario" else ""
+    return (
+        f"Nível {_NOME_NIVEL[nivel]} ainda bloqueado. Responda pelo menos {MIN_RESPOSTAS_LIBERAR} questões "
+        f"diferentes do {_NOME_NIVEL[anterior]} com {round(LIMIAR_LIBERAR)}% de acerto. {situacao}{extra}"
+    )
 
 
 def publico(exercicio: dict) -> dict:
@@ -61,24 +84,60 @@ class ExercicioService:
         quantidade = _validar_quantidade(quantidade)
         etapa = self._obter_etapa(etapa_id)
 
-        liberados = niveis_liberados(self._etapas.niveis(etapa["id"]), etapa["ja_sabia"])
-        if nivel not in liberados:
-            raise EstadoInvalidoError(f"Nível {nivel} ainda bloqueado. {_MOTIVO_BLOQUEIO[nivel]}")
+        niveis = self._etapas.niveis(etapa["id"])
+        if nivel not in niveis_liberados(niveis, etapa["ja_sabia"]):
+            raise EstadoInvalidoError(motivo_bloqueio(nivel, niveis))
+        return [publico(e) for e in self._gerar_na_etapa(etapa, nivel, quantidade)]
 
+    def _gerar_na_etapa(self, etapa: dict, nivel: str, quantidade: int, somente_multipla: bool = False) -> list[dict]:
         trilha = self._trilhas.obter(etapa["trilha_id"]) or {}
         fontes = [
             {"titulo": r["titulo"], "url": r["url"], "trecho": r.get("trecho")}
             for r in self._etapas.recursos(etapa["id"])
         ] + fontes_de_material(self._etapas, etapa["id"])
+        # Todas as perguntas da etapa (de qualquer nível): a IA não deve repetir nenhuma.
+        anteriores = [e["enunciado"] for e in self._exercicios.listar(etapa["id"]) if e.get("enunciado")]
         resposta = self._llm.responder([
             {"role": "system", "content": prompt_exercicios()},
             {"role": "user", "content": mensagem_exercicios(
-                trilha.get("titulo", ""), etapa, nivel, quantidade, fontes)},
+                trilha.get("titulo", ""), etapa, nivel, quantidade, fontes, anteriores, somente_multipla)},
         ])
         # Cada exercício guarda de onde veio, mas não o texto inteiro do arquivo do aluno.
         guardadas = [{k: v for k, v in f.items() if k != "conteudo"} for f in fontes]
         itens = montar_exercicios(extrair_json(resposta), nivel, quantidade, guardadas)
-        return [publico(e) for e in self._exercicios.criar_varios(etapa["id"], itens)]
+        if somente_multipla:
+            itens = [i for i in itens if i["tipo"] == "multipla_escolha"]
+        itens = remover_repetidos(itens, anteriores)
+        if not itens:
+            raise IAIndisponivelError("A IA só trouxe perguntas que você já tem. Tente gerar de novo.")
+        return self._exercicios.criar_varios(etapa["id"], itens)
+
+    def completar_para_simulado(self, categoria_id: str, faltam: int) -> int:
+        """Gera as questões de múltipla escolha que faltam para o simulado. Devolve quantas criou.
+
+        Usa a trilha mais recente da categoria, espalhando pelas etapas, no nível mais alto já
+        liberado em cada uma. Gasta 1 do limite "ia". Falha da IA numa etapa não derruba as outras.
+        """
+        trilhas = self._trilhas.listar(categoria_id)
+        etapas = sorted(self._trilhas.etapas(trilhas[0]["id"]), key=lambda e: e["ordem"]) if trilhas else []
+        if faltam <= 0 or not etapas:
+            return 0
+        if self._uso is not None:
+            self._uso.consumir("ia")
+
+        criadas = 0
+        for i in range(min(MAX_GERACOES_SIMULADO, len(etapas), -(-faltam // QUANTIDADE_MAX))):
+            if criadas >= faltam:
+                break
+            # Espalha: com 2 gerações numa trilha de 6 etapas, usa a 1ª e a 4ª.
+            etapa = etapas[i * len(etapas) // min(MAX_GERACOES_SIMULADO, len(etapas))]
+            nivel = niveis_liberados(self._etapas.niveis(etapa["id"]), etapa["ja_sabia"])[-1]
+            try:
+                criadas += len(self._gerar_na_etapa(
+                    etapa, nivel, min(QUANTIDADE_MAX, faltam - criadas), somente_multipla=True))
+            except IAIndisponivelError:
+                continue
+        return criadas
 
     def listar(self, etapa_id: str, nivel=None) -> list[dict]:
         if nivel is not None:

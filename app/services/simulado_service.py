@@ -1,6 +1,7 @@
-"""Simulado: prova cronometrada com exercícios de múltipla escolha já gerados.
+"""Simulado: prova cronometrada com exercícios de múltipla escolha.
 
-- Não gasta IA: sorteia exercícios existentes da categoria (função SQL atômica).
+- Sorteia exercícios da categoria (função SQL atômica). Se não houver questões suficientes para
+  o tamanho pedido, gera as que faltam antes (gasta 1 do limite "ia"); sem trilha, usa o que houver.
 - Gabarito e explicação só aparecem DEPOIS de finalizar (mesma regra dos exercícios).
 - Correção no código, sem IA. O banco trava a linha para não finalizar duas vezes
   e marca se a entrega foi dentro do prazo.
@@ -19,16 +20,25 @@ CAMPOS_CORRIGIDOS = ("gabarito", "explicacao")
 
 
 class SimuladoService:
-    def __init__(self, categoria_service, simulado_repo):
+    def __init__(self, categoria_service, simulado_repo, completar=None):
         self._categorias = categoria_service
         self._simulados = simulado_repo
+        self._completar = completar  # ExercicioService.completar_para_simulado (opcional)
 
     def criar(self, categoria_id: str, quantidade=None, minutos=None) -> dict:
         quantidade = _inteiro(quantidade, QUANTIDADE_PADRAO, QUANTIDADE_MIN, QUANTIDADE_MAX, "Quantidade")
         minutos = _inteiro(minutos, MINUTOS_PADRAO, MINUTOS_MIN, MINUTOS_MAX, "Tempo (minutos)")
         categoria = self._categorias.obter(categoria_id)
-        simulado_id = self._simulados.criar(categoria["id"], quantidade, minutos * 60)
-        return self.obter(simulado_id)
+        faltam = quantidade - self._simulados.contar_multipla_escolha(categoria["id"])
+        if faltam > 0 and self._completar is not None:
+            self._completar(categoria["id"], faltam)
+        simulado = self.obter(self._simulados.criar(categoria["id"], quantidade, minutos * 60))
+        if simulado.get("total", quantidade) < quantidade:
+            simulado["aviso"] = (
+                f"Só havia {simulado['total']} questões de múltipla escolha nesta categoria. "
+                "Gere mais exercícios nas etapas da trilha para simulados maiores."
+            )
+        return simulado
 
     def listar(self, categoria_id: str) -> list[dict]:
         categoria = self._categorias.obter(categoria_id)

@@ -55,7 +55,9 @@ export function PaginaEtapa() {
       )}
 
       <Dica id="etapa" titulo="Como os níveis funcionam">
-        Comece pelo básico. Acertando 80% de pelo menos 3 exercícios, o intermediário libera (e depois o avançado).
+        Comece pelo básico. Respondendo pelo menos 20 questões diferentes com 80% de acerto, o intermediário libera (e
+        depois o avançado, pela mesma regra). Vale a primeira tentativa de cada questão. Cada clique gera 10 perguntas novas,
+        sem repetir as que você já tem.
         Errou e não entendeu? Clique em “Não entendi” para outra explicação.
       </Dica>
 
@@ -139,10 +141,10 @@ function Exercicios({ etapaId, trilhaId, categoriaId }: { etapaId: string; trilh
               <p>{gerar.error?.message}</p>
             </div>
           ) : gerar.isPending ? (
-            <Trabalhando>A IA está criando 3 exercícios…</Trabalhando>
+            <Trabalhando>A IA está criando 10 exercícios novos… leva uns 20 segundos.</Trabalhando>
           ) : (
             <Button onClick={() => gerar.mutate()} className="self-start">
-              <Sparkles /> Gerar 3 exercícios {NOME_NIVEL[nivel].toLowerCase()}s
+              <Sparkles /> Gerar 10 exercícios {NOME_NIVEL[nivel].toLowerCase()}s
             </Button>
           )}
           {gerar.isError && !bloqueado && <p className="text-sm text-destructive">{gerar.error.message}</p>}

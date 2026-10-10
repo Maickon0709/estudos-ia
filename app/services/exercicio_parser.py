@@ -4,6 +4,8 @@ Funções puras. Tudo que não passa nas regras é descartado; se nada sobra,
 a operação falha sem gravar nada.
 """
 import re
+import unicodedata
+from difflib import SequenceMatcher
 
 from app.core.errors import IAIndisponivelError
 from app.services.proposta_parser import extrair_json
@@ -134,3 +136,28 @@ def limpar_reexplicacao(texto) -> str:
     if not isinstance(texto, str) or not texto.strip():
         raise IAIndisponivelError("A IA não conseguiu explicar agora. Tente novamente.")
     return texto.strip()[:REEXPLICACAO_MAX]
+
+
+SIMILARIDADE_REPETIDA = 0.85  # acima disso, é a mesma pergunta com outras palavras
+
+
+def _normal(texto: str) -> str:
+    sem_acento = unicodedata.normalize("NFKD", texto or "").encode("ascii", "ignore").decode()
+    return " ".join(re.sub(r"[^\w\s]", " ", sem_acento.lower()).split())
+
+
+def remover_repetidos(itens: list[dict], anteriores: list[str]) -> list[dict]:
+    """Tira perguntas iguais ou quase iguais às que a etapa já tem (de qualquer nível) e entre si.
+
+    A IA recebe a lista das anteriores, mas às vezes repete mesmo assim (foi o que aconteceu no
+    intermediário, que trouxe uma pergunta do básico). Esta é a garantia no código.
+    """
+    vistas = [_normal(a) for a in anteriores if a]
+    novos = []
+    for item in itens:
+        atual = _normal(item.get("enunciado", ""))
+        if any(atual == v or SequenceMatcher(None, atual, v).ratio() >= SIMILARIDADE_REPETIDA for v in vistas):
+            continue
+        vistas.append(atual)
+        novos.append(item)
+    return novos

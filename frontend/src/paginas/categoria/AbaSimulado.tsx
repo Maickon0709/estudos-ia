@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { ArrowRight, ClipboardCheck, Clock, Play } from '@/lib/icones'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import { Carregando, Erro } from '@/components/Estados'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,7 +22,10 @@ export function AbaSimulado({ categoriaId }: { categoriaId: string }) {
   const historico = useQuery({ queryKey: ['simulados', categoriaId], queryFn: () => api.simulados(categoriaId) })
   const criar = useMutation({
     mutationFn: () => api.criarSimulado(categoriaId, quantidade, minutos),
-    onSuccess: (s) => navigate(`/simulados/${s.id}`),
+    onSuccess: (s) => {
+      if (s.aviso) toast.info(s.aviso)
+      navigate(`/simulados/${s.id}`)
+    },
   })
 
   return (
@@ -30,8 +34,8 @@ export function AbaSimulado({ categoriaId }: { categoriaId: string }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 font-heading text-xl"><ClipboardCheck className="size-5 text-primary" /> Novo simulado</CardTitle>
           <CardDescription>
-            Questões de múltipla escolha sorteadas entre os exercícios desta categoria, com tempo marcado.
-            Não usa IA: a correção é na hora.
+            Questões de múltipla escolha sorteadas entre os exercícios desta categoria, com tempo marcado e correção na
+            hora. Se faltarem questões para o tamanho escolhido, a IA cria as que faltam antes de começar.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -52,11 +56,12 @@ export function AbaSimulado({ categoriaId }: { categoriaId: string }) {
             </div>
           </div>
           <Button size="lg" onClick={() => criar.mutate()} disabled={criar.isPending}>
-            <Play /> {criar.isPending ? 'Sorteando questões…' : 'Começar simulado'}
+            <Play /> {criar.isPending ? 'Preparando as questões… pode levar uns 30 segundos' : 'Começar simulado'}
           </Button>
           {criar.isError && <p className="text-sm text-destructive">{criar.error.message}</p>}
           <p className="text-xs text-muted-foreground">
-            Se houver menos questões que o pedido, o simulado usa as que existem (mínimo de 3).
+            Completar questões gasta 1 das ações com IA do dia. Sem trilha na categoria, o simulado usa as que existem
+            (mínimo de 3).
           </p>
         </CardContent>
       </Card>

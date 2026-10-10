@@ -53,6 +53,9 @@ class SimuladoRepoFalso:
         self.finalizacoes = []
         self.pediu_completos = []
 
+    def contar_multipla_escolha(self, categoria_id):
+        return sum(1 for e in self.exercicios.values() if e["tipo"] == "multipla_escolha")
+
     def criar(self, categoria_id, quantidade, limite_segundos):
         ids = [e for e in self.exercicios if self.exercicios[e]["tipo"] == "multipla_escolha"][:quantidade]
         sid = novo_id()

@@ -85,7 +85,7 @@ quando precisar do contexto exato de um pedido do Maickon.
 - Roadmap do back-end completo: auth, categorias, chat, pesquisa verificada, propostas com
   confirmação atômica, trilha e checklist, exercícios por nível, correção, trilha adaptativa,
   revisão espaçada, painel, CI e Docker.
-- ~759 testes: 677 unitários + 82 de SQL em Postgres real.
+- ~796 testes: 710 unitários + 86 de SQL em Postgres real.
 - Repositório no GitHub (`Maickon0709/estudos-ia`); o CI passou, inclusive o build real do Docker.
 - **Testado ao vivo em 09/10/2026** contra o Supabase, a Groq e o Tavily reais: cadastro, login,
   RLS entre dois usuários, chat, pesquisa, proposta, confirmação (com clique duplo recusado),
@@ -111,7 +111,8 @@ quando precisar do contexto exato de um pedido do Maickon.
   `migrations/007_limite_uso.sql` (sem a 007, toda rota de IA/pesquisa dá erro 500),
   `migrations/008_documentos.sql` (materiais do aluno; sem a 008, o chat dá erro 500 ao buscar trechos),
   `migrations/009_trilha_materiais.sql` (trilha "Meus arquivos"; sem a 009, abrir QUALQUER trilha dá erro 500,
-  porque a leitura da trilha passa a consultar `etapa_materiais`: rode a 009 ANTES do deploy).
+  porque a leitura da trilha passa a consultar `etapa_materiais`: rode a 009 ANTES do deploy),
+  `migrations/010_acerto_primeira_tentativa.sql` (a view de acerto por nível passa a contar questões diferentes).
 - Ao vivo em 10/10/2026: migrações 004 e 005 já aplicadas no Supabase do Maickon; `/hoje`, `/conta`,
   aceite dos termos e **exclusão de conta** confirmados (login falha depois de excluir).
   Migrações 006 (foto de perfil) e 007 (limite de uso) aplicadas no Supabase em 10/10/2026
@@ -160,6 +161,12 @@ quando precisar do contexto exato de um pedido do Maickon.
   "Tudo junto" (`gerar_misto`, rota `/propostas/misto`, gasta "pesquisa"): até 30 partes dos arquivos + até 12
   links verificados numa numeração ÚNICA (partes 1..N, links N+1..), a IA escolhe por número em "itens";
   pesquisa = "nome da categoria: objetivo"; trilha sem nenhum arquivo do aluno é recusada.
+- Exercícios (11/10/2026, migração 010): 10 por geração (`QUANTIDADE_PADRAO = QUANTIDADE_MAX = 10`); o próximo nível
+  libera com 20 questões DIFERENTES do nível com 80% de acerto, contando a 1ª tentativa (`v_acerto_etapa_nivel`);
+  o bloqueio diz o progresso (`motivo_bloqueio`). A IA recebe as perguntas que a etapa já tem e
+  `remover_repetidos` descarta iguais/quase iguais (similaridade >= 0,85). Prompt mais profundo por nível
+  (mini-casos, distratores plausíveis). Simulado: se faltam questões, `completar_para_simulado` gera só
+  múltipla escolha (até 2 chamadas, gasta 1 de "ia") e avisa (`aviso`) se mesmo assim ficou menor.
 - **No ar em https://estudosia.vercel.app** (10/10/2026): site + API na mesma origem, cabeçalhos de segurança
   ativos (CSP, X-Frame-Options, HSTS). `VITE_SITE_URL` criada em produção. O endereço antigo
   `estudos-ia-zeta.vercel.app` continua no projeto. Todo merge na `main` publica em produção.

@@ -46,7 +46,7 @@ const PASSOS: { icone: typeof Route; titulo: string; onde: string; texto: ReactN
     icone: Dumbbell,
     titulo: 'Pratique',
     onde: 'Categoria → aba “Praticar”',
-    texto: 'Para cada etapa: exercícios em três níveis (o intermediário libera com 80% de acerto no básico) e flashcards. Não entendeu uma correção? Peça outra explicação.',
+    texto: 'Para cada etapa: exercícios em três níveis, 10 por vez e sem repetir pergunta (o intermediário libera com 20 questões do básico e 80% de acerto) e flashcards. Não entendeu uma correção? Peça outra explicação.',
   },
   {
     icone: ClipboardCheck,
@@ -83,7 +83,7 @@ const PERGUNTAS = [
   ['A trilha pode usar os PDFs que eu enviei?', 'Pode. Ao montar a trilha, escolha “Tudo junto” (seus arquivos como base, mais vídeos e sites verificados para completar) ou “Só meus arquivos”. A IA organiza as partes dos seus PDFs e slides em etapas, do básico ao avançado, e os exercícios e flashcards de cada etapa usam o texto delas. “Só vídeos e sites” pesquisa apenas na internet.'],
   ['A tutora leu meus arquivos inteiros?', 'Não. A cada pergunta, ela recebe a lista de todos os arquivos e os trechos que mais combinam com o que você perguntou. Para uma visão geral, peça “resuma meus materiais”; para detalhes, pergunte sobre o tema.'],
   ['Preciso montar uma trilha para usar?', 'Não. Você pode estudar só pela conversa com a tutora. A trilha serve para organizar materiais e liberar exercícios, flashcards e simulados.'],
-  ['Por que o nível intermediário está bloqueado?', 'Ele libera quando você acerta 80% de pelo menos 3 exercícios do básico, ou quando marca “já sei este conteúdo” na etapa.'],
+  ['Por que o nível intermediário está bloqueado?', 'Ele libera quando você responde pelo menos 20 questões diferentes do básico com 80% de acerto (vale a primeira tentativa de cada uma), ou quando marca “já sei este conteúdo” na etapa.'],
   ['As respostas da IA estão sempre certas?', 'Não. A IA pode errar. Use as fontes indicadas para conferir pontos importantes.'],
   ['Como apago meus dados?', 'Na página Conta (ícone de pessoa no topo), em “Excluir conta”. Tudo é apagado na hora.'],
 ]

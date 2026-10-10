@@ -141,6 +141,7 @@ flask --app app:create_app run --debug
 7. `migrations/007_limite_uso.sql` — limite diário de uso por usuário (chat, IA e pesquisa)
 8. `migrations/008_documentos.sql` — materiais do aluno (texto em trechos + busca em português)
 9. `migrations/009_trilha_materiais.sql` — trilha a partir dos materiais (etapas ligadas a partes dos arquivos)
+10. `migrations/010_acerto_primeira_tentativa.sql` — acerto por nível conta questões diferentes, pela primeira tentativa
 
 As migrações são idempotentes (podem rodar de novo sem quebrar).
 
