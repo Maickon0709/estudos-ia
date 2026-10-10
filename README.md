@@ -192,10 +192,23 @@ Erros: `{"erro": "<codigo>", "mensagem": "..."}` com 400, 401, 404, 409, 422 ou 
 
 ## Deploy (Vercel)
 
-`api/index.py` é o ponto de entrada e o `vercel.json` roteia tudo para ele. Configure em
-*Project Settings → Environment Variables*: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `GROQ_API_KEY`,
-`TAVILY_API_KEY`, `YOUTUBE_API_KEY` (opcional) e, se quiser, `GROQ_MODEL`. Gerar proposta e gerar
-exercícios são as rotas mais lentas: confira o tempo máximo de execução do seu plano.
+Um projeto só: o site (build do Vite em `frontend/dist`) na raiz e a API Flask em `/api`, no
+**mesmo domínio**, porque a sessão usa cookies HttpOnly. Tudo já está no `vercel.json`:
+build do front, função Python (`api/index.py`, até 60 s), roteamento (`/api/*` → Flask, o resto →
+`index.html`) e os mesmos cabeçalhos de segurança de `frontend/cabecalhos-seguranca.json`.
+
+1. Na Vercel: **Add New → Project → Import** o repositório do GitHub. Não mude as configurações
+   de build: elas vêm do `vercel.json`.
+2. Em **Environment Variables** (Production), cadastre:
+   `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `GROQ_API_KEY`, `GROQ_MODEL`, `TAVILY_API_KEY` e
+   `YOUTUBE_API_KEY` (opcional).
+3. **Deploy.** Com o endereço final em mãos (ex.: `https://estudos-ia.vercel.app`), crie também
+   `VITE_SITE_URL` com ele e faça um **Redeploy**: o build passa a gerar `sitemap.xml` e as URLs
+   absolutas da imagem de compartilhamento.
+4. No Supabase, rode as migrações na ordem (seção acima) se ainda não rodou.
+
+Depois de cada `git push` na `main`, a Vercel publica sozinha. O chat ao vivo usa streaming; se a
+plataforma segurar a resposta, ela aparece inteira no fim, sem erro.
 
 ## Limites conhecidos
 
