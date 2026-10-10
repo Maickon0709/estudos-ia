@@ -27,6 +27,9 @@ DOMINIOS_SOCIAIS = [
     "instagram.com", "facebook.com", "tiktok.com", "twitter.com", "x.com",
     "threads.net", "pinterest.com", "linkedin.com", "kwai.com",
 ]
+# Categorias do YouTube que não são aula. Achado ao vivo: buscando "crase na língua
+# portuguesa", veio o clipe "Lingua Ignota - PENNSYLVANIA FURNACE". Existir não é ser relevante.
+CATEGORIAS_YOUTUBE_FORA = {"10"}  # 10 = Música
 
 
 class PesquisaService:
@@ -114,7 +117,7 @@ class PesquisaService:
         recursos = []
         for ident, r in videos.items():
             info = infos_v.get(ident)
-            if info:
+            if info and info.categoria_id not in CATEGORIAS_YOUTUBE_FORA:
                 recursos.append(_recurso(
                     "video", info.titulo or r.titulo, url_video(ident), trecho=r.trecho,
                     canal=info.canal, duracao_segundos=info.duracao_segundos,

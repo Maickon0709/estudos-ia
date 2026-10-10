@@ -95,6 +95,19 @@ def test_videos_devolve_info_e_envia_chave_ids_e_parts():
     assert "status" in visto["params"]["part"]
 
 
+def test_videos_trazem_a_categoria_do_youtube():
+    com_categoria = item_video(V1)
+    com_categoria["snippet"]["categoryId"] = "27"
+    sem_categoria = item_video(V2)
+
+    def handler(request):
+        return httpx.Response(200, json={"items": [com_categoria, sem_categoria]})
+
+    resultado = cliente(handler).videos([V1, V2])
+    assert resultado[V1].categoria_id == "27"
+    assert resultado[V2].categoria_id is None
+
+
 def test_videos_privados_ou_nao_listados_sao_descartados():
     def handler(request):
         return httpx.Response(

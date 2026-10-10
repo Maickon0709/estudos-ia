@@ -52,23 +52,23 @@ quando precisar do contexto exato de um pedido do Maickon.
 - Roadmap do back-end completo: auth, categorias, chat, pesquisa verificada, propostas com
   confirmação atômica, trilha e checklist, exercícios por nível, correção, trilha adaptativa,
   revisão espaçada, painel, CI e Docker.
-- ~427 testes: 399 unitários + 28 de SQL em Postgres real.
+- ~429 testes: 401 unitários + 28 de SQL em Postgres real.
 - Repositório no GitHub (`Maickon0709/estudos-ia`); o CI passou, inclusive o build real do Docker.
 - **Testado ao vivo em 09/10/2026** contra o Supabase, a Groq e o Tavily reais: cadastro, login,
   RLS entre dois usuários, chat, pesquisa, proposta, confirmação (com clique duplo recusado),
   trilha, checklist, geração e correção de exercícios, revisão e painel.
 - Modelo da Groq: `openai/gpt-oss-120b`. O `llama-3.3-70b-versatile` não está liberado para a
   conta (erro `model_not_found`). Para ver os modelos disponíveis: `GET /openai/v1/models`.
-- **Ainda não testado ao vivo:** YouTube (falta a chave; os vídeos saem como `nao_verificado`).
-- Pesquisa bloqueia redes sociais (`DOMINIOS_SOCIAIS` em `pesquisa_service.py`): no teste ao vivo,
-  um reel do Instagram chegou como material de estudo.
+- YouTube Data API testada ao vivo: vídeos saem `verificado`, com título oficial, canal e duração.
+- Filtros de relevância em `pesquisa_service.py`, ambos nascidos de achados no teste ao vivo:
+  `DOMINIOS_SOCIAIS` (um reel do Instagram virou material) e `CATEGORIAS_YOUTUBE_FORA`
+  (categoria "10" = Música; "crase na língua portuguesa" trouxe o clipe da banda Lingua Ignota).
 - No Supabase, rodar nesta ordem: `schema_supabase.sql`, `migrations/002_propostas.sql`,
   `migrations/003_exercicios_revisoes.sql`.
 
 ## Próximos passos sugeridos
 
-1. Chave do YouTube Data API (opcional) e repetir a pesquisa para ver os vídeos verificados.
-2. Front-end.
-3. Limite de uso por usuário e cache de pesquisas (Tavily gratuito: 1.000 créditos/mês; cada
+1. Front-end.
+2. Limite de uso por usuário e cache de pesquisas (Tavily gratuito: 1.000 créditos/mês; cada
    pesquisa ou proposta gasta 2).
-4. Endurecer escritas e leituras sensíveis com funções `SECURITY DEFINER` (ver "Limites conhecidos" no README).
+3. Endurecer escritas e leituras sensíveis com funções `SECURITY DEFINER` (ver "Limites conhecidos" no README).

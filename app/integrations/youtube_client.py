@@ -35,6 +35,7 @@ class InfoVideo:
     titulo: str
     canal: str
     duracao_segundos: int | None
+    categoria_id: str | None = None  # snippet.categoryId ("10" = Música, "27" = Educação...)
 
 
 @dataclass(frozen=True)
@@ -122,6 +123,7 @@ class YouTubeClient:
                 duracao_segundos=duracao_em_segundos(
                     (item.get("contentDetails") or {}).get("duration")
                 ),
+                categoria_id=snippet.get("categoryId") if isinstance(snippet.get("categoryId"), str) else None,
             )
         return encontrados
 

@@ -189,9 +189,8 @@ exercícios são as rotas mais lentas: confira o tempo máximo de execução do 
   chave anon, um usuário poderia, *só na própria conta*, criar proposta com link não verificado,
   ler gabaritos ou chamar `registrar_resposta` dizendo que acertou. Fechar isso exige mover essas
   escritas/leituras para funções `SECURITY DEFINER` e revogar o acesso direto.
-- O fluxo completo foi testado ao vivo contra o Supabase, a Groq e o Tavily reais. O YouTube só
-  foi testado com dublês (sem chave, os vídeos saem como `nao_verificado`). O build do Docker
-  roda no CI.
+- O fluxo completo foi testado ao vivo contra o Supabase, a Groq, o Tavily e o YouTube reais.
+  O build do Docker roda no CI.
 
 ## Roadmap
 

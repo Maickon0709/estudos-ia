@@ -18,6 +18,8 @@ from app.services.pesquisa_service import PesquisaService
 
 
 def main() -> int:
+    # No Windows, a saída redirecionada usa cp1252 e quebra com emojis dos títulos.
+    sys.stdout.reconfigure(encoding="utf-8")
     if len(sys.argv) < 2:
         print('Uso: python -m scripts.smoke_busca "o que estudar"')
         return 2

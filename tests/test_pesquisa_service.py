@@ -156,6 +156,26 @@ def test_cota_do_youtube_estourada_degrada_sem_perder_os_videos(erro):
     assert resultado["youtube_verificado"] is False
 
 
+def test_video_de_musica_e_descartado_mesmo_existindo():
+    # Achado ao vivo: "crase na língua portuguesa" trouxe um clipe da banda Lingua Ignota.
+    busca = BuscaFalsa(yt=[
+        res(URL_V1),
+        res(f"https://www.youtube.com/watch?v={V2}"),
+        res(f"https://www.youtube.com/watch?v={V3}"),
+    ])
+    youtube = YouTubeFalso(videos={
+        V1: InfoVideo(V1, "Crase em 10 minutos", "Prof. Ana", 600, categoria_id="27"),
+        V2: InfoVideo(V2, "PENNSYLVANIA FURNACE (Official Video)", "Sargent House", 300, categoria_id="10"),
+        V3: InfoVideo(V3, "Aula sem categoria", "Canal", 60),
+    })
+    servico, _ = montar(busca, youtube, ValidadorFalso())
+
+    resultado = servico.buscar_recursos("crase")
+
+    assert [r["titulo"] for r in resultado["recursos"]] == ["Crase em 10 minutos", "Aula sem categoria"]
+    assert resultado["descartados"] == 1
+
+
 def test_sem_candidatos_do_youtube_nao_chama_a_api():
     youtube = YouTubeFalso()
     busca = BuscaFalsa(yt=[res("https://www.youtube.com/@canal")])
