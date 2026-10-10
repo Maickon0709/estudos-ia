@@ -96,7 +96,7 @@ export function AbaMateriais({ categoriaId, irParaConversa, montarTrilha }: Prop
         geral, <strong>“Explique a página 5 da aula 1”</strong> ou <strong>“O que é estudo de viabilidade?”</strong>. A tutora
         mostra de qual arquivo e página tirou a resposta. Ela não lê o arquivo inteiro de uma vez, só os trechos que combinam
         com a pergunta. Quer estudar por etapas? Use <strong>Montar trilha com estes materiais</strong>: seus arquivos viram uma
-        trilha do básico ao avançado, com exercícios feitos do texto deles. Mantenha nesta categoria só materiais do mesmo
+        trilha do básico ao avançado (dá para juntar com vídeos e sites verificados), com exercícios feitos do texto deles. Mantenha nesta categoria só materiais do mesmo
         assunto: um PDF de outra matéria acaba misturado nas respostas.
       </Dica>
       <input ref={arquivo} type="file" accept={ACEITOS} className="hidden" onChange={aoEscolher} />

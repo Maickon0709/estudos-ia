@@ -5,7 +5,7 @@ import { MessageCircle, Route } from '@/lib/icones'
 // pedir "faça uma trilha" no chat não cria nada; quem cria é o botão "Montar trilha de estudo".
 const PASSOS = [
   { titulo: 'Clique em "Montar trilha de estudo"', texto: 'O botão fica logo abaixo do chat, na aba Conversa.' },
-  { titulo: 'Escreva o objetivo e escolha a fonte', texto: 'Ex.: "do básico ao avançado, para a prova". "Meus arquivos" usa os PDFs e slides da aba Materiais; "Vídeos e sites" busca na internet e confere cada link.' },
+  { titulo: 'Escreva o objetivo e escolha a fonte', texto: 'Ex.: "do básico ao avançado, para a prova". "Tudo junto" usa seus PDFs e slides e completa com vídeos e sites verificados; dá também para usar só um dos dois.' },
   { titulo: 'Revise e confirme a proposta', texto: 'Nada é salvo antes do seu ok. Confirmada, a trilha aparece aqui e libera os exercícios.' },
 ]
 

@@ -200,6 +200,7 @@ pytest                                             # unitários (sem banco, sem 
 | POST | `/categorias/<id>/pesquisar` | `{consulta}` → recursos verificados |
 | POST | `/categorias/<id>/propostas` | `{objetivo}` → proposta `pendente` |
 | POST | `/categorias/<id>/propostas/materiais` | `{objetivo}` → proposta com os arquivos do aluno (sem pesquisa; gasta 1 de "ia") |
+| POST | `/categorias/<id>/propostas/misto` | `{objetivo}` → "Tudo junto": arquivos do aluno + vídeos e sites verificados (gasta 1 de "pesquisa") |
 | GET | `/categorias/<id>/propostas?status=` | listar propostas |
 | GET | `/propostas/<id>` | detalhe |
 | POST | `/propostas/<id>/confirmar` | → `{trilha_id, proposta}` |

@@ -157,6 +157,9 @@ quando precisar do contexto exato de um pedido do Maickon.
   número, e `confirmar_proposta` grava `etapa_materiais` (RLS: só arquivo do próprio aluno; erro `material_indisponivel`).
   Exercícios e flashcards da etapa usam o texto das partes (`fontes_de_material`); o exercício guarda só o rótulo.
   Rota `POST /categorias/<id>/propostas/materiais` (gasta "ia", não "pesquisa").
+  "Tudo junto" (`gerar_misto`, rota `/propostas/misto`, gasta "pesquisa"): até 30 partes dos arquivos + até 12
+  links verificados numa numeração ÚNICA (partes 1..N, links N+1..), a IA escolhe por número em "itens";
+  pesquisa = "nome da categoria: objetivo"; trilha sem nenhum arquivo do aluno é recusada.
 - **No ar em https://estudosia.vercel.app** (10/10/2026): site + API na mesma origem, cabeçalhos de segurança
   ativos (CSP, X-Frame-Options, HSTS). `VITE_SITE_URL` criada em produção. O endereço antigo
   `estudos-ia-zeta.vercel.app` continua no projeto. Todo merge na `main` publica em produção.

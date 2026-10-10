@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { BookOpen, Check, CircleHelp, Compass, Dumbbell, FileText, Lightbulb, MessageCircle, Route, Send, X, type Icone as LucideIcon } from '@/lib/icones'
+import { BookOpen, Check, CircleHelp, Compass, Dumbbell, FileText, Lightbulb, MessageCircle, Route, Send, Sparkles, X, type Icone as LucideIcon } from '@/lib/icones'
 import { Fragment, useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router'
 import { toast } from 'sonner'
@@ -202,7 +202,7 @@ function CartaoAcao({ acao, montar, treinarNoChat }: { acao: Exclude<AcaoChat, n
       </p>
       <p className="text-muted-foreground">
         {trilha
-          ? 'A tutora não cria a trilha pela conversa. Clique abaixo, confira o objetivo e escolha de onde vêm os materiais: “Meus arquivos” divide seus PDFs e slides em etapas; “Vídeos e sites” busca na internet e confere cada link. Você aprova antes de salvar.'
+          ? 'A tutora não cria a trilha pela conversa. Clique abaixo, confira o objetivo e escolha de onde vêm os materiais: “Tudo junto” usa seus arquivos e completa com vídeos e sites verificados; também dá para usar só os arquivos ou só a internet. Você aprova antes de salvar.'
           : 'Exercícios por nível, flashcards e simulados nascem das etapas de uma trilha confirmada. Sem trilha ainda? Monte uma, ou treine agora aqui no chat com perguntas uma de cada vez.'}
       </p>
       <div className="flex flex-wrap gap-2">
@@ -220,13 +220,16 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }
   const queryClient = useQueryClient()
   const documentos = useQuery({ queryKey: ['documentos', categoriaId], queryFn: () => api.documentos(categoriaId), enabled: aberto })
   const totalArquivos = documentos.data?.length ?? 0
-  // Quem já enviou arquivos começa com "Meus arquivos"; dá para trocar.
-  const [escolhida, setEscolhida] = useState<'internet' | 'materiais' | null>(null)
-  const origem = escolhida ?? (totalArquivos > 0 ? 'materiais' : 'internet')
+  // Quem já enviou arquivos começa com "Tudo junto" (arquivos + internet); dá para trocar.
+  const [escolhida, setEscolhida] = useState<Origem | null>(null)
+  const origem: Origem = escolhida ?? (totalArquivos > 0 ? 'misto' : 'internet')
   const gerar = useMutation({
-    mutationFn: () => origem === 'materiais'
-      ? api.gerarPropostaMateriais(categoriaId, objetivo.trim())
-      : api.gerarProposta(categoriaId, objetivo.trim()),
+    mutationFn: () => {
+      const alvo = objetivo.trim()
+      if (origem === 'misto') return api.gerarPropostaMisto(categoriaId, alvo)
+      if (origem === 'materiais') return api.gerarPropostaMateriais(categoriaId, alvo)
+      return api.gerarProposta(categoriaId, alvo)
+    },
     onSuccess: (proposta) => {
       queryClient.setQueryData(['propostas', categoriaId], [proposta])
       setObjetivo('')
@@ -244,13 +247,23 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }
             confirmada, ela fica na aba Trilha e libera os exercícios na aba Praticar.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="De onde vêm os materiais">
+        <div className="grid gap-2" role="radiogroup" aria-label="De onde vêm os materiais">
+          <OpcaoOrigem
+            ativa={origem === 'misto'}
+            desativada={totalArquivos === 0}
+            onClick={() => setEscolhida('misto')}
+            icone={<Sparkles className="size-4" />}
+            titulo="Tudo junto"
+            texto={totalArquivos > 0
+              ? 'Seus arquivos como base, mais vídeos e sites verificados para explicar de outro jeito e aprofundar.'
+              : 'Envie seus arquivos na aba Materiais para juntar com vídeos e sites.'}
+          />
           <OpcaoOrigem
             ativa={origem === 'materiais'}
             desativada={totalArquivos === 0}
             onClick={() => setEscolhida('materiais')}
             icone={<FileText className="size-4" />}
-            titulo={totalArquivos > 0 ? `Meus arquivos (${totalArquivos})` : 'Meus arquivos'}
+            titulo={totalArquivos > 0 ? `Só meus arquivos (${totalArquivos})` : 'Só meus arquivos'}
             texto={totalArquivos > 0
               ? 'Etapas com as partes dos seus PDFs e slides. Os exercícios usam o texto deles.'
               : 'Envie PDFs, Word ou slides na aba Materiais para usar esta opção.'}
@@ -259,7 +272,7 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }
             ativa={origem === 'internet'}
             onClick={() => setEscolhida('internet')}
             icone={<Route className="size-4" />}
-            titulo="Vídeos e sites"
+            titulo="Só vídeos e sites"
             texto="A plataforma pesquisa no YouTube e em sites confiáveis e confere cada link."
           />
         </div>
@@ -273,7 +286,11 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }
         />
         {gerar.isPending && (
           <Trabalhando>
-            {origem === 'materiais' ? 'Organizando seus arquivos em etapas… leva uns 10 segundos.' : 'Pesquisando materiais e montando a trilha… leva uns 10 segundos.'}
+            {origem === 'materiais'
+              ? 'Organizando seus arquivos em etapas… leva uns 10 segundos.'
+              : origem === 'misto'
+                ? 'Pesquisando vídeos e sites e juntando com seus arquivos… leva uns 15 segundos.'
+                : 'Pesquisando materiais e montando a trilha… leva uns 10 segundos.'}
           </Trabalhando>
         )}
         {gerar.isError && <p className="text-sm text-destructive">{gerar.error.message}</p>}
@@ -286,6 +303,8 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }
     </Dialog>
   )
 }
+
+type Origem = 'misto' | 'materiais' | 'internet'
 
 function OpcaoOrigem({ ativa, desativada = false, onClick, icone, titulo, texto }: {
   ativa: boolean; desativada?: boolean; onClick: () => void; icone: ReactNode; titulo: string; texto: string

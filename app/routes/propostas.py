@@ -27,6 +27,16 @@ def gerar_de_materiais(categoria_id):
     return jsonify(proposta), 201
 
 
+@bp.post("/categorias/<categoria_id>/propostas/misto")
+@login_required
+@consome("pesquisa")
+def gerar_misto(categoria_id):
+    """Arquivos do aluno + vídeos e sites verificados (gasta pesquisa, como a trilha da internet)."""
+    corpo = request.get_json(silent=True) or {}
+    proposta = dependencies.get_proposta_service().gerar_misto(categoria_id, corpo.get("objetivo"))
+    return jsonify(proposta), 201
+
+
 @bp.get("/categorias/<categoria_id>/propostas")
 @login_required
 def listar(categoria_id):

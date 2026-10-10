@@ -146,3 +146,66 @@ def montar_payload_materiais(dados: dict, partes_por_id: dict[int, dict], objeti
         "origem": "materiais",
         "etapas": etapas,
     }
+
+
+MAX_ITENS_POR_ETAPA = 5
+MAX_LINKS_POR_ETAPA = 3
+
+
+def montar_payload_misto(dados: dict, partes_por_id: dict[int, dict], recursos_por_id: dict[int, dict],
+                         objetivo: str) -> dict:
+    """Trilha com os arquivos do aluno E vídeos/sites verificados, numa numeração só.
+
+    Mesma regra de sempre: a IA escolhe PELO NÚMERO; o que vai para a proposta é a cópia que o
+    back-end montou (parte de arquivo ou recurso verificado). Cada número entra uma vez.
+    """
+    etapas_brutas = dados.get("etapas")
+    if not isinstance(etapas_brutas, list):
+        raise IAIndisponivelError(_ERRO_FORMATO)
+
+    usados: set[int] = set()
+    etapas = []
+    for bruta in etapas_brutas:
+        if len(etapas) == MAX_ETAPAS:
+            break
+        if not isinstance(bruta, dict):
+            continue
+        titulo = _texto(bruta.get("titulo"), TITULO_MAX)
+        if not titulo:
+            continue
+
+        materiais, recursos = [], []
+        ids = bruta.get("itens")
+        for bruto in ids if isinstance(ids, list) else []:
+            ident = _id(bruto)
+            if ident in usados or len(materiais) + len(recursos) == MAX_ITENS_POR_ETAPA:
+                continue
+            if ident in partes_por_id and len(materiais) < MAX_PARTES_POR_ETAPA:
+                parte = partes_por_id[ident]
+                materiais.append({chave: parte.get(chave) for chave in (
+                    "documento_id", "nome", "ordem_inicio", "ordem_fim", "pagina_inicio", "pagina_fim")})
+                usados.add(ident)
+            elif ident in recursos_por_id and len(recursos) < MAX_LINKS_POR_ETAPA:
+                recursos.append(copy.deepcopy(recursos_por_id[ident]))
+                usados.add(ident)
+        if not materiais and not recursos:
+            continue
+
+        etapas.append({
+            "titulo": titulo,
+            "descricao": _texto(bruta.get("descricao"), DESCRICAO_MAX) or None,
+            "recursos": recursos,
+            "materiais": materiais,
+        })
+
+    if not etapas:
+        raise IAIndisponivelError("A IA não montou nenhuma etapa válida. Tente novamente.")
+    if not any(e["materiais"] for e in etapas):
+        raise IAIndisponivelError("A IA não usou nenhum dos seus arquivos na trilha. Tente novamente.")
+
+    return {
+        "titulo": _texto(dados.get("titulo"), TITULO_MAX) or _texto(f"Trilha: {objetivo}", TITULO_MAX),
+        "objetivo": objetivo,
+        "origem": "misto",
+        "etapas": etapas,
+    }

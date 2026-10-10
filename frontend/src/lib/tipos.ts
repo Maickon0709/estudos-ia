@@ -62,7 +62,7 @@ export type Proposta = {
     titulo: string
     objetivo: string
     youtube_verificado?: boolean
-    origem?: 'materiais'
+    origem?: 'materiais' | 'misto'
     etapas: { titulo: string; descricao: string | null; recursos: Recurso[]; materiais?: MaterialEtapa[] }[]
   }
 }
