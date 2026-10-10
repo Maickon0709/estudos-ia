@@ -8,6 +8,7 @@ import { useLogado } from '@/lib/sessao'
 // Cada página vira um arquivo JS separado, baixado só quando a rota é aberta.
 const PaginaInicio = lazy(() => import('@/paginas/Inicio').then((m) => ({ default: m.PaginaInicio })))
 const PaginaEntrar = lazy(() => import('@/paginas/Entrar').then((m) => ({ default: m.PaginaEntrar })))
+const PaginaRedefinirSenha = lazy(() => import('@/paginas/RedefinirSenha').then((m) => ({ default: m.PaginaRedefinirSenha })))
 const PaginaHoje = lazy(() => import('@/paginas/Hoje').then((m) => ({ default: m.PaginaHoje })))
 const PaginaCategorias = lazy(() => import('@/paginas/Categorias').then((m) => ({ default: m.PaginaCategorias })))
 const PaginaCategoria = lazy(() => import('@/paginas/Categoria').then((m) => ({ default: m.PaginaCategoria })))
@@ -72,6 +73,8 @@ export default function App() {
         <Route path="/como-usar" element={<Suspense><PaginaComoUsar /></Suspense>} />
         <Route path="/termos" element={<Suspense><PaginaTermos /></Suspense>} />
         <Route path="/privacidade" element={<Suspense><PaginaPrivacidade /></Suspense>} />
+        {/* Aberta a todos: o link do e-mail de recuperação pode ser aberto até por quem está logado. */}
+        <Route path="/redefinir-senha" element={<Suspense><PaginaRedefinirSenha /></Suspense>} />
         <Route element={<SoVisitante />}>
           <Route path="/entrar" element={<PaginaEntrar />} />
         </Route>

@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { BadgeCheck, BookOpenText, Route, Sparkles } from '@/lib/icones'
+import { ArrowLeft, BadgeCheck, BookOpenText, Route, Sparkles } from '@/lib/icones'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import BlurText from '@/components/BlurText'
@@ -45,6 +45,7 @@ export function PaginaEntrar() {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [aviso, setAviso] = useState<string | null>(null)
+  const [recuperando, setRecuperando] = useState(params.get('recuperar') === '1')
   const [aceite, setAceite] = useState(false)
   const [tocados, setTocados] = useState<Partial<Record<Campo, boolean>>>({})
   const erros = validar(modo, nome, email, senha)
@@ -102,6 +103,9 @@ export function PaginaEntrar() {
 
       <section className="flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-sm">
+          {recuperando ? (
+            <RecuperarSenha emailInicial={email} voltar={() => setRecuperando(false)} />
+          ) : (<>
           <CardHeader>
             <CardTitle className="font-heading text-2xl">
               {modo === 'entrar' ? 'Bem-vindo de volta' : 'Crie sua conta'}
@@ -139,7 +143,15 @@ export function PaginaEntrar() {
                 <ErroCampo id="erro-email" texto={mostrar('email')} />
               </div>
               <div className="flex flex-col gap-2">
-                <Label htmlFor="senha">Senha</Label>
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor="senha">Senha</Label>
+                  {modo === 'entrar' && (
+                    <button type="button" onClick={() => setRecuperando(true)}
+                      className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+                      Esqueci minha senha
+                    </button>
+                  )}
+                </div>
                 <Input
                   id="senha"
                   type="password"
@@ -180,8 +192,58 @@ export function PaginaEntrar() {
               </Button>
             </form>
           </CardContent>
+          </>)}
         </Card>
       </section>
     </div>
+  )
+}
+
+/** "Esqueci minha senha": pede o link por e-mail. A resposta é a mesma exista a conta ou não. */
+function RecuperarSenha({ emailInicial, voltar }: { emailInicial: string; voltar: () => void }) {
+  const [email, setEmail] = useState(emailInicial)
+  const [tocado, setTocado] = useState(false)
+  const erro = !email.trim() ? 'Informe seu e-mail.' : !EMAIL.test(email.trim()) ? 'Esse e-mail parece incompleto (ex.: nome@gmail.com).' : undefined
+  const pedir = useMutation({ mutationFn: () => api.esqueciSenha(email.trim()) })
+
+  function aoEnviar(e: FormEvent) {
+    e.preventDefault()
+    setTocado(true)
+    if (!erro) pedir.mutate()
+  }
+
+  return (
+    <>
+      <CardHeader>
+        <CardTitle className="font-heading text-2xl">Esqueceu a senha?</CardTitle>
+        <CardDescription>Digite o e-mail da sua conta. Enviamos um link para você criar uma senha nova.</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        {pedir.isSuccess ? (
+          <div className="flex flex-col gap-3 rounded-xl bg-sucesso-suave px-4 py-3 text-sm" role="status">
+            <p className="font-medium text-sucesso">Pronto, confira seu e-mail.</p>
+            <p className="text-muted-foreground">{pedir.data.mensagem} O link vale por 1 hora.</p>
+          </div>
+        ) : (
+          <form onSubmit={aoEnviar} noValidate className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="email-recuperar">E-mail</Label>
+              <Input id="email-recuperar" type="email" autoComplete="email" autoFocus value={email}
+                onChange={(e) => setEmail(e.target.value)} onBlur={() => setTocado(true)}
+                aria-invalid={tocado && !!erro} aria-describedby="erro-email-recuperar" />
+              <ErroCampo id="erro-email-recuperar" texto={tocado ? erro : undefined} />
+            </div>
+            {pedir.isError && <p className="text-sm text-destructive" role="alert">{pedir.error.message}</p>}
+            <Button type="submit" size="lg" disabled={pedir.isPending}>
+              {pedir.isPending ? 'Enviando…' : 'Enviar link'}
+            </Button>
+          </form>
+        )}
+        <button type="button" onClick={voltar}
+          className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="size-4" /> Voltar para entrar
+        </button>
+      </CardContent>
+    </>
   )
 }

@@ -188,6 +188,8 @@ pytest                                             # unitários (sem banco, sem 
 |---|---|---|
 | POST | `/auth/cadastro` | `{email, senha, nome}` |
 | POST | `/auth/login` | `{email, senha}` → `access_token` |
+| POST | `/auth/esqueci` | `{email}` → manda o e-mail de recuperação (resposta igual exista a conta ou não) |
+| POST | `/auth/redefinir` | `{token_hash, senha}` → troca a senha pelo link do e-mail e entra (cookies) |
 | GET/POST | `/categorias` | listar / criar `{nome}` |
 | GET/PATCH/DELETE | `/categorias/<id>` | detalhe / renomear / remover |
 | POST | `/categorias/<id>/chat` | `{mensagem}` → `{pergunta, resposta, fontes}` |
