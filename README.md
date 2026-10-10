@@ -140,6 +140,7 @@ flask --app app:create_app run --debug
 6. `migrations/006_foto_perfil.sql` — bucket privado de fotos de perfil (Storage) e suas políticas
 7. `migrations/007_limite_uso.sql` — limite diário de uso por usuário (chat, IA e pesquisa)
 8. `migrations/008_documentos.sql` — materiais do aluno (texto em trechos + busca em português)
+9. `migrations/009_trilha_materiais.sql` — trilha a partir dos materiais (etapas ligadas a partes dos arquivos)
 
 As migrações são idempotentes (podem rodar de novo sem quebrar).
 
@@ -198,6 +199,7 @@ pytest                                             # unitários (sem banco, sem 
 | DELETE | `/documentos/<id>` | apagar material (e todos os trechos) |
 | POST | `/categorias/<id>/pesquisar` | `{consulta}` → recursos verificados |
 | POST | `/categorias/<id>/propostas` | `{objetivo}` → proposta `pendente` |
+| POST | `/categorias/<id>/propostas/materiais` | `{objetivo}` → proposta com os arquivos do aluno (sem pesquisa; gasta 1 de "ia") |
 | GET | `/categorias/<id>/propostas?status=` | listar propostas |
 | GET | `/propostas/<id>` | detalhe |
 | POST | `/propostas/<id>/confirmar` | → `{trilha_id, proposta}` |
@@ -246,7 +248,8 @@ plataforma segurar a resposta, ela aparece inteira no fim, sem erro.
   da Vercel. A busca é por palavras (com radical e sem acento), não por significado: "célula de energia" não
   acha "mitocôndria". Teto de 30 materiais por usuário e 4 MB por arquivo. A IA não lê os arquivos inteiros:
   recebe a lista de todos e os 5 trechos mais relevantes (numa pergunta sobre o conjunto, como "resuma meus
-  materiais", também o começo de cada arquivo). A trilha ainda é montada só com vídeos e sites da internet.
+  materiais", também o começo de cada arquivo). A trilha "Meus arquivos" divide os arquivos em até 40 partes
+  e a IA escolhe partes pelo número; os exercícios de cada etapa usam até 3 partes (3.500 caracteres cada).
 - **Escrita direta pela API do Supabase**: o RLS deixa o dono escrever nas próprias linhas. Com a
   chave anon, um usuário poderia, *só na própria conta*, criar proposta com link não verificado,
   ler gabaritos ou chamar `registrar_resposta` dizendo que acertou. Fechar isso exige mover essas

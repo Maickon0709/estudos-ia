@@ -96,6 +96,7 @@ def get_proposta_service() -> PropostaService:
         _pesquisa(categorias),
         _llm(),
         PropostaRepository(client),
+        DocumentoRepository(client),
     )
 
 

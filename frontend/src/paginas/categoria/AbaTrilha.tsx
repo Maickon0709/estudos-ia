@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { ComoCriarTrilha } from '@/components/ComoCriarTrilha'
 import { Carregando, Erro, Vazio } from '@/components/Estados'
 import { MapaTrilha as Mapa } from '@/components/MapaTrilha'
+import { MaterialItem } from '@/components/MaterialItem'
 import { RecursoItem } from '@/components/RecursoItem'
 import { Dica } from '@/components/Tutorial'
 import { Button } from '@/components/ui/button'
@@ -165,8 +166,9 @@ function EtapaCard({ etapa, trilhaId, categoriaId }: { etapa: Etapa; trilhaId: s
           {atualizar.isError && <p className="text-sm text-destructive sm:pl-11">{atualizar.error.message}</p>}
         </CardHeader>
 
-        {etapa.recursos.length > 0 && (
+        {(etapa.recursos.length > 0 || !!etapa.materiais?.length) && (
           <CardContent className="flex flex-col gap-2 sm:pl-17">
+            {etapa.materiais?.map((m) => <MaterialItem key={`${m.documento_id}-${m.ordem_inicio}`} material={m} />)}
             {etapa.recursos.map((r) => <RecursoItem key={r.id ?? r.url} recurso={r} />)}
           </CardContent>
         )}

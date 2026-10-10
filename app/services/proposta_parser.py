@@ -92,3 +92,57 @@ def _id(valor) -> int | None:
     if isinstance(valor, str) and valor.strip().isdigit():
         return int(valor.strip())
     return None
+
+
+MAX_PARTES_POR_ETAPA = 4
+
+
+def montar_payload_materiais(dados: dict, partes_por_id: dict[int, dict], objetivo: str) -> dict:
+    """Trilha a partir dos arquivos do aluno: mesma regra dos links, a IA só escolhe PELO NÚMERO.
+
+    Cada etapa leva as partes escolhidas (cópias do que o back-end montou), em `materiais`;
+    `recursos` fica vazio. Uma parte entra em no máximo uma etapa; etapa sem parte é descartada.
+    """
+    etapas_brutas = dados.get("etapas")
+    if not isinstance(etapas_brutas, list):
+        raise IAIndisponivelError(_ERRO_FORMATO)
+
+    usadas: set[int] = set()
+    etapas = []
+    for bruta in etapas_brutas:
+        if len(etapas) == MAX_ETAPAS:
+            break
+        if not isinstance(bruta, dict):
+            continue
+        titulo = _texto(bruta.get("titulo"), TITULO_MAX)
+        if not titulo:
+            continue
+
+        materiais = []
+        ids = bruta.get("materiais")
+        for bruto in ids if isinstance(ids, list) else []:
+            ident = _id(bruto)
+            if ident in partes_por_id and ident not in usadas and len(materiais) < MAX_PARTES_POR_ETAPA:
+                usadas.add(ident)
+                parte = partes_por_id[ident]
+                materiais.append({chave: parte.get(chave) for chave in (
+                    "documento_id", "nome", "ordem_inicio", "ordem_fim", "pagina_inicio", "pagina_fim")})
+        if not materiais:
+            continue  # etapa sem material do aluno não serve para esta trilha
+
+        etapas.append({
+            "titulo": titulo,
+            "descricao": _texto(bruta.get("descricao"), DESCRICAO_MAX) or None,
+            "recursos": [],
+            "materiais": materiais,
+        })
+
+    if not etapas:
+        raise IAIndisponivelError("A IA não montou nenhuma etapa com os seus materiais. Tente novamente.")
+
+    return {
+        "titulo": _texto(dados.get("titulo"), TITULO_MAX) or _texto(f"Trilha: {objetivo}", TITULO_MAX),
+        "objetivo": objetivo,
+        "origem": "materiais",
+        "etapas": etapas,
+    }

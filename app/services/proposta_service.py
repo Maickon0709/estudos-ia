@@ -3,7 +3,9 @@
 Fluxo:
   gerar     -> pesquisa verificada + conversa -> IA escolhe recursos por número
                -> proposta 'pendente' salva (nada de trilha ainda)
-  confirmar -> função SQL atômica cria trilha + etapas + recursos
+  gerar_de_materiais -> partes dos arquivos do aluno (numeradas) -> IA escolhe partes por número
+               -> proposta 'pendente' com `materiais` em cada etapa
+  confirmar -> função SQL atômica cria trilha + etapas + recursos + materiais
   rejeitar  -> marca 'rejeitada'
 
 Custo de `gerar`: 2 créditos do Tavily + 1 chamada à IA (+ YouTube se houver chave).
@@ -16,8 +18,14 @@ from app.core.errors import (
     SemConteudoError,
     ValidacaoError,
 )
-from app.services.prompts import mensagem_proposta, prompt_proposta
-from app.services.proposta_parser import extrair_json, montar_payload
+from app.services.materiais_trilha import montar_partes
+from app.services.prompts import (
+    mensagem_proposta,
+    mensagem_proposta_materiais,
+    prompt_proposta,
+    prompt_proposta_materiais,
+)
+from app.services.proposta_parser import extrair_json, montar_payload, montar_payload_materiais
 
 OBJETIVO_MIN = 3
 OBJETIVO_MAX = 300
@@ -27,12 +35,14 @@ STATUS_VALIDOS = ("pendente", "confirmada", "rejeitada")
 
 
 class PropostaService:
-    def __init__(self, categoria_service, mensagem_repo, pesquisa_service, llm, proposta_repo):
+    def __init__(self, categoria_service, mensagem_repo, pesquisa_service, llm, proposta_repo,
+                 documento_repo=None):
         self._categorias = categoria_service
         self._mensagens = mensagem_repo
         self._pesquisa = pesquisa_service
         self._llm = llm
         self._propostas = proposta_repo
+        self._documentos = documento_repo  # materiais do aluno (trilha a partir dos arquivos)
 
     # ---------- gerar ----------
     def gerar(self, categoria_id: str, objetivo) -> dict:
@@ -58,6 +68,28 @@ class PropostaService:
 
         payload = montar_payload(extrair_json(resposta), numerados, objetivo)
         payload["youtube_verificado"] = pesquisa["youtube_verificado"]
+
+        proposta = self._propostas.criar(categoria["id"], payload)
+        self._propostas.rejeitar_outras_pendentes(categoria["id"], proposta["id"])
+        return proposta
+
+    def gerar_de_materiais(self, categoria_id: str, objetivo) -> dict:
+        """Trilha com os arquivos que o aluno enviou na categoria. Custo: 1 chamada à IA, 0 pesquisa."""
+        objetivo = self._validar_objetivo(objetivo)
+        categoria = self._categorias.obter(categoria_id)
+        partes = montar_partes(self._documentos.previa(categoria["id"]) if self._documentos else [])
+        if not partes:
+            raise SemConteudoError(
+                "Esta categoria ainda não tem materiais. Envie seus arquivos na aba Materiais "
+                "ou monte a trilha com vídeos e sites."
+            )
+
+        numeradas = {i: p for i, p in enumerate(partes, start=1)}
+        resposta = self._llm.responder([
+            {"role": "system", "content": prompt_proposta_materiais()},
+            {"role": "user", "content": mensagem_proposta_materiais(categoria["nome"], objetivo, numeradas)},
+        ])
+        payload = montar_payload_materiais(extrair_json(resposta), numeradas, objetivo)
 
         proposta = self._propostas.criar(categoria["id"], payload)
         self._propostas.rejeitar_outras_pendentes(categoria["id"], proposta["id"])

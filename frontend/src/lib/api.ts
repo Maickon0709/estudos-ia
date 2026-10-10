@@ -186,6 +186,9 @@ export const api = {
     pedir<Proposta[]>('GET', `/categorias/${categoriaId}/propostas?status=pendente`),
   gerarProposta: (categoriaId: string, objetivo: string) =>
     pedir<Proposta>('POST', `/categorias/${categoriaId}/propostas`, { objetivo }),
+  /** Trilha com os arquivos da aba Materiais (sem pesquisa na internet). */
+  gerarPropostaMateriais: (categoriaId: string, objetivo: string) =>
+    pedir<Proposta>('POST', `/categorias/${categoriaId}/propostas/materiais`, { objetivo }),
   confirmarProposta: (id: string) =>
     pedir<{ trilha_id: string; proposta: Proposta }>('POST', `/propostas/${id}/confirmar`),
   rejeitarProposta: (id: string) => pedir<Proposta>('POST', `/propostas/${id}/rejeitar`),

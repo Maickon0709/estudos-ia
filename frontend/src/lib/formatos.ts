@@ -1,4 +1,4 @@
-import type { Nivel, StatusEtapa } from './tipos'
+import type { MaterialEtapa, Nivel, StatusEtapa } from './tipos'
 
 export const NOME_NIVEL: Record<Nivel, string> = {
   basico: 'Básico',
@@ -29,4 +29,12 @@ export function diaMes(isoData: string): string {
 
 export function porcentagem(valor: number): string {
   return `${Math.round(valor)}%`
+}
+
+/** "aula.pdf, p. 3-5": mesmo rótulo que o back-end usa nas fontes dos exercícios. */
+export function rotuloMaterial(m: Pick<MaterialEtapa, 'nome' | 'pagina_inicio' | 'pagina_fim'>): string {
+  const nome = m.nome ?? 'material'
+  if (m.pagina_inicio && m.pagina_fim && m.pagina_fim !== m.pagina_inicio) return `${nome}, p. ${m.pagina_inicio}-${m.pagina_fim}`
+  if (m.pagina_inicio) return `${nome}, p. ${m.pagina_inicio}`
+  return nome
 }

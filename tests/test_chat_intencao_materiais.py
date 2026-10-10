@@ -128,7 +128,7 @@ def test_tutora_nao_finge_criar_trilha_nem_repete_opcoes():
     assert "NÃO repita a lista de opções" in prompt
     assert "NÃO escreva etapas nem uma trilha no chat" in prompt
     assert "Nunca diga que algo foi criado" in prompt
-    assert "ainda não é montada a partir dos arquivos" in prompt
+    assert "Meus arquivos" in prompt and "Vídeos e sites" in prompt
     assert "Sem emojis" in prompt
 
 

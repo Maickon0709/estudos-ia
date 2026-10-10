@@ -43,6 +43,16 @@ export type Recurso = {
   verificacao?: Verificacao
 }
 
+/** Parte de um arquivo do aluno ligada a uma etapa (trilha montada com os materiais). */
+export type MaterialEtapa = {
+  documento_id: string
+  nome: string | null
+  ordem_inicio: number
+  ordem_fim: number
+  pagina_inicio: number | null
+  pagina_fim: number | null
+}
+
 export type Proposta = {
   id: string
   categoria_id: string
@@ -52,7 +62,8 @@ export type Proposta = {
     titulo: string
     objetivo: string
     youtube_verificado?: boolean
-    etapas: { titulo: string; descricao: string | null; recursos: Recurso[] }[]
+    origem?: 'materiais'
+    etapas: { titulo: string; descricao: string | null; recursos: Recurso[]; materiais?: MaterialEtapa[] }[]
   }
 }
 
@@ -68,6 +79,7 @@ export type Etapa = {
   status: StatusEtapa
   ja_sabia: boolean
   recursos: Recurso[]
+  materiais?: MaterialEtapa[]
 }
 
 export type TrilhaResumo = { id: string; titulo: string; created_at: string }

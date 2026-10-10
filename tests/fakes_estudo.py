@@ -22,6 +22,9 @@ class EtapaRepoFalso:
         self.recursos_por_etapa: dict[str, list] = {}
         self.niveis_por_etapa: dict[str, dict] = {}
         self.atualizacoes: list[tuple[str, dict]] = []
+        # partes dos arquivos do aluno (migração 009): etapa_id -> [material]; (doc, início, fim) -> [trecho]
+        self.materiais_por_etapa: dict[str, list] = {}
+        self.textos: dict[tuple, list] = {}
 
     def adicionar(self, etapa_id=ETAPA, trilha_id=TRILHA, ordem=1, status="nao_iniciado",
                   ja_sabia=False, titulo="Conceito", recursos=None):
@@ -50,6 +53,12 @@ class EtapaRepoFalso:
     def recursos(self, etapa_id):
         return copy.deepcopy(self.recursos_por_etapa.get(etapa_id, []))
 
+    def materiais(self, etapa_id):
+        return copy.deepcopy(self.materiais_por_etapa.get(etapa_id, []))
+
+    def texto_material(self, documento_id, ordem_inicio, ordem_fim):
+        return copy.deepcopy(self.textos.get((documento_id, ordem_inicio, ordem_fim), []))
+
     def niveis(self, etapa_id):
         return copy.deepcopy(self.niveis_por_etapa.get(etapa_id, {}))
 
@@ -75,6 +84,9 @@ class TrilhaRepoFalso:
 
     def recursos_das_etapas(self, etapa_ids):
         return [r for i in etapa_ids for r in self._etapas.recursos(i)]
+
+    def materiais_das_etapas(self, etapa_ids):
+        return [{**m, "etapa_id": i} for i in etapa_ids for m in self._etapas.materiais(i)]
 
 
 class ExercicioRepoFalso:
