@@ -61,6 +61,7 @@ export {
   TrendDown as TrendingDown,
   Trophy,
   ArrowUUpLeft as Undo2,
+  UploadSimple as Upload,
   User as UserRound,
   X,
 } from '@phosphor-icons/react'

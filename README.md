@@ -15,9 +15,10 @@ pratica com **exercícios por nível** corrigidos automaticamente, revisa o que 
 | Arquitetura | Camadas `routes → services → repositories`, integrações externas atrás de interfaces |
 | Segurança | RLS no Postgres, JWT do usuário repassado ao banco, proteção SSRF, gabarito nunca exposto antes da resposta |
 | IA sem alucinar link | A IA escolhe materiais **por número** de uma lista verificada e nem vê as URLs |
+| RAG sem custo | O aluno envia PDF, Word, PowerPoint ou texto; a busca textual do Postgres acha os trechos e a tutora cita arquivo e página |
 | Banco | Funções SQL **atômicas** (confirmar proposta, registrar resposta), views do painel |
 | Regras de negócio | Trilha adaptativa, revisão espaçada e sequência de dias como funções puras |
-| Qualidade | ~430 testes; SQL testado em **Postgres real**; regras críticas validadas por **mutação** |
+| Qualidade | ~670 testes; SQL testado em **Postgres real**; regras críticas validadas por **mutação** |
 | Front-end | React + TypeScript + Tailwind + shadcn/ui, animações do React Bits, CSP e testes no navegador |
 | Entrega | CI no GitHub Actions com Postgres de serviço, Docker multi-stage, deploy na Vercel |
 
@@ -51,6 +52,7 @@ cd frontend && npm install && npm run dev
 
 1. **Categoria** → `POST /categorias`
 2. **Conversa** com a IA tutora sobre objetivo, nível e tempo → `POST /categorias/<id>/chat`
+   - opcional: envia **materiais** (apostila, slides) → `POST /categorias/<id>/documentos`, e a tutora passa a responder com base neles
 3. **Proposta de trilha** → `POST /categorias/<id>/propostas`: pesquisa verificada + IA monta as etapas
 4. **Confirma** → `POST /propostas/<id>/confirmar`: o banco cria trilha, etapas e recursos de uma vez
 5. **Estuda** pela trilha → `GET /trilhas/<id>`, marca etapas → `PATCH /etapas/<id>`
@@ -78,6 +80,22 @@ cd frontend && npm install && npm run dev
 - `registrar_resposta` grava a resposta, recalcula a etapa e aplica a revisão espaçada
   **numa transação**: se qualquer parte falhar, nada fica gravado.
 - Views com `security_invoker` alimentam o painel respeitando o RLS.
+
+### Materiais do aluno (RAG com a busca textual do Postgres)
+- Formatos: **PDF** (`pypdf`), **Word** e **PowerPoint** (lidos como ZIP + XML, sem biblioteca extra), **.txt** e **.md**.
+  O tipo vem do **conteúdo** (assinatura do arquivo), não da extensão.
+- Tetos contra arquivo malicioso: 4 MB, 300 páginas, 20 MB por XML descompactado (bomba de compressão),
+  XML com `DOCTYPE` recusado (ataque de entidades) e 400 mil caracteres (o resto é cortado e avisado).
+- O texto vira trechos de ~1.200 caracteres que **nunca atravessam páginas** (a citação "p. 12" é sempre
+  verdadeira) e repetem o final do trecho anterior (sobreposição). **O arquivo original não é guardado.**
+- `criar_documento()` grava documento e trechos **numa transação**. Cada trecho tem um `tsvector` em
+  português com índice GIN; `buscar_trechos()` troca o "E" do `plainto_tsquery` por "OU" e ordena por `ts_rank`
+  (uma pergunta longa quase nunca tem todas as palavras num trecho só). Acento não importa: a função
+  imutável `sem_acento()` trata texto e pergunta do mesmo jeito ("mitocondria" acha "mitocôndria").
+- No chat, os 5 trechos mais relevantes vão para a IA logo antes da pergunta, delimitados como
+  **dados, não instruções** (um PDF pode trazer "ignore as regras"), e a resposta mostra as fontes.
+- Por que não vetores (embeddings): sem custo, sem outro serviço, e ótimo para termos exatos de estudo.
+  Se precisar de busca por significado, o próximo passo é `pgvector` no mesmo banco.
 
 ### Exercícios e correção
 - Níveis **básico, intermediário e avançado**, gerados pela IA com base nas fontes da etapa.
@@ -120,7 +138,8 @@ flask --app app:create_app run --debug
 4. `migrations/004_flashcards_simulados_estudo.sql` — flashcards, simulados, cronômetro, metas e calendário
 5. `migrations/005_consentimento_exclusao_conta.sql` — aceite dos termos e exclusão da conta (LGPD)
 6. `migrations/006_foto_perfil.sql` — bucket privado de fotos de perfil (Storage) e suas políticas
-7. `migrations/007_limite_uso.sql` — limite diário de uso por usuário (chat, IA e pesquisa)
+7. `migrations/007_limite_uso.sql` — limite diário de uso por usuário (chat, IA e pesquisa)
+8. `migrations/008_documentos.sql` — materiais do aluno (texto em trechos + busca em português)
 
 As migrações são idempotentes (podem rodar de novo sem quebrar).
 
@@ -148,7 +167,8 @@ pytest                                             # unitários (sem banco, sem 
 
 - Unitários usam dublês de repositório, IA, busca e YouTube e um transporte HTTP simulado.
 - **SQL em Postgres real** (`tests/integracao`): RLS entre usuários, confirmação atômica,
-  rollback em proposta inválida, clique duplo simultâneo, registro de resposta, revisões e views.
+  rollback em proposta inválida, clique duplo simultâneo, registro de resposta, revisões, views
+  e a busca dos materiais (radical em português, relevância, isolamento entre usuários).
   Rodam quando `TEST_DATABASE_URL` aponta para um Postgres 15+ (no CI isso é automático):
 
   ```bash
@@ -170,8 +190,10 @@ pytest                                             # unitários (sem banco, sem 
 | POST | `/auth/login` | `{email, senha}` → `access_token` |
 | GET/POST | `/categorias` | listar / criar `{nome}` |
 | GET/PATCH/DELETE | `/categorias/<id>` | detalhe / renomear / remover |
-| POST | `/categorias/<id>/chat` | `{mensagem}` → `{pergunta, resposta}` |
+| POST | `/categorias/<id>/chat` | `{mensagem}` → `{pergunta, resposta, fontes}` |
 | GET | `/categorias/<id>/mensagens` | histórico do chat |
+| GET/POST | `/categorias/<id>/documentos` | listar / enviar material (multipart, campo `arquivo`) |
+| DELETE | `/documentos/<id>` | apagar material (e todos os trechos) |
 | POST | `/categorias/<id>/pesquisar` | `{consulta}` → recursos verificados |
 | POST | `/categorias/<id>/propostas` | `{objetivo}` → proposta `pendente` |
 | GET | `/categorias/<id>/propostas?status=` | listar propostas |
@@ -218,6 +240,9 @@ plataforma segurar a resposta, ela aparece inteira no fim, sem erro.
   variáveis `LIMITE_*_DIA`. O contador fica no banco (`uso_diario`), porque na Vercel cada requisição
   pode cair numa instância diferente; só a função `consumir_uso()` (SECURITY DEFINER, só `auth.uid()`)
   escreve nele, então o usuário não consegue zerar o próprio contador. Falta: cache de pesquisas.
+- **Materiais**: PDF escaneado (só imagem) não é lido, porque OCR é pesado demais para a função gratuita
+  da Vercel. A busca é por palavras (com radical e sem acento), não por significado: "célula de energia" não
+  acha "mitocôndria". Teto de 30 materiais por usuário e 4 MB por arquivo.
 - **Escrita direta pela API do Supabase**: o RLS deixa o dono escrever nas próprias linhas. Com a
   chave anon, um usuário poderia, *só na própria conta*, criar proposta com link não verificado,
   ler gabaritos ou chamar `registrar_resposta` dizendo que acertou. Fechar isso exige mover essas
@@ -237,5 +262,6 @@ plataforma segurar a resposta, ela aparece inteira no fim, sem erro.
 - [x] CI (GitHub Actions) e Docker
 - [x] Front-end
 - [x] Limite de uso por usuário
+- [x] Materiais do aluno (PDF, Word, PowerPoint, texto) com busca textual
 - [ ] Cache de pesquisas
 - [ ] Endurecer escritas sensíveis com funções `SECURITY DEFINER`

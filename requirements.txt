@@ -4,6 +4,8 @@ supabase>=2.10
 httpx>=0.27
 # Foto de perfil: valida e regrava a imagem (tira metadados como GPS).
 pillow>=11
+# Materiais do aluno: tira o texto de PDFs (Python puro, sem binário nativo).
+pypdf>=5,<7
 # Fuso de Brasília no Windows (o Python do Windows não traz a base de fusos).
 tzdata>=2024.1
 # Servidor de produção usado no Docker.

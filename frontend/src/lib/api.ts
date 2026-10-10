@@ -1,7 +1,7 @@
 // Único lugar do front que fala com a API (mesma ideia dos repositories no back-end).
 import { definirLogado, estaLogado } from './sessao'
 import type {
-  Categoria, Correcao, Exercicio, Flashcard, FlashcardPendente, Hoje, Mensagem, Meta, Nivel, Painel,
+  Categoria, Correcao, Documento, Exercicio, Flashcard, FlashcardPendente, Fonte, Hoje, Mensagem, Meta, Nivel, Painel,
   Proposta, Revisao, Simulado, StatusEtapa, Trilha, TrilhaResumo,
 } from './tipos'
 
@@ -110,7 +110,7 @@ async function pedir<T>(metodo: string, caminho: string, corpo?: unknown): Promi
 
 type EventoChat =
   | { tipo: 'delta'; texto: string }
-  | { tipo: 'fim'; pergunta: Mensagem; resposta: Mensagem }
+  | { tipo: 'fim'; pergunta: Mensagem; resposta: Mensagem; fontes?: Fonte[] }
   | { tipo: 'erro'; erro: string; mensagem: string }
 
 /**
@@ -121,7 +121,7 @@ async function conversarAoVivo(
   categoriaId: string,
   mensagem: string,
   aoEscrever: (pedaco: string) => void,
-): Promise<{ pergunta: Mensagem; resposta: Mensagem }> {
+): Promise<{ pergunta: Mensagem; resposta: Mensagem; fontes: Fonte[] }> {
   const resposta = await enviar('POST', `/categorias/${categoriaId}/chat/stream`, { mensagem })
   if (!resposta.body) throw new ErroApi(0, 'sem_stream', 'Seu navegador não recebeu a resposta ao vivo.')
 
@@ -138,7 +138,7 @@ async function conversarAoVivo(
       if (!bloco.startsWith('data: ')) continue
       const evento = JSON.parse(bloco.slice(6)) as EventoChat
       if (evento.tipo === 'delta') aoEscrever(evento.texto)
-      else if (evento.tipo === 'fim') return { pergunta: evento.pergunta, resposta: evento.resposta }
+      else if (evento.tipo === 'fim') return { pergunta: evento.pergunta, resposta: evento.resposta, fontes: evento.fontes ?? [] }
       else throw new ErroApi(502, evento.erro, evento.mensagem)
     }
   }
@@ -201,6 +201,14 @@ export const api = {
   revisoesHoje: () => pedir<Revisao[]>('GET', '/revisoes/hoje'),
 
   conversarAoVivo,
+
+  documentos: (categoriaId: string) => pedir<Documento[]>('GET', `/categorias/${categoriaId}/documentos`),
+  enviarDocumento: (categoriaId: string, arquivo: File) => {
+    const formulario = new FormData()
+    formulario.append('arquivo', arquivo)
+    return pedir<Documento>('POST', `/categorias/${categoriaId}/documentos`, formulario)
+  },
+  removerDocumento: (id: string) => pedir<void>('DELETE', `/documentos/${id}`),
   explicar: (exercicioId: string) => pedir<{ explicacao: string }>('POST', `/exercicios/${exercicioId}/explicar`),
 
   flashcards: (etapaId: string) => pedir<Flashcard[]>('GET', `/etapas/${etapaId}/flashcards`),

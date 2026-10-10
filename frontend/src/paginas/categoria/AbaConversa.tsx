@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { BookOpen, Check, CircleHelp, Compass, MessageCircle, Route, Send, X, type Icone as LucideIcon } from '@/lib/icones'
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { BookOpen, Check, CircleHelp, Compass, FileText, MessageCircle, Route, Send, X, type Icone as LucideIcon } from '@/lib/icones'
+import { Fragment, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { toast } from 'sonner'
 import { Carregando, Erro, Trabalhando, Vazio } from '@/components/Estados'
 import { Bolha } from '@/components/Bolha'
@@ -15,7 +15,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
 import { LIMITES } from '@/lib/seguranca'
-import type { Mensagem, Proposta } from '@/lib/tipos'
+import type { Fonte, Mensagem, Proposta } from '@/lib/tipos'
 
 type Props = { categoriaId: string; aoConfirmar: () => void }
 
@@ -38,6 +38,8 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
   const [texto, setTexto] = useState('')
   const [dialogoAberto, setDialogoAberto] = useState(false)
   const [parcial, setParcial] = useState('') // resposta da IA chegando ao vivo
+  // Materiais usados em cada resposta desta visita (id da resposta -> fontes). Não ficam no histórico.
+  const [fontes, setFontes] = useState<Record<string, Fonte[]>>({})
   const fim = useRef<HTMLDivElement>(null)
 
   const enviar = useMutation({
@@ -45,8 +47,9 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
       setParcial('')
       return api.conversarAoVivo(categoriaId, mensagem, (pedaco) => setParcial((atual) => atual + pedaco))
     },
-    onSuccess: ({ pergunta, resposta }) => {
+    onSuccess: ({ pergunta, resposta, fontes: usadas }) => {
       setTexto('')
+      if (usadas.length) setFontes((atuais) => ({ ...atuais, [resposta.id]: usadas }))
       queryClient.setQueryData<Mensagem[]>(chaveMensagens, (antigas = []) => [...antigas, pergunta, resposta])
     },
     onSettled: () => setParcial(''),
@@ -89,7 +92,12 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
               com vídeos do YouTube e sites verificados. Use os atalhos abaixo para começar.
             </Vazio>
           )}
-          {mensagens.data?.map((m) => <Bolha key={m.id} mensagem={m} />)}
+          {mensagens.data?.map((m) => (
+            <Fragment key={m.id}>
+              <Bolha mensagem={m} />
+              {fontes[m.id] && <Fontes lista={fontes[m.id]} />}
+            </Fragment>
+          ))}
           {enviar.isPending && (
             <>
               <Bolha mensagem={{ papel: 'user', conteudo: enviar.variables }} />
@@ -236,5 +244,20 @@ function PropostaCard({ proposta, categoriaId, aoConfirmar }: { proposta: Propos
         {decidir.isError && <p className="w-full text-sm text-destructive">{decidir.error.message}</p>}
       </CardFooter>
     </Card>
+  )
+}
+
+/** De onde a tutora tirou a resposta (arquivo e página). Só texto: nome de arquivo nunca vira link. */
+function Fontes({ lista }: { lista: Fonte[] }) {
+  return (
+    <p className="-mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 pl-1 text-xs text-muted-foreground">
+      <FileText className="size-3.5 text-primary" />
+      <span>Dos seus materiais:</span>
+      {lista.map((f) => (
+        <span key={`${f.documento_id}-${f.pagina}`} className="rounded-full border px-2 py-0.5">
+          {f.nome}{f.pagina ? `, p. ${f.pagina}` : ''}
+        </span>
+      ))}
+    </p>
   )
 }
