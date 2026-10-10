@@ -54,85 +54,85 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Tema "Índigo + Ciano" (decisões em frontend/DESIGN.md).
-   Neutros frios levemente azulados, índigo como cor de ação e ciano só para brilho e destaque. */
+/* Tema "Preto, branco e vermelho" (decisões em frontend/DESIGN.md).
+   Quase monocromático, estilo editorial: preto para ação, um vermelho claro só para marcar. */
 :root {
-    --background: oklch(0.975 0.005 275);     /* #F6F7FB */
-    --foreground: oklch(0.2 0.045 275);       /* #11142B, tinta índigo, nunca preto puro */
+    --background: oklch(0.985 0.002 90);      /* #FAFAF9 */
+    --foreground: oklch(0.2 0 0);             /* #111 suave, nunca preto puro */
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.2 0.045 275);
+    --card-foreground: oklch(0.2 0 0);
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.2 0.045 275);
-    --primary: oklch(0.511 0.262 277);        /* índigo #4F46E5 */
-    --primary-foreground: oklch(0.985 0.005 275);
-    --secondary: oklch(0.955 0.012 275);
-    --secondary-foreground: oklch(0.3 0.05 275);
-    --muted: oklch(0.955 0.01 275);
-    --muted-foreground: oklch(0.5 0.035 275);
-    --accent: oklch(0.95 0.03 277);           /* tinta suave do índigo (hover, seleção) */
-    --accent-foreground: oklch(0.4 0.2 277);
-    --destaque: oklch(0.715 0.143 215);       /* ciano #06B6D4: brilhos, gradientes, detalhes */
-    --destaque-foreground: oklch(0.2 0.05 220);
-    --destructive: oklch(0.577 0.245 27);
-    --border: oklch(0.915 0.015 275);
-    --input: oklch(0.88 0.02 275);
-    --ring: oklch(0.511 0.262 277);
-    --chart-1: oklch(0.511 0.262 277);        /* índigo */
-    --chart-2: oklch(0.715 0.143 215);        /* ciano */
-    --chart-3: oklch(0.77 0.16 70);           /* âmbar */
-    --chart-4: oklch(0.696 0.17 162);         /* esmeralda */
-    --chart-5: oklch(0.7 0.03 275);
-    --sucesso: oklch(0.6 0.15 162);           /* esmeralda #10B981 escurecida para contraste */
-    --sucesso-suave: oklch(0.955 0.04 162);
-    --sombra: 245 50% 12%;                    /* sombras tingidas de índigo, não preto */
+    --popover-foreground: oklch(0.2 0 0);
+    --primary: oklch(0.21 0 0);               /* preto: botões e ação */
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.96 0.002 90);
+    --secondary-foreground: oklch(0.25 0 0);
+    --muted: oklch(0.96 0.002 90);
+    --muted-foreground: oklch(0.5 0.005 90);
+    --accent: oklch(0.96 0.025 25);           /* rosado bem claro: seleção, hover */
+    --accent-foreground: oklch(0.42 0.14 27);
+    --destaque: oklch(0.66 0.17 27);          /* vermelho levemente claro: marcações, números, foco */
+    --destaque-foreground: oklch(0.99 0 0);
+    --destructive: oklch(0.55 0.2 27);
+    --border: oklch(0.91 0.003 90);
+    --input: oklch(0.87 0.004 90);
+    --ring: oklch(0.66 0.17 27);
+    --chart-1: oklch(0.66 0.17 27);           /* vermelho */
+    --chart-2: oklch(0.3 0 0);                /* grafite */
+    --chart-3: oklch(0.6 0 0);                /* cinza */
+    --chart-4: oklch(0.8 0.08 27);            /* vermelho claro */
+    --chart-5: oklch(0.85 0 0);
+    --sucesso: oklch(0.55 0.11 155);
+    --sucesso-suave: oklch(0.955 0.03 155);
+    --sombra: 0 0% 8%;                        /* sombra neutra */
     --radius: 0.75rem;
-    --sidebar: oklch(0.965 0.008 275);
-    --sidebar-foreground: oklch(0.2 0.045 275);
-    --sidebar-primary: oklch(0.511 0.262 277);
-    --sidebar-primary-foreground: oklch(0.985 0.005 275);
-    --sidebar-accent: oklch(0.95 0.03 277);
-    --sidebar-accent-foreground: oklch(0.4 0.2 277);
-    --sidebar-border: oklch(0.915 0.015 275);
-    --sidebar-ring: oklch(0.511 0.262 277);
+    --sidebar: oklch(0.97 0.002 90);
+    --sidebar-foreground: oklch(0.2 0 0);
+    --sidebar-primary: oklch(0.21 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.96 0.025 25);
+    --sidebar-accent-foreground: oklch(0.42 0.14 27);
+    --sidebar-border: oklch(0.91 0.003 90);
+    --sidebar-ring: oklch(0.66 0.17 27);
 }
 
 .dark {
-    --background: oklch(0.16 0.03 277);       /* #0A0C1B */
-    --foreground: oklch(0.95 0.01 275);
-    --card: oklch(0.205 0.04 277);            /* #12152B */
-    --card-foreground: oklch(0.95 0.01 275);
-    --popover: oklch(0.215 0.04 277);
-    --popover-foreground: oklch(0.95 0.01 275);
-    --primary: oklch(0.673 0.182 277);        /* índigo claro #818CF8 */
-    --primary-foreground: oklch(0.17 0.04 277);
-    --secondary: oklch(0.25 0.04 277);
-    --secondary-foreground: oklch(0.92 0.01 275);
-    --muted: oklch(0.25 0.04 277);
-    --muted-foreground: oklch(0.72 0.03 275);
-    --accent: oklch(0.28 0.07 277);
-    --accent-foreground: oklch(0.92 0.05 277);
-    --destaque: oklch(0.789 0.154 212);       /* ciano #22D3EE */
-    --destaque-foreground: oklch(0.18 0.04 220);
+    --background: oklch(0.17 0 0);           /* #121212 */
+    --foreground: oklch(0.95 0 0);
+    --card: oklch(0.215 0 0);
+    --card-foreground: oklch(0.95 0 0);
+    --popover: oklch(0.225 0 0);
+    --popover-foreground: oklch(0.95 0 0);
+    --primary: oklch(0.95 0 0);              /* branco: botões no escuro */
+    --primary-foreground: oklch(0.17 0 0);
+    --secondary: oklch(0.26 0 0);
+    --secondary-foreground: oklch(0.92 0 0);
+    --muted: oklch(0.26 0 0);
+    --muted-foreground: oklch(0.7 0 0);
+    --accent: oklch(0.28 0.04 25);
+    --accent-foreground: oklch(0.9 0.05 25);
+    --destaque: oklch(0.72 0.15 25);         /* vermelho claro */
+    --destaque-foreground: oklch(0.17 0 0);
     --destructive: oklch(0.68 0.18 25);
-    --border: oklch(1 0 0 / 9%);
-    --input: oklch(1 0 0 / 14%);
-    --ring: oklch(0.673 0.182 277);
-    --chart-1: oklch(0.673 0.182 277);
-    --chart-2: oklch(0.789 0.154 212);
-    --chart-3: oklch(0.82 0.15 75);
-    --chart-4: oklch(0.77 0.15 162);
-    --chart-5: oklch(0.55 0.03 275);
-    --sucesso: oklch(0.77 0.15 162);
-    --sucesso-suave: oklch(0.3 0.06 162);
-    --sombra: 240 60% 3%;
-    --sidebar: oklch(0.205 0.04 277);
-    --sidebar-foreground: oklch(0.95 0.01 275);
-    --sidebar-primary: oklch(0.673 0.182 277);
-    --sidebar-primary-foreground: oklch(0.17 0.04 277);
-    --sidebar-accent: oklch(0.28 0.07 277);
-    --sidebar-accent-foreground: oklch(0.92 0.05 277);
-    --sidebar-border: oklch(1 0 0 / 9%);
-    --sidebar-ring: oklch(0.673 0.182 277);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.72 0.15 25);
+    --chart-1: oklch(0.72 0.15 25);
+    --chart-2: oklch(0.85 0 0);
+    --chart-3: oklch(0.6 0 0);
+    --chart-4: oklch(0.55 0.1 25);
+    --chart-5: oklch(0.4 0 0);
+    --sucesso: oklch(0.75 0.13 155);
+    --sucesso-suave: oklch(0.3 0.05 155);
+    --sombra: 0 0% 2%;
+    --sidebar: oklch(0.215 0 0);
+    --sidebar-foreground: oklch(0.95 0 0);
+    --sidebar-primary: oklch(0.95 0 0);
+    --sidebar-primary-foreground: oklch(0.17 0 0);
+    --sidebar-accent: oklch(0.28 0.04 25);
+    --sidebar-accent-foreground: oklch(0.9 0.05 25);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.72 0.15 25);
 }
 
 @layer base {
@@ -188,7 +188,7 @@
 
 /* Cartão clicável: sobe de leve e ganha sombra quente */
 .cartao-vivo { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
-.cartao-vivo:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -14px color-mix(in oklch, var(--primary) 45%, transparent); }
+.cartao-vivo:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -14px hsl(var(--sombra) / 0.35); }
 .cartao-vivo:active { transform: translateY(0); }
 
 @media (prefers-reduced-motion: reduce) {
@@ -233,26 +233,17 @@
 .cartao-brilho::before {
   z-index: 1;
   background: radial-gradient(420px circle at var(--brilho-x, 50%) var(--brilho-y, 50%),
-    color-mix(in oklch, var(--primary) 14%, transparent), transparent 65%);
+    color-mix(in oklch, var(--destaque) 7%, transparent), transparent 65%);
 }
 /* borda que acende perto do cursor (máscara deixa só o anel de 1.5px) */
 .cartao-brilho::after {
   z-index: 2; padding: 1.5px;
   background: radial-gradient(260px circle at var(--brilho-x, 50%) var(--brilho-y, 50%),
-    color-mix(in oklch, var(--primary) 85%, transparent), transparent 70%);
+    color-mix(in oklch, var(--destaque) 55%, transparent), transparent 70%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
 }
 .cartao-brilho[data-ativo]::before, .cartao-brilho[data-ativo]::after { opacity: 1; }
-/* no cartão que já é da cor de ação, a luz é clara */
-.cartao-brilho.bg-primary::before {
-  background: radial-gradient(420px circle at var(--brilho-x, 50%) var(--brilho-y, 50%),
-    color-mix(in oklch, var(--primary-foreground) 16%, transparent), transparent 65%);
-}
-.cartao-brilho.bg-primary::after {
-  background: radial-gradient(260px circle at var(--brilho-x, 50%) var(--brilho-y, 50%),
-    color-mix(in oklch, var(--primary-foreground) 70%, transparent), transparent 70%);
-}
 
 /* Fundo de pontos do hero: some nas bordas */
 .mascara-radial { mask-image: radial-gradient(ellipse 75% 70% at 50% 40%, #000 40%, transparent 100%); }
@@ -261,8 +252,8 @@
 @keyframes tracejado { to { background-position: 100% 0, 0 100%, 0 0, 100% 100%; } }
 .soltar-ativo {
   background-image:
-    linear-gradient(90deg, var(--primary) 50%, transparent 50%), linear-gradient(90deg, var(--primary) 50%, transparent 50%),
-    linear-gradient(0deg, var(--primary) 50%, transparent 50%), linear-gradient(0deg, var(--primary) 50%, transparent 50%);
+    linear-gradient(90deg, var(--destaque) 50%, transparent 50%), linear-gradient(90deg, var(--destaque) 50%, transparent 50%),
+    linear-gradient(0deg, var(--destaque) 50%, transparent 50%), linear-gradient(0deg, var(--destaque) 50%, transparent 50%);
   background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
   background-size: 14px 2px, 14px 2px, 2px 14px, 2px 14px;
   background-position: 0 0, 100% 100%, 0 100%, 100% 0;
@@ -274,52 +265,17 @@
   .soltar-ativo { animation: none; }
 }
 
-/* ---------- Landing: paleta índigo + ciano em movimento ---------- */
-/* Manchas de luz que flutuam devagar atrás da página toda (só CSS, sem JS) */
-@keyframes flutuar-a { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(8vw, 6vh) scale(1.15); } }
-@keyframes flutuar-b { 0%, 100% { transform: translate(0, 0) scale(1.1); } 50% { transform: translate(-10vw, -4vh) scale(0.95); } }
-.brilhos { position: fixed; inset: 0; z-index: -20; pointer-events: none; overflow: hidden; }
-.brilhos::before, .brilhos::after {
-  content: ""; position: absolute; width: 55vmax; height: 55vmax; border-radius: 50%; filter: blur(90px);
+/* ---------- Landing: movimento discreto ---------- */
+/* Grifo vermelho claro atrás de uma expressão (como marca-texto), desenhado da esquerda para a direita */
+@keyframes grifar { from { background-size: 0% 0.32em; } to { background-size: 100% 0.32em; } }
+.grifo {
+  background: linear-gradient(color-mix(in oklch, var(--destaque) 45%, transparent), color-mix(in oklch, var(--destaque) 45%, transparent)) no-repeat 0 88% / 100% 0.32em;
+  animation: grifar 0.9s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  padding: 0 0.04em;
 }
-.brilhos::before {
-  top: -20vmax; left: -12vmax; animation: flutuar-a 26s ease-in-out infinite;
-  background: radial-gradient(circle, color-mix(in oklch, var(--primary) 22%, transparent), transparent 65%);
-}
-.brilhos::after {
-  bottom: -25vmax; right: -15vmax; animation: flutuar-b 32s ease-in-out infinite;
-  background: radial-gradient(circle, color-mix(in oklch, var(--destaque) 18%, transparent), transparent 65%);
-}
-.dark .brilhos::before { background: radial-gradient(circle, color-mix(in oklch, var(--primary) 30%, transparent), transparent 65%); }
-.dark .brilhos::after { background: radial-gradient(circle, color-mix(in oklch, var(--destaque) 20%, transparent), transparent 65%); }
-
-/* Texto em gradiente índigo → ciano que desliza devagar */
-@keyframes deslizar-gradiente { to { background-position: 200% center; } }
-.texto-gradiente {
-  background: linear-gradient(90deg, var(--primary), var(--destaque), var(--primary)) 0 center / 200% auto;
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  animation: deslizar-gradiente 6s linear infinite;
-}
-
-/* Borda viva: anel em gradiente girando em volta do cartão (o filho cobre o miolo) */
-@property --giro { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-@keyframes girar { to { --giro: 360deg; } }
-.borda-viva {
-  background: conic-gradient(from var(--giro), var(--border) 0deg, var(--primary) 70deg, var(--destaque) 120deg, var(--border) 180deg, var(--border) 360deg);
-  animation: girar 6s linear infinite;
-}
-
-/* Botão principal: faixa de luz que atravessa no hover e brilho em volta */
-.botao-brilho { position: relative; overflow: hidden; box-shadow: 0 10px 30px -12px color-mix(in oklch, var(--primary) 70%, transparent); }
-.botao-brilho::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
-  transform: translateX(-120%); transition: transform 0.7s ease;
-}
-.botao-brilho:hover::after { transform: translateX(120%); }
 
 /* Pulso leve para chamar atenção a um botão de exemplo */
-@keyframes pulso { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 45%, transparent); } 50% { box-shadow: 0 0 0 7px transparent; } }
+@keyframes pulso { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--destaque) 45%, transparent); } 50% { box-shadow: 0 0 0 7px transparent; } }
 .pulso-suave { animation: pulso 2s ease-out infinite; }
 
 /* Faixa infinita de assuntos (duplicada no HTML; anda metade da largura e recomeça) */
@@ -328,14 +284,13 @@
 .faixa-rolando:hover { animation-play-state: paused; }
 .mascara-lados { mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
 
-/* Chamada final: gradiente índigo/ciano em movimento */
-@keyframes mover-fundo { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-.fundo-chamada {
-  background: linear-gradient(120deg, var(--primary), color-mix(in oklch, var(--primary) 55%, var(--destaque)), var(--primary)) 0 50% / 220% 220%;
-  animation: mover-fundo 14s ease-in-out infinite;
-}
+/* Foto em preto e branco que ganha cor no hover (no toque já aparece colorida) */
+.foto-pb { filter: grayscale(1) contrast(1.05); transition: filter 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.group:hover .foto-pb, .group:focus-visible .foto-pb { filter: grayscale(0); transform: scale(1.04); }
+@media (hover: none) { .foto-pb { filter: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .brilhos::before, .brilhos::after, .texto-gradiente, .borda-viva, .pulso-suave, .faixa-rolando, .fundo-chamada { animation: none; }
-  .botao-brilho::after { display: none; }
+  .grifo, .pulso-suave, .faixa-rolando { animation: none; }
+  .foto-pb { transition: none; }
+  .group:hover .foto-pb { transform: none; }
 }

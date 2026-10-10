@@ -134,8 +134,9 @@ quando precisar do contexto exato de um pedido do Maickon.
 - Landing animada (10/10/2026): grade de pontos interativa no hero, faixa de números, linha do tempo que se
   desenha com o scroll, tour em 3D que se endireita, bento com brilho, comparação "chat de IA x Estudos IA",
   FAQ com o limite grátis (60/30/6) e área de arrastar e soltar na aba Materiais. Detalhes em `frontend/DESIGN.md`.
-  Depois (mesmo dia): paleta trocada para **Índigo + Ciano**, fundo animado na página toda, demo animada no hero
-  e "escolha como estudar" interativa. Ícones e `og.jpg` regerados nas cores novas.
+  Depois (mesmo dia, PR #5): fundo animado na página toda, demo animada no hero e "escolha como estudar" interativa.
+  Paleta final: **preto, branco e vermelho claro** (o índigo + ciano foi rejeitado por "cara de vibe coded"), sem
+  linhas entre as seções e com fotos do Unsplash por matéria (`public/imagens`, créditos no README).
 - **No ar em https://estudosia.vercel.app** (10/10/2026): site + API na mesma origem, cabeçalhos de segurança
   ativos (CSP, X-Frame-Options, HSTS). `VITE_SITE_URL` criada em produção. O endereço antigo
   `estudos-ia-zeta.vercel.app` continua no projeto. Todo merge na `main` publica em produção.

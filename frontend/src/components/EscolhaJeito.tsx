@@ -92,14 +92,14 @@ export function EscolhaJeito() {
               className={cn(
                 'group relative flex items-start gap-4 overflow-hidden rounded-2xl p-5 text-left transition-all duration-300',
                 ativo
-                  ? 'bg-gradient-to-br from-primary to-[color-mix(in_oklch,var(--primary)_60%,var(--destaque))] text-primary-foreground shadow-[0_18px_40px_-18px] shadow-primary/60'
-                  : 'bg-card ring-1 ring-border hover:-translate-y-0.5 hover:ring-primary/40',
+                  ? 'bg-foreground text-background sombra-alta'
+                  : 'bg-card ring-1 ring-border hover:-translate-y-0.5 hover:ring-foreground/30',
               )}
             >
               <span
                 className={cn(
                   'grid size-11 shrink-0 place-items-center rounded-xl transition-colors',
-                  ativo ? 'bg-white/15' : 'bg-accent text-primary',
+                  ativo ? 'bg-background/15 text-destaque' : 'bg-accent text-destaque',
                 )}
               >
                 <Icone className="size-5" weight={ativo ? 'fill' : 'regular'} />
@@ -139,7 +139,7 @@ export function EscolhaJeito() {
                     transition={{ delay: 0.1 + i * 0.08 }}
                     className="flex gap-3 text-sm"
                   >
-                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-accent font-mono text-xs font-semibold text-primary">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-accent font-mono text-xs font-semibold text-destaque">
                       {i + 1}
                     </span>
                     <span className="pt-0.5">{passo}</span>
@@ -186,7 +186,7 @@ function DemoChat() {
       {visiveis < MENSAGENS.length && MENSAGENS[visiveis].papel === 'assistant' && (
         <div className="flex items-center gap-1 pl-11" aria-label="A tutora está escrevendo">
           {[0, 1, 2].map((i) => (
-            <span key={i} className="size-1.5 animate-bounce rounded-full bg-primary/70" style={{ animationDelay: `${i * 0.12}s` }} />
+            <span key={i} className="size-1.5 animate-bounce rounded-full bg-muted-foreground/70" style={{ animationDelay: `${i * 0.12}s` }} />
           ))}
         </div>
       )}
@@ -206,7 +206,7 @@ function DemoTrilha() {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: i * 0.15, duration: 0.4 }}
-            className={cn('h-2 flex-1 origin-left rounded-full', i === 0 ? 'bg-sucesso' : i === 1 ? 'bg-gradient-to-r from-primary to-destaque' : 'bg-border')}
+            className={cn('h-2 flex-1 origin-left rounded-full', i === 0 ? 'bg-sucesso' : i === 1 ? 'bg-destaque' : 'bg-border')}
             title={etapa}
           />
         ))}
@@ -280,7 +280,7 @@ function DemoPratica() {
                 {escolha === CERTA ? <><Check className="size-4 text-sucesso" weight="bold" /> Acertou.</> : 'Quase.'}
               </p>
               <p className="text-muted-foreground">“Ir” pede a preposição <b>a</b> e “escola” leva o artigo <b>a</b>: a + a = <b>à</b>.</p>
-              <button type="button" onClick={() => setEscolha(null)} className="flex w-fit items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+              <button type="button" onClick={() => setEscolha(null)} className="flex w-fit items-center gap-1.5 text-xs font-medium text-destaque hover:underline">
                 <RotateCcw className="size-3.5" /> Tentar de novo
               </button>
             </div>
