@@ -81,6 +81,43 @@ def test_chamadas_a_busca_sao_duas_e_com_os_filtros_certos():
     assert len(busca.chamadas) == 2  # 2 créditos, nem mais
 
 
+def test_busca_web_ja_pede_para_excluir_redes_sociais():
+    busca = BuscaFalsa()
+    servico, _ = montar(busca, YouTubeFalso(), ValidadorFalso())
+    servico.buscar_recursos("crase")
+
+    web, _ = busca.chamadas
+    assert {"instagram.com", "tiktok.com", "facebook.com"} <= set(web["excluir"])
+
+
+def test_rede_social_que_escapa_da_busca_e_descartada_sem_ser_acessada():
+    # Achado no teste ao vivo: um reel do Instagram chegou como material de estudo.
+    social = [
+        "https://www.instagram.com/reel/DXKqlyoiZKn",
+        "https://m.facebook.com/post/1",
+        "https://vm.tiktok.com/abc",
+        "https://x.com/perfil/status/1",
+    ]
+    busca = BuscaFalsa(web=[res(u) for u in social] + [res("https://todamateria.com.br/crase")])
+    validador = ValidadorFalso(validos=set(social) | {"https://todamateria.com.br/crase"})
+    servico, _ = montar(busca, YouTubeFalso(), validador)
+
+    resultado = servico.buscar_recursos("crase")
+
+    assert [r["url"] for r in resultado["recursos"]] == ["https://todamateria.com.br/crase"]
+    assert validador.recebidos == [["https://todamateria.com.br/crase"]]  # nem chega a validar
+    assert resultado["descartados"] == 4
+
+
+def test_dominio_que_so_parece_rede_social_passa():
+    urls = ["https://box.com/aula", "https://instagram.com.br.exemplo.org/crase"]
+    busca = BuscaFalsa(web=[res(u) for u in urls])
+    servico, _ = montar(busca, YouTubeFalso(), ValidadorFalso(validos=set(urls)))
+
+    resultado = servico.buscar_recursos("crase")
+    assert [r["url"] for r in resultado["recursos"]] == urls
+
+
 def test_links_repetidos_sao_validados_uma_vez():
     busca = BuscaFalsa(web=[res("https://a.com"), res("https://a.com"), res("https://b.com")])
     validador = ValidadorFalso(validos={"https://a.com", "https://b.com"})

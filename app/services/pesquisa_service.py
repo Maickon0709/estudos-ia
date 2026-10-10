@@ -7,6 +7,7 @@ Custo por pesquisa: 2 buscas no Tavily (2 créditos) + 1 a 2 chamadas ao
 YouTube (1 unidade cada) quando há chave.
 """
 from datetime import datetime, timezone
+from urllib.parse import urlsplit
 
 from app.core.errors import ValidacaoError, YouTubeIndisponivelError
 from app.integrations.youtube_client import (
@@ -20,6 +21,12 @@ CONSULTA_MAX = 200
 MAX_LINKS = 5
 MAX_YOUTUBE = 8  # candidatos pedidos; sobram menos após a verificação
 DOMINIOS_YOUTUBE = ["youtube.com", "youtu.be"]
+# Redes sociais: o link existe, mas um post ou reel não serve como material de estudo.
+# O Tavily já recebe a lista em exclude_domains; o filtro no código é a segunda barreira.
+DOMINIOS_SOCIAIS = [
+    "instagram.com", "facebook.com", "tiktok.com", "twitter.com", "x.com",
+    "threads.net", "pinterest.com", "linkedin.com", "kwai.com",
+]
 
 
 class PesquisaService:
@@ -37,7 +44,9 @@ class PesquisaService:
     def buscar_recursos(self, consulta) -> dict:
         consulta = self._validar_consulta(consulta)
 
-        web = self._busca.buscar(consulta, excluir=DOMINIOS_YOUTUBE, max_resultados=MAX_LINKS)
+        web = self._busca.buscar(
+            consulta, excluir=DOMINIOS_YOUTUBE + DOMINIOS_SOCIAIS, max_resultados=MAX_LINKS
+        )
         yt = self._busca.buscar(
             f"{consulta} aula", dominios=DOMINIOS_YOUTUBE, max_resultados=MAX_YOUTUBE
         )
@@ -57,12 +66,14 @@ class PesquisaService:
         unicos = {}
         for r in resultados:
             unicos.setdefault(r.url, r)
-        veredito = self._validador.validar_varios(list(unicos))
+        permitidos = [url for url in unicos if not _rede_social(url)]
+        veredito = self._validador.validar_varios(permitidos) if permitidos else {}
 
         agora = _agora()
         aprovados = [
-            _recurso("link", r.titulo, r.url, trecho=r.trecho, verificacao="verificado", validado_em=agora)
-            for url, r in unicos.items()
+            _recurso("link", unicos[url].titulo, url, trecho=unicos[url].trecho,
+                     verificacao="verificado", validado_em=agora)
+            for url in permitidos
             if veredito.get(url)
         ]
         return aprovados, len(unicos) - len(aprovados)
@@ -128,6 +139,12 @@ class PesquisaService:
         if len(consulta) > CONSULTA_MAX:
             raise ValidacaoError(f"A consulta pode ter no máximo {CONSULTA_MAX} caracteres.")
         return consulta
+
+
+def _rede_social(url: str) -> bool:
+    """True para o domínio ou qualquer subdomínio dele (www., m., pt-br. ...)."""
+    host = (urlsplit(url).hostname or "").lower().rstrip(".")
+    return any(host == d or host.endswith("." + d) for d in DOMINIOS_SOCIAIS)
 
 
 def _agora() -> str:

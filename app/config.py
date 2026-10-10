@@ -15,7 +15,7 @@ class Config:
     # IA (Groq). Opcional na inicialização: sem chave, só o chat responde 502.
     GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
     # Modelos mudam com o tempo: confira o nome atual no console da Groq.
-    GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+    GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 
     # Busca de conteúdo real (Tavily). Sem chave, a pesquisa responde 502.
     TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY")

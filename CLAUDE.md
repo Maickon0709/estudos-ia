@@ -52,15 +52,22 @@ quando precisar do contexto exato de um pedido do Maickon.
 - Roadmap do back-end completo: auth, categorias, chat, pesquisa verificada, propostas com
   confirmação atômica, trilha e checklist, exercícios por nível, correção, trilha adaptativa,
   revisão espaçada, painel, CI e Docker.
-- ~424 testes: 396 unitários + 28 de SQL em Postgres real.
-- **Não testado ao vivo** (faltavam as chaves): Groq, Tavily, YouTube e o caminho Supabase ↔ Flask.
-  O build do Docker só foi validado por emulação; o build real acontece no CI.
+- ~427 testes: 399 unitários + 28 de SQL em Postgres real.
+- Repositório no GitHub (`Maickon0709/estudos-ia`); o CI passou, inclusive o build real do Docker.
+- **Testado ao vivo em 09/10/2026** contra o Supabase, a Groq e o Tavily reais: cadastro, login,
+  RLS entre dois usuários, chat, pesquisa, proposta, confirmação (com clique duplo recusado),
+  trilha, checklist, geração e correção de exercícios, revisão e painel.
+- Modelo da Groq: `openai/gpt-oss-120b`. O `llama-3.3-70b-versatile` não está liberado para a
+  conta (erro `model_not_found`). Para ver os modelos disponíveis: `GET /openai/v1/models`.
+- **Ainda não testado ao vivo:** YouTube (falta a chave; os vídeos saem como `nao_verificado`).
+- Pesquisa bloqueia redes sociais (`DOMINIOS_SOCIAIS` em `pesquisa_service.py`): no teste ao vivo,
+  um reel do Instagram chegou como material de estudo.
 - No Supabase, rodar nesta ordem: `schema_supabase.sql`, `migrations/002_propostas.sql`,
   `migrations/003_exercicios_revisoes.sql`.
 
 ## Próximos passos sugeridos
 
-1. Smoke test com as chaves reais e um fluxo completo contra o Supabase.
+1. Chave do YouTube Data API (opcional) e repetir a pesquisa para ver os vídeos verificados.
 2. Front-end.
 3. Limite de uso por usuário e cache de pesquisas (Tavily gratuito: 1.000 créditos/mês; cada
    pesquisa ou proposta gasta 2).
