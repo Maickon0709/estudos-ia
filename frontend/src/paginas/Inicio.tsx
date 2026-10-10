@@ -1,29 +1,33 @@
 import { motion, useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react'
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { Link } from 'react-router'
 import AnimatedContent from '@/components/AnimatedContent'
-import { Bolha } from '@/components/Bolha'
-import { Calendario } from '@/components/Calendario'
 import { CartaoBrilho } from '@/components/CartaoBrilho'
 import CountUp from '@/components/CountUp'
+import { DemoHero } from '@/components/DemoHero'
+import { EscolhaJeito } from '@/components/EscolhaJeito'
 import { FundoPontos } from '@/components/FundoPontos'
 import { BotaoTema } from '@/components/Layout'
 import { Perguntas, type Pergunta } from '@/components/Perguntas'
-import { RecursoItem } from '@/components/RecursoItem'
 import { Rodape } from '@/components/Rodape'
 import RotatingText from '@/components/RotatingText'
 import { TelaInclinada } from '@/components/TelaInclinada'
+import { TituloRevelado } from '@/components/TituloRevelado'
 import { TourProduto } from '@/components/TourProduto'
 import { Button } from '@/components/ui/button'
 import {
-  ArrowRight, BadgeCheck, BookOpen, BookOpenText, Brain, Check, ClipboardCheck, Compass, Dumbbell, Layers,
+  ArrowRight, BadgeCheck, BookOpenText, Brain, Check, ClipboardCheck, Compass, Dumbbell, Layers,
   MessageCircle, Minus, Route, Search, ShieldAlert, Timer,
 } from '@/lib/icones'
-import { atividadeExemplo, RECURSOS_EXEMPLO } from '@/lib/exemplos'
 import { useTitulo } from '@/lib/titulo'
 import { cn } from '@/lib/utils'
 
 const CTA = 'Criar conta grátis' // um texto só para a mesma ação, em toda a página
+
+const ASSUNTOS = [
+  'Python', 'SQL', 'Inglês', 'Crase', 'Física', 'Excel', 'Estatística', 'Redação', 'Química',
+  'Git', 'Matemática financeira', 'Biologia', 'Power BI', 'Espanhol', 'História', 'Lógica de programação',
+]
 
 const ARMADILHAS = [
   {
@@ -113,10 +117,12 @@ export function PaginaInicio() {
   const ctaTopo = useRef<HTMLDivElement>(null)
   const rodape = useRef<HTMLDivElement>(null)
   const ctaFixo = useCtaFixo(ctaTopo, rodape)
-  const hoje = new Date().toISOString().slice(0, 10)
 
   return (
     <div className="textura min-h-svh overflow-x-hidden">
+      {/* fundo da página inteira: manchas de luz que flutuam + grade de pontos que reage ao mouse */}
+      <div className="brilhos" aria-hidden />
+      <FundoPontos fixo className="-z-10" />
       {/* ---------- topo ---------- */}
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur">
         <nav className="mx-auto flex h-16 max-w-6xl items-center gap-1 px-4 sm:px-6" aria-label="Principal">
@@ -137,8 +143,6 @@ export function PaginaInicio() {
 
       <main>
         {/* ---------- hero: texto à esquerda, produto real à direita ---------- */}
-        <div className="relative isolate">
-        <FundoPontos className="mascara-radial -z-10" />
         <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-14 pb-20 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-20">
           <div className="flex flex-col gap-6">
             <h1 className="text-[2.6rem] leading-[1.04] sm:text-6xl">
@@ -152,13 +156,13 @@ export function PaginaInicio() {
                 splitLevelClassName="overflow-hidden pb-1"
                 transition={{ type: 'spring', damping: 32, stiffness: 380 }}
               />
-              <br className="hidden sm:block" /> com uma tutora que pesquisa por você.
+              <br className="hidden sm:block" /> com uma tutora <span className="texto-gradiente">que pesquisa por você.</span>
             </h1>
             <p className="max-w-[46ch] text-lg leading-relaxed text-muted-foreground">
               A plataforma busca vídeos e sites reais, confere cada link e monta sua trilha do básico ao avançado.
             </p>
             <div ref={ctaTopo} className="flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Button asChild size="lg" className="h-12 rounded-xl px-6 text-base">
+              <Button asChild size="lg" className="botao-brilho h-12 rounded-xl px-6 text-base">
                 <Link to="/entrar?modo=cadastrar">{CTA} <ArrowRight weight="bold" /></Link>
               </Button>
               <a href="#tour" className="group flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
@@ -167,19 +171,23 @@ export function PaginaInicio() {
             </div>
           </div>
 
-          {/* Componentes reais do app com dados de exemplo (não é print nem desenho) */}
-          <div className="relative" aria-label="Exemplo da interface" role="group">
-            <div className="rounded-2xl bg-card p-4 sombra-alta sm:p-5 lg:mr-16">
-              <p className="mb-3 text-sm font-medium">Materiais da etapa “Regras obrigatórias”</p>
-              <div className="flex flex-col gap-2">
-                {RECURSOS_EXEMPLO.slice(0, 2).map((r) => <RecursoItem key={r.url} recurso={r} />)}
-              </div>
-            </div>
-            <div className="relative mt-4 rounded-2xl bg-card p-4 sombra-alta lg:-mt-3 lg:ml-auto lg:w-[22rem]">
-              <Calendario atividade={atividadeExemplo(hoje)} hoje={hoje} semanas={15} />
-            </div>
-          </div>
+          {/* Demonstração animada: pedido → links conferidos (um é descartado) → trilha pronta */}
+          <DemoHero />
         </section>
+
+        {/* ---------- faixa infinita de assuntos ---------- */}
+        <div className="mascara-lados overflow-hidden border-t py-5" aria-label="Exemplos de assuntos">
+          <ul className="faixa-rolando flex w-max gap-3">
+            {[...ASSUNTOS, ...ASSUNTOS].map((assunto, i) => (
+              <li
+                key={i}
+                aria-hidden={i >= ASSUNTOS.length}
+                className="rounded-full bg-card/80 px-4 py-1.5 text-sm text-muted-foreground ring-1 ring-border backdrop-blur"
+              >
+                {assunto}
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* ---------- números verdadeiros, contando ao aparecer ---------- */}
@@ -200,7 +208,7 @@ export function PaginaInicio() {
         <section id="por-que" className="border-t bg-card/60">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 py-24 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
             <div className="lg:sticky lg:top-28 lg:self-start">
-              <h2 className="text-3xl sm:text-4xl">Estudar sozinho tem três armadilhas.</h2>
+              <TituloRevelado texto="Estudar sozinho tem três armadilhas." className="text-3xl sm:text-4xl" />
               <p className="mt-4 max-w-[42ch] text-muted-foreground">
                 O Estudos IA nasceu para resolver as três num lugar só: um caminho claro, fontes que existem e prática que fixa.
               </p>
@@ -223,7 +231,7 @@ export function PaginaInicio() {
 
         {/* ---------- como funciona: linha do tempo horizontal ---------- */}
         <section id="como-funciona" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6">
-          <h2 className="max-w-[20ch] text-3xl sm:text-4xl">Da dúvida à trilha em quatro passos.</h2>
+          <TituloRevelado texto="Da dúvida à trilha em quatro passos." className="max-w-[20ch] text-3xl sm:text-4xl" />
           <LinhaDoTempo />
         </section>
 
@@ -232,48 +240,18 @@ export function PaginaInicio() {
           <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
             <div className="mb-12 max-w-2xl">
               <p className="mb-3 text-sm font-medium text-primary">Por dentro</p>
-              <h2 className="text-3xl sm:text-4xl">As telas que você vai usar todo dia.</h2>
+              <TituloRevelado texto="As telas que você vai usar todo dia." className="text-3xl sm:text-4xl" />
               <p className="mt-4 text-muted-foreground">São os componentes do próprio app, com dados de exemplo. Clique para explorar.</p>
             </div>
             <TelaInclinada><TourProduto /></TelaInclinada>
           </div>
         </section>
 
-        {/* ---------- três jeitos: bento assimétrico ---------- */}
+        {/* ---------- três jeitos: escolha um e veja como funciona ---------- */}
         <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-          <h2 className="max-w-[22ch] text-3xl sm:text-4xl">Peça ajuda e escolha como estudar.</h2>
-          <div className="mt-12 grid gap-4 lg:grid-cols-[1.25fr_1fr] lg:grid-rows-2">
-            <Jeito
-              className="bg-primary text-primary-foreground"
-              icone={<BookOpen className="size-6" />}
-              titulo="Pelo chat, passo a passo"
-              texto="A tutora explica com exemplos do dia a dia e confere se você entendeu antes de seguir."
-              exemplo="“Me explique crase do zero.”"
-              grande
-            >
-              <div className="flex flex-col gap-3 rounded-2xl bg-card p-4 text-card-foreground sombra-alta">
-                <Bolha mensagem={{ papel: 'user', conteudo: 'Quando a crase é obrigatória?' }} />
-                <Bolha mensagem={{
-                  papel: 'assistant',
-                  conteudo: 'Quando a preposição **a** encontra o artigo **a**. Um teste rápido: troque a palavra feminina por uma masculina. Se virar **ao**, tem crase.\n\n*Vou à escola* → *Vou ao colégio*. Faz sentido?',
-                }} />
-              </div>
-            </Jeito>
-            <Jeito
-              className="bg-card sombra-suave"
-              icone={<Route className="size-6 text-primary" />}
-              titulo="Com uma trilha"
-              texto="Vídeos e sites verificados, organizados em etapas."
-              exemplo="“Quero dominar SQL para análise de dados.”"
-            />
-            <Jeito
-              className="pontilhado bg-muted/60"
-              icone={<Dumbbell className="size-6 text-primary" />}
-              titulo="Praticando"
-              texto="Exercícios por nível, flashcards e simulados."
-              exemplo="“Me teste com perguntas.”"
-            />
-          </div>
+          <TituloRevelado texto="Peça ajuda e escolha como estudar." className="max-w-[22ch] text-3xl sm:text-4xl" />
+          <p className="mt-4 max-w-[56ch] text-muted-foreground">Clique em cada jeito para ver para quem é, como funciona e um exemplo que dá para mexer.</p>
+          <EscolhaJeito />
 
           <dl className="mt-16 grid gap-x-10 gap-y-8 border-t pt-12 sm:grid-cols-2 lg:grid-cols-4">
             {EXTRAS.map(({ icone: Icone, titulo, texto }) => (
@@ -288,7 +266,7 @@ export function PaginaInicio() {
         {/* ---------- comparação: o que a plataforma acrescenta a um chat de IA ---------- */}
         <section className="border-y bg-card/60">
           <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-            <h2 className="max-w-[24ch] text-3xl sm:text-4xl">Por que não estudar só com um chat de IA?</h2>
+            <TituloRevelado texto="Por que não estudar só com um chat de IA?" className="max-w-[24ch] text-3xl sm:text-4xl" />
             <p className="mt-4 max-w-[56ch] text-muted-foreground">
               Um chat explica bem. Estudar pede mais: fonte que existe, ordem certa, prática e revisão na hora certa.
             </p>
@@ -320,7 +298,7 @@ export function PaginaInicio() {
         {/* ---------- grátis + perguntas frequentes ---------- */}
         <section id="perguntas" className="mx-auto grid max-w-6xl scroll-mt-20 gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
           <div className="flex flex-col gap-8 lg:sticky lg:top-28 lg:self-start">
-            <h2 className="text-3xl sm:text-4xl">Perguntas frequentes</h2>
+            <TituloRevelado texto="Perguntas frequentes" className="text-3xl sm:text-4xl" />
             <CartaoBrilho className="rounded-3xl bg-card p-7 sombra-suave">
               <p className="font-medium">Grátis, com um limite por dia</p>
               <p className="mt-1 text-sm text-muted-foreground">Por conta, zerando à meia-noite.</p>
@@ -339,14 +317,15 @@ export function PaginaInicio() {
 
         {/* ---------- chamada final ---------- */}
         <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-          <div className="pontilhado flex flex-col items-start gap-6 rounded-3xl bg-accent px-6 py-14 sm:px-12 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <h2 className="max-w-[22ch] text-3xl text-accent-foreground sm:text-4xl">Seu próximo assunto pode começar hoje.</h2>
-              <p className="mt-3 max-w-[50ch] text-accent-foreground/80">
+          <div className="fundo-chamada relative flex flex-col items-start gap-6 overflow-hidden rounded-3xl px-6 py-14 text-primary-foreground sm:px-12 lg:flex-row lg:items-center lg:justify-between">
+            <div aria-hidden className="pontilhado absolute inset-0 opacity-40" />
+            <div className="relative">
+              <h2 className="max-w-[22ch] text-3xl sm:text-4xl">Seu próximo assunto pode começar hoje.</h2>
+              <p className="mt-3 max-w-[50ch] opacity-85">
                 Grátis, sem cartão. Projeto de portfólio com o código aberto no GitHub.
               </p>
             </div>
-            <Button asChild size="lg" className="h-12 rounded-xl px-6 text-base">
+            <Button asChild size="lg" variant="secondary" className="botao-brilho relative h-12 rounded-xl px-6 text-base">
               <Link to="/entrar?modo=cadastrar">{CTA} <ArrowRight weight="bold" /></Link>
             </Button>
           </div>
@@ -368,24 +347,6 @@ export function PaginaInicio() {
         </Button>
       </div>
     </div>
-  )
-}
-
-function Jeito({ className, icone, titulo, texto, exemplo, grande = false, children }: {
-  className?: string; icone: ReactNode; titulo: string; texto: string; exemplo: string; grande?: boolean; children?: ReactNode
-}) {
-  return (
-    <AnimatedContent distance={30} className={cn('flex', grande && 'lg:row-span-2')}>
-      <CartaoBrilho className={cn('flex flex-1 flex-col justify-between gap-8 rounded-3xl p-7 sm:p-9', className)}>
-        <div className="flex flex-col gap-3">
-          {icone}
-          <h3 className={grande ? 'text-3xl' : 'text-xl'}>{titulo}</h3>
-          <p className={cn('max-w-[40ch]', grande ? 'text-lg opacity-90' : 'text-muted-foreground')}>{texto}</p>
-        </div>
-        {children}
-        <p className={cn('text-sm italic', grande ? 'opacity-80' : 'text-muted-foreground')}>{exemplo}</p>
-      </CartaoBrilho>
-    </AnimatedContent>
   )
 }
 

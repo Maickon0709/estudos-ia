@@ -1,7 +1,7 @@
 # DESIGN.md — Estudos IA
 
-Estilo: **Terracota + Ardósia**. Ferramenta de estudo para adultos: calma, legível, com um único
-destaque quente. Baseado nas regras de `taste-skill`, `redesign-skill` e `ui-ux-pro-max`
+Estilo: **Índigo + Ciano** (escolhido pelo Maickon em 10/10/2026, no lugar do antigo Terracota + Ardósia).
+Ferramenta de estudo com cara de produto moderno: índigo para ação, ciano só para brilho e gradiente. Baseado nas regras de `taste-skill`, `redesign-skill` e `ui-ux-pro-max`
 (repositórios de skills de design para IA), aplicadas para evitar o visual genérico de "site feito por IA".
 Os tokens moram em `src/index.css` (`:root` e `.dark`).
 
@@ -9,14 +9,15 @@ Os tokens moram em `src/index.css` (`:root` e `.dark`).
 
 | Papel | Token | Uso |
 |---|---|---|
-| Fundo | `--background` | Quase branco levemente frio (ardósia). Nunca creme, nunca branco puro. |
-| Texto | `--foreground` | Tinta ardósia escura. Nunca `#000`. |
-| Destaque | `--primary` | Terracota. A ÚNICA cor de destaque: CTA, links, foco, marcador "você está aqui". |
-| Superfícies | `--secondary`, `--muted` | Ardósia clara, mesma família de cinza (nada de misturar cinza quente e frio). |
-| Tinta do destaque | `--accent` | Terracota bem clara: seleção, hover, faixa final da landing. |
+| Fundo | `--background` | `#F6F7FB` no claro, `#0A0C1B` no escuro. Nunca branco ou preto puro. |
+| Texto | `--foreground` | Tinta índigo escura (`#11142B`). Nunca `#000`. |
+| Ação | `--primary` | Índigo (`#4F46E5`; `#818CF8` no escuro): CTA, links, foco, "você está aqui". |
+| Brilho | `--destaque` | Ciano (`#06B6D4`; `#22D3EE` no escuro): só em gradientes, brilhos e detalhes, nunca em texto corrido. |
+| Superfícies | `--secondary`, `--muted` | Cinza levemente azulado, mesma família do fundo. |
+| Tinta da ação | `--accent` | Índigo bem claro: seleção, hover, células de destaque. |
 | Estado | `--sucesso`, `--destructive` | Só para acerto/erro, nunca decoração. |
 
-Sombras tingidas de ardósia (`.sombra-suave`, `.sombra-alta`), só no que flutua de verdade.
+Sombras tingidas de índigo (`.sombra-suave`, `.sombra-alta`), só no que flutua de verdade.
 Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado`).
 
 ## Tipografia
@@ -44,8 +45,11 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
 
 - Motivado: entrada de página/aba (`.surgir`), cascata em listas (`.cascata`), tour que avança sozinho.
 - Botões afundam de leve ao clicar. Tudo desligado com `prefers-reduced-motion`.
-- Interativo na landing (inspirado no React Bits e no 21st.dev, recolorido para terracota):
-  `FundoPontos` (grade que foge do cursor, canvas 2D, pausa fora da tela), `TelaInclinada` (tour que se
+- Interativo na landing (inspirado no React Bits e no 21st.dev, recolorido para a paleta):
+  fundo da página toda (`.brilhos` + `FundoPontos fixo`: manchas que flutuam e grade que foge do cursor),
+  `DemoHero` (pedido → links conferidos, com um descartado → trilha), `EscolhaJeito` (três jeitos clicáveis,
+  com demonstração; a de prática é uma questão de verdade), `TituloRevelado` (títulos palavra por palavra),
+  faixa infinita de assuntos, `.texto-gradiente`, `.borda-viva`, `.botao-brilho`, `.fundo-chamada`, `TelaInclinada` (tour que se
   endireita com a rolagem), linha do tempo que se desenha com o scroll, `CartaoBrilho` (luz e borda que
   seguem o mouse, leve inclinação) e `CountUp` nos números. Efeitos de mouse ignoram toque.
 - Sem WebGL nem biblioteca nova: só `motion`, `gsap` (já instalados), CSS e canvas.
