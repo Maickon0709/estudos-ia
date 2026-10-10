@@ -5,6 +5,7 @@ from flask import Blueprint, Response, jsonify, request, stream_with_context
 
 from app.core import dependencies
 from app.core.auth import login_required
+from app.core.limite import consome
 
 bp = Blueprint("chat", __name__, url_prefix="/categorias")
 
@@ -17,6 +18,7 @@ def historico(categoria_id):
 
 @bp.post("/<categoria_id>/chat")
 @login_required
+@consome("chat")
 def enviar(categoria_id):
     corpo = request.get_json(silent=True) or {}
     resultado = dependencies.get_chat_service().enviar(categoria_id, corpo.get("mensagem"))
@@ -25,6 +27,7 @@ def enviar(categoria_id):
 
 @bp.post("/<categoria_id>/chat/stream")
 @login_required
+@consome("chat")
 def enviar_stream(categoria_id):
     """Server-Sent Events: o texto da IA chega aos pedaços, como num chat ao vivo."""
     corpo = request.get_json(silent=True) or {}

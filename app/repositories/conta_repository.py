@@ -12,7 +12,7 @@ from app.core.errors import NaoAutenticadoError
 TABELAS_EXPORTADAS = (
     "profiles", "metas", "categorias", "mensagens", "propostas", "trilhas", "etapas",
     "recursos", "exercicios", "respostas", "revisoes", "flashcards", "flashcard_revisoes",
-    "simulados", "simulado_questoes", "sessoes_estudo",
+    "simulados", "simulado_questoes", "sessoes_estudo", "uso_diario",
 )
 
 

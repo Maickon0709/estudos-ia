@@ -26,6 +26,12 @@ class Config:
     # se o seu navegador não aceitar no desenvolvimento, use COOKIE_SEGURO=0 no .env.
     COOKIE_SEGURO = os.environ.get("COOKIE_SEGURO", "1") != "0"
 
+    # Limite de uso POR USUÁRIO POR DIA (zera à meia-noite de Brasília). Protege a cota
+    # gratuita da Groq e do Tavily, que é uma só para o site inteiro.
+    LIMITE_CHAT_DIA = int(os.environ.get("LIMITE_CHAT_DIA", "60"))
+    LIMITE_IA_DIA = int(os.environ.get("LIMITE_IA_DIA", "30"))
+    LIMITE_PESQUISA_DIA = int(os.environ.get("LIMITE_PESQUISA_DIA", "6"))
+
     @classmethod
     def validar(cls) -> None:
         faltando = [

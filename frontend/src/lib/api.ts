@@ -5,6 +5,8 @@ import type {
   Proposta, Revisao, Simulado, StatusEtapa, Trilha, TrilhaResumo,
 } from './tipos'
 
+export type UsoDiario = Record<'chat' | 'ia' | 'pesquisa', { usado: number; limite: number }>
+
 export type Conta = {
   email: string | null
   nome: string | null
@@ -223,6 +225,7 @@ export const api = {
   hoje: () => pedir<Hoje>('GET', '/hoje'),
 
   conta: () => pedir<Conta>('GET', '/conta'),
+  uso: () => pedir<UsoDiario>('GET', '/conta/uso'),
   renomear: (nome: string) => pedir<Conta>('PATCH', '/conta', { nome }),
   enviarAvatar: (foto: File) => {
     const formulario = new FormData()

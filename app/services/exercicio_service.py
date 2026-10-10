@@ -44,7 +44,7 @@ def publico(exercicio: dict) -> dict:
 
 class ExercicioService:
     def __init__(self, etapa_repo, trilha_repo, exercicio_repo, resposta_repo,
-                 revisao_repo, llm, hoje=hoje_brasil):
+                 revisao_repo, llm, hoje=hoje_brasil, uso=None):
         self._etapas = etapa_repo
         self._trilhas = trilha_repo
         self._exercicios = exercicio_repo
@@ -52,6 +52,7 @@ class ExercicioService:
         self._revisoes = revisao_repo
         self._llm = llm
         self._hoje = hoje
+        self._uso = uso  # limite diário: entre as respostas, só a aberta gasta IA
 
     # ---------- gerar ----------
     def gerar(self, etapa_id: str, nivel, quantidade=None) -> list[dict]:
@@ -124,6 +125,8 @@ class ExercicioService:
                 "Correto!" if correta else f"A resposta certa é a letra {exercicio['gabarito']}."
             )
         else:
+            if self._uso is not None:
+                self._uso.consumir("ia")
             avaliacao = interpretar_correcao(self._llm.responder([
                 {"role": "system", "content": prompt_correcao()},
                 {"role": "user", "content": mensagem_correcao(exercicio, resposta)},

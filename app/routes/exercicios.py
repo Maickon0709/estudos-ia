@@ -3,12 +3,14 @@ from flask import Blueprint, jsonify, request
 
 from app.core import dependencies
 from app.core.auth import login_required
+from app.core.limite import consome
 
 bp = Blueprint("exercicios", __name__)
 
 
 @bp.post("/etapas/<etapa_id>/exercicios")
 @login_required
+@consome("ia")
 def gerar(etapa_id):
     corpo = request.get_json(silent=True) or {}
     exercicios = dependencies.get_exercicio_service().gerar(
@@ -25,6 +27,7 @@ def listar(etapa_id):
 
 @bp.post("/exercicios/<exercicio_id>/explicar")
 @login_required
+@consome("ia")
 def explicar(exercicio_id):
     return jsonify(dependencies.get_exercicio_service().explicar(exercicio_id))
 

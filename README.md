@@ -120,6 +120,7 @@ flask --app app:create_app run --debug
 4. `migrations/004_flashcards_simulados_estudo.sql` — flashcards, simulados, cronômetro, metas e calendário
 5. `migrations/005_consentimento_exclusao_conta.sql` — aceite dos termos e exclusão da conta (LGPD)
 6. `migrations/006_foto_perfil.sql` — bucket privado de fotos de perfil (Storage) e suas políticas
+7. `migrations/007_limite_uso.sql` — limite diário de uso por usuário (chat, IA e pesquisa)
 
 As migrações são idempotentes (podem rodar de novo sem quebrar).
 
@@ -212,8 +213,11 @@ plataforma segurar a resposta, ela aparece inteira no fim, sem erro.
 
 ## Limites conhecidos
 
-- **Sem limite de uso por usuário**: o plano gratuito do Tavily tem 1.000 créditos/mês (cada
-  proposta ou pesquisa gasta 2). Próximo passo: cache de pesquisas e limite diário.
+- **Limite de uso por usuário (feito)**: por dia, 60 mensagens de chat, 30 gerações/correções com IA e
+  6 pesquisas ou trilhas (cada uma gasta 2 créditos do Tavily, que dá 1.000/mês). Ajustável por
+  variáveis `LIMITE_*_DIA`. O contador fica no banco (`uso_diario`), porque na Vercel cada requisição
+  pode cair numa instância diferente; só a função `consumir_uso()` (SECURITY DEFINER, só `auth.uid()`)
+  escreve nele, então o usuário não consegue zerar o próprio contador. Falta: cache de pesquisas.
 - **Escrita direta pela API do Supabase**: o RLS deixa o dono escrever nas próprias linhas. Com a
   chave anon, um usuário poderia, *só na própria conta*, criar proposta com link não verificado,
   ler gabaritos ou chamar `registrar_resposta` dizendo que acertou. Fechar isso exige mover essas
@@ -231,6 +235,7 @@ plataforma segurar a resposta, ela aparece inteira no fim, sem erro.
 - [x] Exercícios por nível e correção
 - [x] Trilha adaptativa, revisão espaçada e painel de progresso
 - [x] CI (GitHub Actions) e Docker
-- [ ] Front-end
-- [ ] Limite de uso e cache de pesquisas
+- [x] Front-end
+- [x] Limite de uso por usuário
+- [ ] Cache de pesquisas
 - [ ] Endurecer escritas sensíveis com funções `SECURITY DEFINER`
