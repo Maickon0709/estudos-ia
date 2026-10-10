@@ -15,7 +15,8 @@ def s(total, acertos):
 # ---------- dominou / reforço: limites exatos ----------
 @pytest.mark.parametrize(
     "stats,esperado",
-    [(None, False), (s(0, 0), False), (s(2, 2), False), (s(3, 3), True), (s(5, 4), True), (s(5, 3), False), (s(10, 8), True)],
+    [(None, False), (s(0, 0), False), (s(3, 3), False), (s(19, 19), False), (s(20, 16), True), (s(20, 15), False),
+     (s(25, 20), True), (s(30, 23), False)],
 )
 def test_dominou(stats, esperado):
     assert dominou(stats) is esperado
@@ -34,12 +35,12 @@ def test_precisa_reforco(stats, esperado):
     "niveis,ja_sabia,esperado",
     [
         ({}, False, ["basico"]),
-        ({"basico": s(3, 2)}, False, ["basico"]),
-        ({"basico": s(3, 3)}, False, ["basico", "intermediario"]),
+        ({"basico": s(10, 10)}, False, ["basico"]),  # 100% mas só 10 questões: ainda não
+        ({"basico": s(20, 16)}, False, ["basico", "intermediario"]),
         ({}, True, ["basico", "intermediario"]),  # "já sei" pula o básico
-        ({"basico": s(3, 3), "intermediario": s(3, 3)}, False, ["basico", "intermediario", "avancado"]),
+        ({"basico": s(20, 20), "intermediario": s(20, 18)}, False, ["basico", "intermediario", "avancado"]),
         # avançado não abre sem o intermediário estar liberado
-        ({"intermediario": s(3, 3)}, False, ["basico"]),
+        ({"intermediario": s(20, 20)}, False, ["basico"]),
     ],
 )
 def test_niveis_liberados(niveis, ja_sabia, esperado):
@@ -76,7 +77,7 @@ def test_ja_sei_que_nao_se_confirma_e_desfeito():
 
 
 def test_ja_sei_se_mantem_com_bom_desempenho():
-    r = avaliar(etapa("em_andamento", ja_sabia=True), {"intermediario": s(4, 4)})
+    r = avaliar(etapa("em_andamento", ja_sabia=True), {"intermediario": s(20, 20)})
     assert r["ja_sabia"] is True
     assert r["niveis_liberados"] == ["basico", "intermediario", "avancado"]
 
@@ -92,7 +93,7 @@ def test_reforco_aponta_o_nivel_mais_basico_com_problema():
 
 
 def test_dominar_avancado_so_sugere_concluir():
-    niveis = {"basico": s(3, 3), "intermediario": s(3, 3), "avancado": s(3, 3)}
+    niveis = {"basico": s(20, 20), "intermediario": s(20, 20), "avancado": s(20, 20)}
     r = avaliar(etapa("em_andamento"), niveis)
     assert (r["status"], r["recomendacao"]) == ("em_andamento", "pode_concluir")
     assert avaliar(etapa("concluido"), niveis)["recomendacao"] is None

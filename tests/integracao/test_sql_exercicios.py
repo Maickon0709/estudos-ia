@@ -54,10 +54,12 @@ def test_taxa_e_niveis_acumulam(url_banco):
         ana.execute(REGISTRAR, (basico, "A", False, None, None))
         retorno = valor(ana, REGISTRAR, (inter, "B", True, None, None))
 
+        # Níveis (migração 010): cada questão conta uma vez, pela PRIMEIRA tentativa (acertou o básico).
         assert retorno["niveis"] == {
-            "basico": {"total": 2, "acertos": 1},
+            "basico": {"total": 1, "acertos": 1},
             "intermediario": {"total": 1, "acertos": 1},
         }
+        # Já as estatísticas da etapa contam todas as tentativas.
         assert etapa_stats(ana, etapa) == (3, 66.67)
 
 

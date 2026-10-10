@@ -164,6 +164,8 @@ export type Simulado = {
   finalizado_em: string | null
   prazo_em: string
   questoes?: { ordem: number; exercicio: ExercicioCorrigido; resposta?: string | null; correta?: boolean | null }[]
+  /** Quando não deu para montar o tamanho pedido (só na criação). */
+  aviso?: string
 }
 
 export type Meta = { dias_por_semana: number | null; minutos_por_semana: number | null }

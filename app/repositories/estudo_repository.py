@@ -81,6 +81,20 @@ class SimuladoRepository:
     def __init__(self, client):
         self._client = client
 
+    def contar_multipla_escolha(self, categoria_id: str) -> int:
+        """Quantas questões de múltipla escolha a categoria já tem (as que o simulado pode sortear)."""
+        trilhas = [t["id"] for t in self._client.table("trilhas").select("id").eq("categoria_id", categoria_id).execute().data or []]
+        if not trilhas:
+            return 0
+        etapas = [e["id"] for e in self._client.table("etapas").select("id").in_("trilha_id", trilhas).execute().data or []]
+        if not etapas:
+            return 0
+        resposta = (
+            self._client.table("exercicios").select("id", count="exact")
+            .in_("etapa_id", etapas).eq("tipo", "multipla_escolha").limit(1).execute()
+        )
+        return int(resposta.count or 0)
+
     def criar(self, categoria_id: str, quantidade: int, limite_segundos: int) -> str:
         return str(_rpc(self._client, "criar_simulado", {
             "p_categoria_id": categoria_id, "p_quantidade": quantidade, "p_limite_segundos": limite_segundos,

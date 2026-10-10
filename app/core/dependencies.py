@@ -139,7 +139,11 @@ def get_flashcard_service() -> FlashcardService:
 
 def get_simulado_service() -> SimuladoService:
     client = user_client(g.token)
-    return SimuladoService(CategoriaService(CategoriaRepository(client)), SimuladoRepository(client))
+    return SimuladoService(
+        CategoriaService(CategoriaRepository(client)),
+        SimuladoRepository(client),
+        completar=get_exercicio_service().completar_para_simulado,
+    )
 
 
 def get_estudo_service() -> EstudoService:

@@ -203,7 +203,7 @@ export const api = {
 
   exercicios: (etapaId: string, nivel: Nivel) =>
     pedir<Exercicio[]>('GET', `/etapas/${etapaId}/exercicios?nivel=${nivel}`),
-  gerarExercicios: (etapaId: string, nivel: Nivel, quantidade = 3) =>
+  gerarExercicios: (etapaId: string, nivel: Nivel, quantidade = 10) =>
     pedir<Exercicio[]>('POST', `/etapas/${etapaId}/exercicios`, { nivel, quantidade }),
   responder: (exercicioId: string, resposta: string) =>
     pedir<Correcao>('POST', `/exercicios/${exercicioId}/responder`, { resposta }),

@@ -67,7 +67,7 @@ def test_gerar_basico_devolve_sem_gabarito_e_salva_completo(c):
                                     "trecho": "Crase é a fusão de a + a."}]
     texto = prompt(c.llm)
     assert "Trilha: Crase do zero" in texto and "Etapa: Conceito" in texto
-    assert "Quantidade: 3" in texto and "Guia de crase" in texto and "básico" in texto
+    assert "Quantidade: 10" in texto and "Guia de crase" in texto and "básico" in texto
 
 
 def test_intermediario_bloqueado_ate_dominar_o_basico(c):
@@ -75,7 +75,11 @@ def test_intermediario_bloqueado_ate_dominar_o_basico(c):
         c.servico.gerar(ETAPA, "intermediario")
     assert c.llm.chamadas == []
 
-    c.etapas.niveis_por_etapa[ETAPA] = {"basico": {"total": 3, "acertos": 3}}
+    c.etapas.niveis_por_etapa[ETAPA] = {"basico": {"total": 19, "acertos": 19}}
+    with pytest.raises(EstadoInvalidoError, match="Você respondeu 19 de 20 questões do básico, com 100% de acerto"):
+        c.servico.gerar(ETAPA, "intermediario")
+
+    c.etapas.niveis_por_etapa[ETAPA] = {"basico": {"total": 20, "acertos": 16}}
     assert c.servico.gerar(ETAPA, "intermediario")
 
 
@@ -86,7 +90,7 @@ def test_ja_sei_libera_intermediario_mas_nao_avancado(c):
         c.servico.gerar(ETAPA, "avancado")
 
 
-@pytest.mark.parametrize("nivel,qtd", [("facil", 3), (None, 3), ("basico", 0), ("basico", 6), ("basico", "3"), ("basico", True)])
+@pytest.mark.parametrize("nivel,qtd", [("facil", 3), (None, 3), ("basico", 0), ("basico", 11), ("basico", "3"), ("basico", True)])
 def test_parametros_invalidos_nao_chamam_a_ia(c, nivel, qtd):
     with pytest.raises(ValidacaoError):
         c.servico.gerar(ETAPA, nivel, qtd)
@@ -205,7 +209,7 @@ def test_sem_mudanca_na_etapa_nao_grava(c):
 
 def test_acertar_libera_proximo_nivel_na_resposta(c):
     c.etapas.etapas[ETAPA]["status"] = "em_andamento"
-    c.etapas.niveis_por_etapa[ETAPA] = {"basico": {"total": 2, "acertos": 2}}
+    c.etapas.niveis_por_etapa[ETAPA] = {"basico": {"total": 19, "acertos": 19}}
     ex = c.exercicios.adicionar()
     r = c.servico.responder(ex["id"], "B")
     assert r["etapa"]["niveis_liberados"] == ["basico", "intermediario"]

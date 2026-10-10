@@ -2,9 +2,9 @@
 
 Regras (todas aqui, sem IA, fáceis de testar e de explicar):
 - Básico está sempre liberado.
-- Intermediário libera com >= 80% no básico (mínimo de 3 respostas),
-  ou direto se o estudante marcou "já sei" na etapa.
-- Avançado libera com >= 80% no intermediário (mínimo de 3 respostas).
+- Intermediário libera com >= 80% no básico em pelo menos 20 questões DIFERENTES (conta a primeira
+  tentativa de cada uma; responder de novo não infla o número), ou direto com "já sei" na etapa.
+- Avançado libera com >= 80% no intermediário, também em pelo menos 20 questões diferentes.
 - Reforço: < 50% num nível com pelo menos 4 respostas. Nesse caso uma etapa
   "concluída" volta para "em andamento", e um "já sei" que não se confirmou
   no básico ou no intermediário é desfeito (volta a exigir o básico).
@@ -17,7 +17,7 @@ Regras (todas aqui, sem IA, fáceis de testar e de explicar):
 
 ORDEM_NIVEIS = ("basico", "intermediario", "avancado")
 LIMIAR_LIBERAR = 80.0
-MIN_RESPOSTAS_LIBERAR = 3
+MIN_RESPOSTAS_LIBERAR = 20
 LIMIAR_REFORCO = 50.0
 MIN_RESPOSTAS_REFORCO = 4
 
