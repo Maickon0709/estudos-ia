@@ -64,11 +64,13 @@ export default function CountUp({
         maximumFractionDigits: hasDecimals ? maxDecimals : 0
       };
 
-      const formattedNumber = Intl.NumberFormat('en-US', options).format(latest);
+      // A mola começa com um valor minúsculo fora da faixa e o Intl escrevia "-0": prende entre from e to.
+      const dentro = Math.min(Math.max(latest, Math.min(from, to)), Math.max(from, to));
+      const formattedNumber = Intl.NumberFormat('en-US', options).format(dentro);
 
       return separator ? formattedNumber.replace(/,/g, separator) : formattedNumber;
     },
-    [maxDecimals, separator]
+    [maxDecimals, separator, from, to]
   );
 
   useEffect(() => {

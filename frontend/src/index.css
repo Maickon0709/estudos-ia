@@ -211,3 +211,59 @@
   background-image: radial-gradient(color-mix(in oklch, var(--foreground) 12%, transparent) 1px, transparent 1px);
   background-size: 18px 18px;
 }
+
+/* ---------- Landing: efeitos interativos ---------- */
+/* Cartão com brilho que segue o mouse (CartaoBrilho.tsx grava --brilho-x/y e --incl-x/y) */
+.cartao-brilho {
+  position: relative; isolation: isolate;
+  transform: perspective(900px) rotateX(var(--incl-x, 0deg)) rotateY(var(--incl-y, 0deg));
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cartao-brilho::before, .cartao-brilho::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+/* luz por cima do conteúdo, bem suave */
+.cartao-brilho::before {
+  z-index: 1;
+  background: radial-gradient(420px circle at var(--brilho-x, 50%) var(--brilho-y, 50%),
+    color-mix(in oklch, var(--primary) 14%, transparent), transparent 65%);
+}
+/* borda que acende perto do cursor (máscara deixa só o anel de 1.5px) */
+.cartao-brilho::after {
+  z-index: 2; padding: 1.5px;
+  background: radial-gradient(260px circle at var(--brilho-x, 50%) var(--brilho-y, 50%),
+    color-mix(in oklch, var(--primary) 85%, transparent), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.cartao-brilho[data-ativo]::before, .cartao-brilho[data-ativo]::after { opacity: 1; }
+/* no cartão que já é terracota, a luz é clara */
+.cartao-brilho.bg-primary::before {
+  background: radial-gradient(420px circle at var(--brilho-x, 50%) var(--brilho-y, 50%),
+    color-mix(in oklch, var(--primary-foreground) 16%, transparent), transparent 65%);
+}
+.cartao-brilho.bg-primary::after {
+  background: radial-gradient(260px circle at var(--brilho-x, 50%) var(--brilho-y, 50%),
+    color-mix(in oklch, var(--primary-foreground) 70%, transparent), transparent 70%);
+}
+
+/* Fundo de pontos do hero: some nas bordas */
+.mascara-radial { mask-image: radial-gradient(ellipse 75% 70% at 50% 40%, #000 40%, transparent 100%); }
+
+/* Área de soltar arquivo: borda tracejada que "anda" enquanto o arquivo está por cima */
+@keyframes tracejado { to { background-position: 100% 0, 0 100%, 0 0, 100% 100%; } }
+.soltar-ativo {
+  background-image:
+    linear-gradient(90deg, var(--primary) 50%, transparent 50%), linear-gradient(90deg, var(--primary) 50%, transparent 50%),
+    linear-gradient(0deg, var(--primary) 50%, transparent 50%), linear-gradient(0deg, var(--primary) 50%, transparent 50%);
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  background-size: 14px 2px, 14px 2px, 2px 14px, 2px 14px;
+  background-position: 0 0, 100% 100%, 0 100%, 100% 0;
+  animation: tracejado 0.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartao-brilho { transform: none; transition: none; }
+  .soltar-ativo { animation: none; }
+}

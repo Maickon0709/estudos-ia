@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FileText, MessageCircle, Trash2, Upload } from '@/lib/icones'
-import { useRef, type ChangeEvent } from 'react'
+import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { toast } from 'sonner'
 import { Carregando, Erro, Trabalhando, Vazio } from '@/components/Estados'
 import { Badge } from '@/components/ui/badge'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { api } from '@/lib/api'
 import type { Documento } from '@/lib/tipos'
+import { cn } from '@/lib/utils'
 
 type Props = { categoriaId: string; irParaConversa: () => void }
 
@@ -45,34 +46,87 @@ export function AbaMateriais({ categoriaId, irParaConversa }: Props) {
     onError: (erro) => toast.error(erro.message),
   })
 
-  function aoEscolher(e: ChangeEvent<HTMLInputElement>) {
-    const escolhido = e.target.files?.[0]
-    e.target.value = '' // permite escolher o mesmo arquivo de novo
-    if (!escolhido) return
+  const [arrastando, setArrastando] = useState(false)
+  const profundidade = useRef(0) // dragenter/dragleave disparam também nos filhos: conta para não piscar
+
+  function receber(escolhido: File | undefined) {
+    if (!escolhido || enviar.isPending) return
     if (escolhido.size > MAX_BYTES) return void toast.error('O arquivo pode ter no máximo 4 MB.')
     enviar.mutate(escolhido)
   }
 
+  function aoEscolher(e: ChangeEvent<HTMLInputElement>) {
+    const escolhido = e.target.files?.[0]
+    e.target.value = '' // permite escolher o mesmo arquivo de novo
+    receber(escolhido)
+  }
+
+  const temArquivo = (e: DragEvent) => e.dataTransfer.types.includes('Files')
+  const soltar = {
+    onDragEnter: (e: DragEvent) => {
+      if (!temArquivo(e)) return
+      e.preventDefault()
+      profundidade.current += 1
+      setArrastando(true)
+    },
+    onDragOver: (e: DragEvent) => {
+      if (!temArquivo(e)) return
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'copy'
+    },
+    onDragLeave: () => {
+      profundidade.current = Math.max(0, profundidade.current - 1)
+      if (profundidade.current === 0) setArrastando(false)
+    },
+    onDrop: (e: DragEvent) => {
+      if (!temArquivo(e)) return
+      e.preventDefault()
+      profundidade.current = 0
+      setArrastando(false)
+      if (e.dataTransfer.files.length > 1) toast.info('Um arquivo por vez: enviei só o primeiro.')
+      receber(e.dataTransfer.files[0])
+    },
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <p className="mr-auto max-w-xl text-sm text-muted-foreground">
-          Envie apostilas, resumos e slides. Quando você perguntar no chat, a tutora procura os trechos certos
-          nos seus materiais e diz de qual arquivo e página tirou a resposta.
-        </p>
-        <input ref={arquivo} type="file" accept={ACEITOS} className="hidden" onChange={aoEscolher} />
-        <Button onClick={() => arquivo.current?.click()} disabled={enviar.isPending}>
-          <Upload /> {enviar.isPending ? 'Lendo o arquivo…' : 'Enviar material'}
-        </Button>
-      </div>
+      <input ref={arquivo} type="file" accept={ACEITOS} className="hidden" onChange={aoEscolher} />
+      {/* Área de soltar: também é um botão (teclado e toque abrem a janela de escolha) */}
+      <button
+        type="button"
+        {...soltar}
+        onClick={() => arquivo.current?.click()}
+        disabled={enviar.isPending}
+        className={cn(
+          'group flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-colors',
+          'hover:border-primary/60 hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
+          'disabled:cursor-wait disabled:opacity-70',
+          arrastando && 'soltar-ativo border-transparent bg-accent',
+        )}
+      >
+        <span
+          className={cn(
+            'grid size-12 place-items-center rounded-2xl bg-accent text-primary transition-transform duration-300 motion-reduce:transition-none',
+            arrastando ? '-translate-y-1 scale-110' : 'group-hover:-translate-y-0.5',
+          )}
+        >
+          <Upload className="size-6" weight={arrastando ? 'bold' : 'regular'} />
+        </span>
+        <span className="font-medium">
+          {enviar.isPending ? 'Lendo o arquivo…' : arrastando ? 'Solte para enviar' : 'Arraste um arquivo aqui ou clique para escolher'}
+        </span>
+        <span className="max-w-md text-sm text-muted-foreground">
+          PDF, Word, PowerPoint, .txt ou .md, até 4 MB. No chat, a tutora procura os trechos certos e diz de qual arquivo e página tirou a resposta.
+        </span>
+      </button>
 
       {enviar.isPending && <Trabalhando>Lendo o arquivo e separando o texto em trechos…</Trabalhando>}
       {documentos.isPending && <Carregando linhas={2} />}
       {documentos.isError && <Erro erro={documentos.error} />}
       {documentos.data?.length === 0 && !enviar.isPending && (
         <Vazio icone={<FileText className="size-6" />} titulo="Nenhum material ainda">
-          PDF, Word (.docx), PowerPoint (.pptx), .txt ou .md, até 4 MB. PDF escaneado (foto da página) ainda não
-          dá para ler. O arquivo não fica guardado: só o texto, para a tutora consultar.
+          Envie apostilas, resumos e slides. PDF escaneado (foto da página) ainda não dá para ler. O arquivo não
+          fica guardado: só o texto, para a tutora consultar.
         </Vazio>
       )}
 
