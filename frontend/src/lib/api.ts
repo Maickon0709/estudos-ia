@@ -1,7 +1,7 @@
 // Único lugar do front que fala com a API (mesma ideia dos repositories no back-end).
 import { definirLogado, estaLogado } from './sessao'
 import type {
-  Categoria, Correcao, Documento, Exercicio, Flashcard, FlashcardPendente, Fonte, Hoje, Mensagem, Meta, Nivel, Painel,
+  AcaoChat, Categoria, Correcao, Documento, Exercicio, Flashcard, FlashcardPendente, Fonte, Hoje, Mensagem, Meta, Nivel, Painel,
   Proposta, Revisao, Simulado, StatusEtapa, Trilha, TrilhaResumo,
 } from './tipos'
 
@@ -110,7 +110,7 @@ async function pedir<T>(metodo: string, caminho: string, corpo?: unknown): Promi
 
 type EventoChat =
   | { tipo: 'delta'; texto: string }
-  | { tipo: 'fim'; pergunta: Mensagem; resposta: Mensagem; fontes?: Fonte[] }
+  | { tipo: 'fim'; pergunta: Mensagem; resposta: Mensagem; fontes?: Fonte[]; acao?: AcaoChat }
   | { tipo: 'erro'; erro: string; mensagem: string }
 
 /**
@@ -121,7 +121,7 @@ async function conversarAoVivo(
   categoriaId: string,
   mensagem: string,
   aoEscrever: (pedaco: string) => void,
-): Promise<{ pergunta: Mensagem; resposta: Mensagem; fontes: Fonte[] }> {
+): Promise<{ pergunta: Mensagem; resposta: Mensagem; fontes: Fonte[]; acao: AcaoChat }> {
   const resposta = await enviar('POST', `/categorias/${categoriaId}/chat/stream`, { mensagem })
   if (!resposta.body) throw new ErroApi(0, 'sem_stream', 'Seu navegador não recebeu a resposta ao vivo.')
 
@@ -138,7 +138,7 @@ async function conversarAoVivo(
       if (!bloco.startsWith('data: ')) continue
       const evento = JSON.parse(bloco.slice(6)) as EventoChat
       if (evento.tipo === 'delta') aoEscrever(evento.texto)
-      else if (evento.tipo === 'fim') return { pergunta: evento.pergunta, resposta: evento.resposta, fontes: evento.fontes ?? [] }
+      else if (evento.tipo === 'fim') return { pergunta: evento.pergunta, resposta: evento.resposta, fontes: evento.fontes ?? [], acao: evento.acao ?? null }
       else throw new ErroApi(502, evento.erro, evento.mensagem)
     }
   }

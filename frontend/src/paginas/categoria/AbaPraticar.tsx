@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, CircleCheck, Dumbbell, Layers, RotateCcw, Route } from '@/lib/icones'
 import { Link } from 'react-router'
+import { ComoCriarTrilha } from '@/components/ComoCriarTrilha'
 import { Carregando, Erro, Vazio } from '@/components/Estados'
 import { Dica } from '@/components/Tutorial'
 import { Button } from '@/components/ui/button'
@@ -11,7 +12,7 @@ import { cn } from '@/lib/utils'
 import { AbaSimulado } from './AbaSimulado'
 
 /** Tudo para praticar numa categoria: exercícios e flashcards por etapa, revisões e simulado. */
-export function AbaPraticar({ categoriaId, irParaConversa }: { categoriaId: string; irParaConversa: () => void }) {
+export function AbaPraticar({ categoriaId, irParaConversa, montarTrilha }: { categoriaId: string; irParaConversa: () => void; montarTrilha: () => void }) {
   const trilhas = useQuery({ queryKey: ['trilhas', categoriaId], queryFn: () => api.trilhas(categoriaId) })
   const trilhaId = trilhas.data?.[0]?.id
   const trilha = useQuery({ queryKey: ['trilha', trilhaId], queryFn: () => api.trilha(trilhaId!), enabled: !!trilhaId })
@@ -23,8 +24,11 @@ export function AbaPraticar({ categoriaId, irParaConversa }: { categoriaId: stri
   if (!trilhaId) {
     return (
       <Vazio icone={<Route className="size-6" />} titulo="Primeiro, monte uma trilha">
-        <p>Os exercícios, flashcards e simulados nascem das etapas da trilha. Peça uma à tutora na conversa.</p>
-        <Button className="mt-4" onClick={irParaConversa}>Ir para a conversa</Button>
+        <p className="mb-6">
+          Os exercícios por nível, flashcards e simulados nascem das etapas da trilha. Enquanto isso, você pode pedir à
+          tutora, na conversa, perguntas de treino uma de cada vez.
+        </p>
+        <ComoCriarTrilha montarTrilha={montarTrilha} irParaConversa={irParaConversa} />
       </Vazio>
     )
   }

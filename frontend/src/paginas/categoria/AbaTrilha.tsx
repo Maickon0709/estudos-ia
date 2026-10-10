@@ -3,6 +3,7 @@ import { ArrowRight, CircleCheck, Dumbbell, Route } from '@/lib/icones'
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { toast } from 'sonner'
+import { ComoCriarTrilha } from '@/components/ComoCriarTrilha'
 import { Carregando, Erro, Vazio } from '@/components/Estados'
 import { MapaTrilha as Mapa } from '@/components/MapaTrilha'
 import { RecursoItem } from '@/components/RecursoItem'
@@ -19,9 +20,9 @@ import { NOME_STATUS } from '@/lib/formatos'
 import type { Etapa, StatusEtapa, Trilha } from '@/lib/tipos'
 import { cn } from '@/lib/utils'
 
-type Props = { categoriaId: string; irParaConversa: () => void }
+type Props = { categoriaId: string; irParaConversa: () => void; montarTrilha: () => void }
 
-export function AbaTrilha({ categoriaId, irParaConversa }: Props) {
+export function AbaTrilha({ categoriaId, irParaConversa, montarTrilha }: Props) {
   const trilhas = useQuery({ queryKey: ['trilhas', categoriaId], queryFn: () => api.trilhas(categoriaId) })
   const [escolhida, setEscolhida] = useState<string | null>(null)
   const trilhaId = escolhida ?? trilhas.data?.[0]?.id // a mais recente por padrão
@@ -31,8 +32,8 @@ export function AbaTrilha({ categoriaId, irParaConversa }: Props) {
   if (!trilhaId) {
     return (
       <Vazio icone={<Route className="size-6" />} titulo="Nenhuma trilha ainda">
-        <p>Na conversa, peça à tutora para montar uma trilha. Você revisa a proposta antes de confirmar.</p>
-        <Button className="mt-4" onClick={irParaConversa}>Ir para a conversa</Button>
+        <p className="mb-6">Uma trilha organiza o assunto em etapas, do básico ao avançado. Veja como criar a sua:</p>
+        <ComoCriarTrilha montarTrilha={montarTrilha} irParaConversa={irParaConversa} />
       </Vazio>
     )
   }

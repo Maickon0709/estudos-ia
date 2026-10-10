@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { BookOpen, Check, CircleHelp, Compass, FileText, MessageCircle, Route, Send, X, type Icone as LucideIcon } from '@/lib/icones'
+import { BookOpen, Check, CircleHelp, Compass, Dumbbell, FileText, Lightbulb, MessageCircle, Route, Send, X, type Icone as LucideIcon } from '@/lib/icones'
 import { Fragment, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useSearchParams } from 'react-router'
 import { toast } from 'sonner'
 import { Carregando, Erro, Trabalhando, Vazio } from '@/components/Estados'
 import { Bolha } from '@/components/Bolha'
@@ -15,7 +16,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/lib/api'
 import { LIMITES } from '@/lib/seguranca'
-import type { Fonte, Mensagem, Proposta } from '@/lib/tipos'
+import type { AcaoChat, Fonte, Mensagem, Proposta } from '@/lib/tipos'
 
 type Props = { categoriaId: string; aoConfirmar: () => void }
 
@@ -37,6 +38,10 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
   })
   const [texto, setTexto] = useState('')
   const [dialogoAberto, setDialogoAberto] = useState(false)
+  const [objetivo, setObjetivo] = useState('') // texto do diálogo "Montar trilha"
+  // Pedidos que só a plataforma atende (trilha, exercícios salvos): id da resposta -> ação + o que o aluno pediu.
+  const [acoes, setAcoes] = useState<Record<string, { acao: Exclude<AcaoChat, null>; pedido: string }>>({})
+  const [params, setParams] = useSearchParams()
   const [parcial, setParcial] = useState('') // resposta da IA chegando ao vivo
   // Materiais usados em cada resposta desta visita (id da resposta -> fontes). Não ficam no histórico.
   const [fontes, setFontes] = useState<Record<string, Fonte[]>>({})
@@ -47,9 +52,10 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
       setParcial('')
       return api.conversarAoVivo(categoriaId, mensagem, (pedaco) => setParcial((atual) => atual + pedaco))
     },
-    onSuccess: ({ pergunta, resposta, fontes: usadas }) => {
+    onSuccess: ({ pergunta, resposta, fontes: usadas, acao }) => {
       setTexto('')
       if (usadas.length) setFontes((atuais) => ({ ...atuais, [resposta.id]: usadas }))
+      if (acao) setAcoes((atuais) => ({ ...atuais, [resposta.id]: { acao, pedido: pergunta.conteudo } }))
       queryClient.setQueryData<Mensagem[]>(chaveMensagens, (antigas = []) => [...antigas, pergunta, resposta])
     },
     onSettled: () => setParcial(''),
@@ -59,6 +65,25 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
   useEffect(() => {
     fim.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [mensagens.data?.length, enviar.isPending, escrevendo])
+
+  /** Abre a montagem da trilha, já com o pedido do aluno como objetivo (ele pode editar). */
+  function montarTrilha(pedido = '') {
+    setObjetivo(pedido.slice(0, LIMITES.objetivo))
+    setDialogoAberto(true)
+  }
+
+  // Vindo das abas Trilha/Praticar ("Montar trilha agora"), a URL traz ?montar=1: o diálogo já abre.
+  const montagemPedida = params.get('montar') === '1'
+  function mudarDialogo(aberto: boolean) {
+    setDialogoAberto(aberto)
+    if (!aberto && montagemPedida) {
+      setParams((atuais) => {
+        const novos = new URLSearchParams(atuais)
+        novos.delete('montar')
+        return novos
+      }, { replace: true })
+    }
+  }
 
   function aoEnviar(e?: FormEvent) {
     e?.preventDefault()
@@ -76,9 +101,10 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <Dica id="conversa" titulo="Escolha como estudar">
-        Peça ajuda à tutora e ela mostra as opções: estudar aqui pelo chat, montar uma trilha com vídeos e sites verificados,
-        ou praticar. Os atalhos logo acima do campo de mensagem fazem isso com um clique.
+      <Dica id="conversa-v2" titulo="Como funciona a conversa">
+        A tutora explica, tira dúvidas e faz perguntas de treino aqui mesmo. Ela não cria nada sozinha: a trilha só existe
+        depois que você clica em <strong>Montar trilha de estudo</strong> (abaixo do chat), escreve o objetivo e confirma a
+        proposta. Aí ela aparece na aba Trilha, e os exercícios salvos ficam na aba Praticar.
       </Dica>
       {proposta && <PropostaCard proposta={proposta} categoriaId={categoriaId} aoConfirmar={aoConfirmar} />}
 
@@ -96,6 +122,13 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
             <Fragment key={m.id}>
               <Bolha mensagem={m} />
               {fontes[m.id] && <Fontes lista={fontes[m.id]} />}
+              {acoes[m.id] && (
+                <CartaoAcao
+                  acao={acoes[m.id].acao}
+                  montar={() => montarTrilha(acoes[m.id].pedido)}
+                  treinarNoChat={() => enviar.mutate('Me faça perguntas de treino sobre este assunto, uma de cada vez, e corrija cada resposta.')}
+                />
+              )}
             </Fragment>
           ))}
           {enviar.isPending && (
@@ -119,7 +152,7 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
                 key={rotulo}
                 type="button"
                 disabled={enviar.isPending}
-                onClick={() => (mensagem ? enviar.mutate(mensagem) : setDialogoAberto(true))}
+                onClick={() => (mensagem ? enviar.mutate(mensagem) : montarTrilha())}
                 className="flex items-center gap-1.5 rounded-full border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground disabled:opacity-50"
               >
                 <Icone className="size-3.5 text-primary" /> {rotulo}
@@ -139,22 +172,50 @@ export function AbaConversa({ categoriaId, aoConfirmar }: Props) {
             <Button type="submit" disabled={!texto.trim() || enviar.isPending}>
               <Send /> Enviar
             </Button>
-            <Button type="button" variant="outline" className="ml-auto" onClick={() => setDialogoAberto(true)}>
+            <Button type="button" variant="outline" className="ml-auto" onClick={() => montarTrilha()}>
               <Route /> Montar trilha de estudo
             </Button>
           </div>
         </form>
       </Card>
 
-      <DialogoObjetivo categoriaId={categoriaId} aberto={dialogoAberto} aoMudar={setDialogoAberto} />
+      <DialogoObjetivo categoriaId={categoriaId} aberto={dialogoAberto || montagemPedida} aoMudar={mudarDialogo}
+        objetivo={objetivo} setObjetivo={setObjetivo} />
     </div>
   )
 }
 
 
-function DialogoObjetivo({ categoriaId, aberto, aoMudar }: { categoriaId: string; aberto: boolean; aoMudar: (v: boolean) => void }) {
+/**
+ * Cartão que aparece embaixo da resposta quando o aluno pediu algo que só a plataforma faz.
+ * Sem ele, "faça uma trilha" ficava só na conversa e a aba Trilha continuava vazia.
+ */
+function CartaoAcao({ acao, montar, treinarNoChat }: { acao: Exclude<AcaoChat, null>; montar: () => void; treinarNoChat: () => void }) {
+  const trilha = acao === 'trilha'
+  return (
+    <div className="ml-11 flex flex-col gap-3 rounded-2xl border border-destaque/30 bg-accent/40 p-4 text-sm" role="note">
+      <p className="flex items-center gap-2 font-medium">
+        <Lightbulb className="size-4 text-destaque" weight="fill" />
+        {trilha ? 'Para a trilha aparecer na aba Trilha' : 'Exercícios salvos ficam na aba Praticar'}
+      </p>
+      <p className="text-muted-foreground">
+        {trilha
+          ? 'A tutora não cria a trilha pela conversa. Clique abaixo, confira o objetivo e gere a proposta: a plataforma busca vídeos e sites, confere cada link e você aprova antes de salvar. A trilha usa materiais da internet; seus arquivos continuam disponíveis aqui no chat.'
+          : 'Exercícios por nível, flashcards e simulados nascem das etapas de uma trilha confirmada. Sem trilha ainda? Monte uma, ou treine agora aqui no chat com perguntas uma de cada vez.'}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" onClick={montar}><Route /> Montar trilha de estudo</Button>
+        {!trilha && <Button size="sm" variant="outline" onClick={treinarNoChat}><Dumbbell /> Treinar aqui no chat</Button>}
+      </div>
+    </div>
+  )
+}
+
+/** O texto do objetivo mora na aba: assim "Montar trilha" no cartão do chat já abre com o pedido do aluno. */
+function DialogoObjetivo({ categoriaId, aberto, aoMudar, objetivo, setObjetivo }: {
+  categoriaId: string; aberto: boolean; aoMudar: (v: boolean) => void; objetivo: string; setObjetivo: (v: string) => void
+}) {
   const queryClient = useQueryClient()
-  const [objetivo, setObjetivo] = useState('')
   const gerar = useMutation({
     mutationFn: () => api.gerarProposta(categoriaId, objetivo.trim()),
     onSuccess: (proposta) => {
@@ -170,7 +231,8 @@ function DialogoObjetivo({ categoriaId, aberto, aoMudar }: { categoriaId: string
         <DialogHeader>
           <DialogTitle>O que você quer aprender?</DialogTitle>
           <DialogDescription>
-            A tutora pesquisa materiais reais, confere cada link e propõe uma trilha. Nada é salvo antes de você confirmar.
+            A plataforma pesquisa vídeos e sites reais, confere cada link e propõe uma trilha em etapas. Nada é salvo antes
+            de você confirmar. Depois de confirmada, ela fica na aba Trilha e libera os exercícios na aba Praticar.
           </DialogDescription>
         </DialogHeader>
         <Textarea

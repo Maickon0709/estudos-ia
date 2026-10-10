@@ -3,6 +3,7 @@ from collections.abc import Iterator
 
 from app.core.errors import AppError, IAIndisponivelError, ValidacaoError
 from app.services.prompts import prompt_materiais, prompt_tutor
+from app.services.regras.intencao import acao_sugerida
 
 HISTORICO_MAX = 20   # mensagens anteriores enviadas à IA (controla custo e contexto)
 MENSAGEM_MAX = 4000  # caracteres por mensagem do usuário
@@ -30,11 +31,12 @@ class ChatService:
         pergunta_salva, resposta_salva = self._mensagens.criar_par(
             categoria["id"], texto, resposta
         )
-        return {"pergunta": pergunta_salva, "resposta": resposta_salva, "fontes": fontes}
+        return {"pergunta": pergunta_salva, "resposta": resposta_salva, "fontes": fontes,
+                "acao": acao_sugerida(texto)}
 
     def enviar_stream(self, categoria_id: str, texto) -> Iterator[dict]:
         """Como `enviar`, mas devolve eventos conforme a IA escreve:
-        {"tipo": "delta", "texto"}... e no fim {"tipo": "fim", "pergunta", "resposta"}
+        {"tipo": "delta", "texto"}... e no fim {"tipo": "fim", "pergunta", "resposta", "fontes", "acao"}
         ou {"tipo": "erro", "erro", "mensagem"}.
 
         Validação e categoria são checadas AGORA (antes do primeiro byte), para
@@ -60,17 +62,20 @@ class ChatService:
         except AppError as erro:
             yield {"tipo": "erro", "erro": erro.codigo, "mensagem": erro.mensagem}
             return
-        yield {"tipo": "fim", "pergunta": pergunta_salva, "resposta": resposta_salva, "fontes": fontes}
+        yield {"tipo": "fim", "pergunta": pergunta_salva, "resposta": resposta_salva, "fontes": fontes,
+               "acao": acao_sugerida(texto)}
 
     def _contexto(self, categoria: dict, texto: str) -> tuple[list[dict], list[dict]]:
         """Mensagens para a IA e as fontes (arquivo + página) dos trechos de material usados."""
         historico = self._mensagens.listar_recentes(categoria["id"], HISTORICO_MAX)
         contexto = [{"role": "system", "content": prompt_tutor(categoria["nome"])}]
         contexto += [{"role": m["papel"], "content": m["conteudo"]} for m in historico]
-        trechos = self._documentos.trechos_para(categoria["id"], texto) if self._documentos else []
-        if trechos:
+        materiais = self._documentos.contexto_para(categoria["id"], texto) if self._documentos else None
+        trechos = materiais["trechos"] if materiais else []
+        if materiais and materiais["inventario"]:
             # Logo antes da pergunta: é o que a IA "lembra" melhor.
-            contexto.append({"role": "system", "content": prompt_materiais(trechos)})
+            contexto.append({"role": "system", "content": prompt_materiais(
+                trechos, materiais["inventario"], materiais["visao_geral"])})
         contexto.append({"role": "user", "content": texto})
         return contexto, _fontes(trechos)
 

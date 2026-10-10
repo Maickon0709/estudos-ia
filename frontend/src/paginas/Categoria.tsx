@@ -28,6 +28,8 @@ export function PaginaCategoria() {
   const pedida = params.get('aba') === 'simulado' ? 'praticar' : params.get('aba') // link antigo
   const aba: Aba = ABAS.includes(pedida as Aba) ? (pedida as Aba) : 'conversa'
   const irPara = (nova: Aba) => setParams({ aba: nova }, { replace: true })
+  // Vai para a conversa e já abre a montagem da trilha (AbaConversa lê ?montar=1).
+  const montarTrilha = () => setParams({ aba: 'conversa', montar: '1' }, { replace: true })
 
   const categoria = useQuery({ queryKey: ['categoria', categoriaId], queryFn: () => api.categoria(categoriaId) })
   useTitulo(categoria.data?.nome)
@@ -62,10 +64,10 @@ export function PaginaCategoria() {
           <AbaMateriais categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} />
         </TabsContent>
         <TabsContent value="trilha">
-          <AbaTrilha categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} />
+          <AbaTrilha categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} montarTrilha={montarTrilha} />
         </TabsContent>
         <TabsContent value="praticar">
-          <AbaPraticar categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} />
+          <AbaPraticar categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} montarTrilha={montarTrilha} />
         </TabsContent>
         <TabsContent value="painel">
           <Suspense fallback={<Carregando />}><AbaPainel categoriaId={categoriaId} /></Suspense>

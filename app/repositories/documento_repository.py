@@ -65,3 +65,26 @@ class DocumentoRepository:
             "p_consulta": consulta,
             "p_limite": limite,
         }).execute().data or []
+
+    def primeiros_trechos(self, categoria_id: str, por_documento: int) -> list[dict]:
+        """Os primeiros trechos de cada material da categoria: uma "amostra" de cada arquivo,
+        para perguntas sobre o conjunto ("resuma os materiais"). O RLS limita ao dono."""
+        linhas = (
+            self._client.table("documento_trechos")
+            .select("documento_id, ordem, pagina, conteudo, documentos(nome)")
+            .eq("categoria_id", categoria_id)
+            .lte("ordem", por_documento)
+            .order("documento_id")
+            .order("ordem")
+            .execute()
+            .data
+        ) or []
+        return [
+            {
+                "documento_id": linha.get("documento_id"),
+                "nome": (linha.get("documentos") or {}).get("nome"),
+                "pagina": linha.get("pagina"),
+                "conteudo": linha.get("conteudo"),
+            }
+            for linha in linhas
+        ]
