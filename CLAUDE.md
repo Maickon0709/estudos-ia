@@ -73,13 +73,15 @@ quando precisar do contexto exato de um pedido do Maickon.
 9. Cadastro exige aceite dos termos (versão em `TERMOS_VERSAO` no `auth.py` = `VERSAO_TERMOS` no front).
 10. Rota que chama IA ou busca leva `@consome("chat"|"ia"|"pesquisa")` (`app/core/limite.py`) depois de
     `@login_required`; a correção de resposta aberta conta no service. Estourou: 429 `limite_uso`.
+11. Texto de material do aluno é DADO: vai para a IA delimitado (`prompt_materiais`), sem as marcas de
+    delimitação dentro, e só os trechos achados pela busca (nunca o arquivo inteiro). O arquivo original não é guardado.
 
 ## Estado atual
 
 - Roadmap do back-end completo: auth, categorias, chat, pesquisa verificada, propostas com
   confirmação atômica, trilha e checklist, exercícios por nível, correção, trilha adaptativa,
   revisão espaçada, painel, CI e Docker.
-- ~619 testes: 560 unitários + 59 de SQL em Postgres real.
+- ~669 testes: 600 unitários + 69 de SQL em Postgres real.
 - Repositório no GitHub (`Maickon0709/estudos-ia`); o CI passou, inclusive o build real do Docker.
 - **Testado ao vivo em 09/10/2026** contra o Supabase, a Groq e o Tavily reais: cadastro, login,
   RLS entre dois usuários, chat, pesquisa, proposta, confirmação (com clique duplo recusado),
@@ -102,10 +104,12 @@ quando precisar do contexto exato de um pedido do Maickon.
 - No Supabase, rodar nesta ordem: `schema_supabase.sql`, `migrations/002_propostas.sql`,
   `migrations/003_exercicios_revisoes.sql`, `migrations/004_flashcards_simulados_estudo.sql`,
   `migrations/005_consentimento_exclusao_conta.sql`, `migrations/006_foto_perfil.sql`,
-  `migrations/007_limite_uso.sql` (sem a 007, toda rota de IA/pesquisa dá erro 500).
+  `migrations/007_limite_uso.sql` (sem a 007, toda rota de IA/pesquisa dá erro 500),
+  `migrations/008_documentos.sql` (materiais do aluno; sem a 008, o chat dá erro 500 ao buscar trechos).
 - Ao vivo em 10/10/2026: migrações 004 e 005 já aplicadas no Supabase do Maickon; `/hoje`, `/conta`,
   aceite dos termos e **exclusão de conta** confirmados (login falha depois de excluir).
-  Falta rodar a 006 (foto de perfil): sem ela o Storage responde "Bucket not found".
+  Migrações 006 (foto de perfil) e 007 (limite de uso) aplicadas no Supabase em 10/10/2026
+  (limite de uso entrou na `main` pelo PR #1, com CI verde).
 - Foto de perfil: bucket PRIVADO `avatares`, arquivo `<user_id>/avatar.webp`; a API valida o conteúdo
   (Pillow), recorta 256x256, regrava em WebP sem metadados (some o GPS) e entrega ao site como blob:.
   Excluir a conta apaga a foto ANTES (o Storage fica fora da cascata do banco).
@@ -118,10 +122,13 @@ quando precisar do contexto exato de um pedido do Maickon.
 - Decisões: sem banner de cookies (os cookies da sessão são estritamente necessários) (o site não usa cookies; o armazenamento local é só o essencial);
   analytics fica para o deploy (preferir uma opção sem cookies, como Vercel Web Analytics ou Umami,
   e atualizar a Política de Privacidade).
+- Materiais do aluno (branch `documentos`, 10/10/2026): PDF, .docx, .pptx, .txt e .md viram texto
+  (`services/extrator.py`, só o texto é guardado), trechos (`services/trechos.py`, nunca atravessam página) e
+  busca textual em português sem acento (`buscar_trechos()`, migração 008). O chat injeta os 5 melhores trechos
+  e devolve `fontes` (arquivo + página); aba "Materiais" na categoria. **Falta testar ao vivo** (rodar a 008).
 
 ## Próximos passos sugeridos
 
 1. Deploy (Vercel) do site e da API, aplicando `cabecalhos-seguranca.json`.
-2. Upload de PDFs/documentos como fonte (RAG com busca textual do Postgres).
-3. Cache de pesquisas (o limite por usuário já existe: `LIMITE_*_DIA`, migração 007).
-4. Endurecer escritas e leituras sensíveis com funções `SECURITY DEFINER` (ver "Limites conhecidos" no README).
+2. Cache de pesquisas (o limite por usuário já existe: `LIMITE_*_DIA`, migração 007).
+3. Endurecer escritas e leituras sensíveis com funções `SECURITY DEFINER` (ver "Limites conhecidos" no README).

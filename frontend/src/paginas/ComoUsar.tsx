@@ -1,5 +1,5 @@
 import {
-  ArrowRight, BadgeCheck, CalendarDays, ClipboardCheck, Dumbbell, FolderPlus, Layers, MessageCircle,
+  ArrowRight, BadgeCheck, CalendarDays, ClipboardCheck, Dumbbell, FileText, FolderPlus, Layers, MessageCircle,
   Moon, RotateCcw, Route, Target, Timer, UserRound,
 } from '@/lib/icones'
 import type { ReactNode } from 'react'
@@ -68,6 +68,7 @@ const PASSOS: { icone: typeof Route; titulo: string; onde: string; texto: ReactN
 ]
 
 const EXTRAS = [
+  { icone: FileText, titulo: 'Seus materiais', texto: 'Aba “Materiais” da categoria: envie PDF, Word, PowerPoint ou texto e a tutora responde com base neles, dizendo o arquivo e a página.' },
   { icone: Timer, titulo: 'Cronômetro de foco', texto: 'Ícone de relógio no topo: ciclos de 25 minutos de foco e 5 de pausa. O tempo vai para o calendário.' },
   { icone: Target, titulo: 'Meta da semana', texto: 'Na tela Hoje, defina quantos dias por semana quer estudar e acompanhe o andamento.' },
   { icone: Layers, titulo: 'Flashcards', texto: 'Vire o cartão, responda se lembrou e a revisão espaçada cuida do resto.' },

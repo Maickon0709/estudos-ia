@@ -12,6 +12,7 @@ from app.integrations.storage_client import StorageClient
 from app.integrations.youtube_client import YouTubeClient
 from app.repositories.categoria_repository import CategoriaRepository
 from app.repositories.conta_repository import ContaRepository
+from app.repositories.documento_repository import DocumentoRepository
 from app.repositories.estudo_repository import EstudoRepository, FlashcardRepository, SimuladoRepository
 from app.repositories.exercicio_repository import (
     ExercicioRepository,
@@ -26,6 +27,7 @@ from app.repositories.uso_repository import UsoRepository
 from app.services.categoria_service import CategoriaService
 from app.services.chat_service import ChatService
 from app.services.conta_service import ContaService
+from app.services.documento_service import DocumentoService
 from app.services.estudo_service import EstudoService
 from app.services.exercicio_service import ExercicioService
 from app.services.flashcard_service import FlashcardService
@@ -67,11 +69,18 @@ def get_categoria_service() -> CategoriaService:
 
 def get_chat_service() -> ChatService:
     client = user_client(g.token)
+    categorias = CategoriaService(CategoriaRepository(client))
     return ChatService(
-        CategoriaService(CategoriaRepository(client)),
+        categorias,
         MensagemRepository(client),
         _llm(),
+        documentos=DocumentoService(categorias, DocumentoRepository(client)),
     )
+
+
+def get_documento_service() -> DocumentoService:
+    client = user_client(g.token)
+    return DocumentoService(CategoriaService(CategoriaRepository(client)), DocumentoRepository(client))
 
 
 def get_pesquisa_service() -> PesquisaService:

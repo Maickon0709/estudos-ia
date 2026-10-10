@@ -9,7 +9,7 @@ from app.core.errors import AppError
 def create_app(config: dict | None = None) -> Flask:
     app = Flask(__name__)
     app.config.from_object(Config)
-    # Teto de qualquer requisição (a maior é a foto de perfil, até 5 MB). Acima: 413.
+    # Teto de qualquer requisição (as maiores: foto de perfil até 5 MB, material até 4 MB). Acima: 413.
     app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024
     if config:
         app.config.update(config)
@@ -21,6 +21,7 @@ def create_app(config: dict | None = None) -> Flask:
         categorias,
         chat,
         conta,
+        documentos,
         estudo,
         exercicios,
         flashcards,
@@ -32,7 +33,7 @@ def create_app(config: dict | None = None) -> Flask:
     )
 
     for modulo in (auth, categorias, chat, pesquisa, propostas, trilhas, exercicios, painel,
-                   flashcards, simulados, estudo, conta):
+                   flashcards, simulados, estudo, conta, documentos):
         app.register_blueprint(modulo.bp)
 
     @app.get("/health")

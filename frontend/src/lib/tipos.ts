@@ -10,6 +10,22 @@ export type Mensagem = {
   created_at: string
 }
 
+/** Material do aluno (PDF, Word, PowerPoint, texto). Só o texto fica guardado, nunca o arquivo. */
+export type Documento = {
+  id: string
+  categoria_id: string
+  nome: string
+  tipo: 'pdf' | 'docx' | 'pptx' | 'txt' | 'md'
+  paginas: number | null
+  caracteres: number
+  trechos: number
+  truncado: boolean
+  created_at: string
+}
+
+/** De onde veio um trecho que a tutora usou para responder. */
+export type Fonte = { documento_id: string; nome: string; pagina: number | null }
+
 export type Verificacao = 'verificado' | 'nao_verificado'
 export type TipoRecurso = 'link' | 'video' | 'playlist'
 

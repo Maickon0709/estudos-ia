@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, ChartColumn, Dumbbell, MessageCircle, Route, Trash2 } from '@/lib/icones'
+import { ArrowLeft, ChartColumn, Dumbbell, FileText, MessageCircle, Route, Trash2 } from '@/lib/icones'
 import { Suspense, lazy, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { toast } from 'sonner'
@@ -12,13 +12,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { api } from '@/lib/api'
 import { useTitulo } from '@/lib/titulo'
 import { AbaConversa } from './categoria/AbaConversa'
+import { AbaMateriais } from './categoria/AbaMateriais'
 import { AbaPraticar } from './categoria/AbaPraticar'
 import { AbaTrilha } from './categoria/AbaTrilha'
 
 // O painel traz a biblioteca de gráficos (pesada): só carrega quando a aba é aberta.
 const AbaPainel = lazy(() => import('./categoria/AbaPainel').then((m) => ({ default: m.AbaPainel })))
 
-const ABAS = ['conversa', 'trilha', 'praticar', 'painel'] as const
+const ABAS = ['conversa', 'materiais', 'trilha', 'praticar', 'painel'] as const
 type Aba = (typeof ABAS)[number]
 
 export function PaginaCategoria() {
@@ -49,12 +50,16 @@ export function PaginaCategoria() {
       <Tabs value={aba} onValueChange={(v) => irPara(v as Aba)} className="gap-6">
         <TabsList>
           <TabsTrigger value="conversa" aria-label="Conversa"><MessageCircle /> <span className="hidden sm:inline">Conversa</span></TabsTrigger>
+          <TabsTrigger value="materiais" aria-label="Materiais"><FileText /> <span className="hidden sm:inline">Materiais</span></TabsTrigger>
           <TabsTrigger value="trilha" aria-label="Trilha"><Route /> <span className="hidden sm:inline">Trilha</span></TabsTrigger>
           <TabsTrigger value="praticar" aria-label="Praticar"><Dumbbell /> <span className="hidden sm:inline">Praticar</span></TabsTrigger>
           <TabsTrigger value="painel" aria-label="Painel"><ChartColumn /> <span className="hidden sm:inline">Painel</span></TabsTrigger>
         </TabsList>
         <TabsContent value="conversa">
           <AbaConversa categoriaId={categoriaId} aoConfirmar={() => irPara('trilha')} />
+        </TabsContent>
+        <TabsContent value="materiais">
+          <AbaMateriais categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} />
         </TabsContent>
         <TabsContent value="trilha">
           <AbaTrilha categoriaId={categoriaId} irParaConversa={() => irPara('conversa')} />

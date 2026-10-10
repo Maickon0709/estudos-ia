@@ -85,6 +85,7 @@ export function PaginaPrivacidade() {
         <ul>
           <li><strong>Cadastro:</strong> e-mail, nome (opcional), senha (guardada pelo serviço de login em formato protegido, nunca em texto puro) e a data em que você aceitou estes termos.</li>
           <li><strong>Estudos:</strong> categorias, mensagens trocadas com a tutora, trilhas, etapas, materiais, exercícios e suas respostas, flashcards, simulados, revisões, metas e o tempo cronometrado.</li>
+          <li><strong>Materiais que você envia</strong> (PDF, Word, PowerPoint, texto): guardamos só o <strong>texto</strong> extraído, dividido em trechos, e o nome do arquivo. O arquivo original não é guardado. Apagar o material apaga todo o texto dele.</li>
         </ul>
 
         <h2>2. Para que usamos</h2>
@@ -96,7 +97,7 @@ export function PaginaPrivacidade() {
         <h2>3. Serviços de terceiros que recebem dados</h2>
         <ul>
           <li><strong>Supabase:</strong> banco de dados e login. Guarda tudo o que está no item 1.</li>
-          <li><strong>Groq (IA):</strong> recebe o texto das conversas, das etapas e das suas respostas discursivas para gerar respostas, exercícios, flashcards e correções.</li>
+          <li><strong>Groq (IA):</strong> recebe o texto das conversas, das etapas, das suas respostas discursivas e os trechos dos seus materiais ligados à pergunta para gerar respostas, exercícios, flashcards e correções.</li>
           <li><strong>Tavily (pesquisa na web):</strong> recebe o objetivo de estudo que você descreve ao montar uma trilha.</li>
           <li><strong>YouTube Data API (Google):</strong> recebe apenas os identificadores dos vídeos encontrados, para confirmar que existem.</li>
         </ul>
