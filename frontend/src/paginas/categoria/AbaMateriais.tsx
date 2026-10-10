@@ -3,6 +3,7 @@ import { FileText, MessageCircle, Trash2, Upload } from '@/lib/icones'
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { toast } from 'sonner'
 import { Carregando, Erro, Trabalhando, Vazio } from '@/components/Estados'
+import { Dica } from '@/components/Tutorial'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -90,6 +91,13 @@ export function AbaMateriais({ categoriaId, irParaConversa }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
+      <Dica id="materiais-uso" titulo="Como usar seus materiais">
+        Depois de enviar, vá à aba Conversa e pergunte. Experimente: <strong>“Resuma meus materiais”</strong> para uma visão
+        geral, <strong>“Explique a página 5 da aula 1”</strong> ou <strong>“O que é estudo de viabilidade?”</strong>. A tutora
+        mostra de qual arquivo e página tirou a resposta. Ela não lê o arquivo inteiro de uma vez, só os trechos que combinam
+        com a pergunta. A trilha (aba Trilha) ainda usa vídeos e sites da internet, não os seus arquivos. Mantenha nesta
+        categoria só materiais do mesmo assunto: um PDF de outra matéria acaba misturado nas respostas.
+      </Dica>
       <input ref={arquivo} type="file" accept={ACEITOS} className="hidden" onChange={aoEscolher} />
       {/* Área de soltar: também é um botão (teclado e toque abrem a janela de escolha) */}
       <button

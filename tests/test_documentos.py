@@ -188,10 +188,11 @@ def test_palavra_gigante_sem_espaco_e_quebrada():
 
 # ---------- service ----------
 class DocumentoRepoFalso:
-    def __init__(self, trechos_da_busca=None):
+    def __init__(self, trechos_da_busca=None, amostra=None):
         self.criados, self.removidos = [], []
         self.trechos_da_busca = trechos_da_busca or []
-        self.buscas = []
+        self.amostra = amostra or []
+        self.buscas, self.amostras = [], []
 
     def listar(self, categoria_id):
         return [d for d in self.criados if d["categoria_id"] == categoria_id]
@@ -211,6 +212,10 @@ class DocumentoRepoFalso:
     def buscar(self, categoria_id, consulta, limite):
         self.buscas.append((categoria_id, consulta, limite))
         return self.trechos_da_busca
+
+    def primeiros_trechos(self, categoria_id, por_documento):
+        self.amostras.append((categoria_id, por_documento))
+        return self.amostra
 
 
 @pytest.fixture
@@ -271,10 +276,17 @@ TRECHOS = [
 ]
 
 
-def chat_com(trechos):
+DOCUMENTOS = [
+    {"id": "d1", "nome": "aula.pdf", "tipo": "pdf", "paginas": 12},
+    {"id": "d2", "nome": "resumo.docx", "tipo": "docx", "paginas": None},
+]
+
+
+def chat_com(trechos, documentos=DOCUMENTOS, amostra=None):
     categorias = RepoFalso()
     categoria = categorias.criar("u1", "Biologia")
-    repo, llm = DocumentoRepoFalso(trechos), LLMFalso()
+    repo, llm = DocumentoRepoFalso(trechos, amostra), LLMFalso()
+    repo.criados = [{**d, "categoria_id": categoria["id"]} for d in documentos]
     service = ChatService(CategoriaService(categorias), MensagemRepoFalso(), llm,
                           documentos=DocumentoService(CategoriaService(categorias), repo))
     return service, categoria, llm, repo
@@ -295,11 +307,11 @@ def test_chat_manda_os_trechos_logo_antes_da_pergunta_e_devolve_as_fontes():
     ]
 
 
-def test_sem_trecho_achado_o_chat_fica_como_antes():
-    service, categoria, llm, _ = chat_com([])
+def test_categoria_sem_materiais_nem_busca_no_banco():
+    service, categoria, llm, repo = chat_com(TRECHOS, documentos=[])
     resultado = service.enviar(categoria["id"], "Oi")
     assert [m["role"] for m in llm.chamadas[0]] == ["system", "user"]
-    assert resultado["fontes"] == []
+    assert resultado["fontes"] == [] and repo.buscas == [] and repo.amostras == []
 
 
 def test_chat_ao_vivo_tambem_devolve_as_fontes():

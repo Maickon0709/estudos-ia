@@ -75,13 +75,16 @@ quando precisar do contexto exato de um pedido do Maickon.
     `@login_required`; a correção de resposta aberta conta no service. Estourou: 429 `limite_uso`.
 11. Texto de material do aluno é DADO: vai para a IA delimitado (`prompt_materiais`), sem as marcas de
     delimitação dentro, e só os trechos achados pela busca (nunca o arquivo inteiro). O arquivo original não é guardado.
+12. A tutora não cria nada: trilha, exercícios salvos e flashcards só nascem pelos botões da plataforma. O prompt
+    proíbe escrever trilha no chat ou dizer que algo foi criado; `regras/intencao.py` detecta o pedido e o front
+    mostra o botão certo (`acao` na resposta do chat).
 
 ## Estado atual
 
 - Roadmap do back-end completo: auth, categorias, chat, pesquisa verificada, propostas com
   confirmação atômica, trilha e checklist, exercícios por nível, correção, trilha adaptativa,
   revisão espaçada, painel, CI e Docker.
-- ~690 testes: 621 unitários + 69 de SQL em Postgres real.
+- ~717 testes: 648 unitários + 69 de SQL em Postgres real.
 - Repositório no GitHub (`Maickon0709/estudos-ia`); o CI passou, inclusive o build real do Docker.
 - **Testado ao vivo em 09/10/2026** contra o Supabase, a Groq e o Tavily reais: cadastro, login,
   RLS entre dois usuários, chat, pesquisa, proposta, confirmação (com clique duplo recusado),
@@ -141,6 +144,11 @@ quando precisar do contexto exato de um pedido do Maickon.
   `POST /auth/redefinir` (`verify_otp` com `token_hash` de uso único + `update_user`, devolve cookies). Página
   `/redefinir-senha` e "Esqueci minha senha" no `/entrar`. O e-mail sai pelo SMTP do Brevo configurado no Supabase,
   com modelo em português cujo link é `{{ .SiteURL }}/redefinir-senha?token_hash={{ .TokenHash }}&type=recovery`.
+- Correção do chat com materiais (10/10/2026), após um teste real que falhou: a IA via só 5 trechos ao acaso em
+  "analise meus materiais", repetia as opções depois de o aluno escolher e escreveu uma trilha falsa no chat (com
+  vídeos inventados e exercícios "prontos" que não existiam), e a aba Trilha ficou vazia. Agora: inventário de
+  todos os arquivos + amostra do começo de cada um em perguntas gerais (`DocumentoService.contexto_para`),
+  prompt mais firme, cartão "Montar trilha" no chat, passo a passo nas abas Trilha/Praticar e no guia.
 - **No ar em https://estudosia.vercel.app** (10/10/2026): site + API na mesma origem, cabeçalhos de segurança
   ativos (CSP, X-Frame-Options, HSTS). `VITE_SITE_URL` criada em produção. O endereço antigo
   `estudos-ia-zeta.vercel.app` continua no projeto. Todo merge na `main` publica em produção.

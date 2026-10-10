@@ -244,7 +244,9 @@ plataforma segurar a resposta, ela aparece inteira no fim, sem erro.
   escreve nele, então o usuário não consegue zerar o próprio contador. Falta: cache de pesquisas.
 - **Materiais**: PDF escaneado (só imagem) não é lido, porque OCR é pesado demais para a função gratuita
   da Vercel. A busca é por palavras (com radical e sem acento), não por significado: "célula de energia" não
-  acha "mitocôndria". Teto de 30 materiais por usuário e 4 MB por arquivo.
+  acha "mitocôndria". Teto de 30 materiais por usuário e 4 MB por arquivo. A IA não lê os arquivos inteiros:
+  recebe a lista de todos e os 5 trechos mais relevantes (numa pergunta sobre o conjunto, como "resuma meus
+  materiais", também o começo de cada arquivo). A trilha ainda é montada só com vídeos e sites da internet.
 - **Escrita direta pela API do Supabase**: o RLS deixa o dono escrever nas próprias linhas. Com a
   chave anon, um usuário poderia, *só na própria conta*, criar proposta com link não verificado,
   ler gabaritos ou chamar `registrar_resposta` dizendo que acertou. Fechar isso exige mover essas

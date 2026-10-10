@@ -25,6 +25,8 @@ export type Documento = {
 
 /** De onde veio um trecho que a tutora usou para responder. */
 export type Fonte = { documento_id: string; nome: string; pagina: number | null }
+/** O que o pedido do aluno precisa e só a plataforma faz (a tutora não cria trilha nem exercícios). */
+export type AcaoChat = 'trilha' | 'praticar' | null
 
 export type Verificacao = 'verificado' | 'nao_verificado'
 export type TipoRecurso = 'link' | 'video' | 'playlist'

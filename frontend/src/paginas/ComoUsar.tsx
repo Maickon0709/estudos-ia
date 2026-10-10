@@ -26,6 +26,7 @@ const PASSOS: { icone: typeof Route; titulo: string; onde: string; texto: ReactN
         <strong> estudar ali mesmo pelo chat</strong>, com explicações e perguntas;
         <strong> montar uma trilha</strong> com vídeos do YouTube e sites verificados; ou
         <strong> praticar</strong> com exercícios, flashcards e simulados. Os botões de atalho acima do campo de mensagem levam direto a cada um.
+        Importante: a tutora conversa, mas não cria nada sozinha. Pedir “faça uma trilha” no chat não cria a trilha; use o botão do próximo passo.
       </>
     ),
   },
@@ -33,7 +34,7 @@ const PASSOS: { icone: typeof Route; titulo: string; onde: string; texto: ReactN
     icone: Route,
     titulo: 'Aprove a trilha',
     onde: 'Botão “Montar trilha de estudo”',
-    texto: 'Descreva seu objetivo. A plataforma pesquisa, confere cada link e propõe etapas do básico ao avançado. Nada é criado antes de você clicar em Confirmar.',
+    texto: 'Clique em “Montar trilha de estudo”, abaixo do chat, e descreva seu objetivo. A plataforma pesquisa vídeos e sites, confere cada link e propõe etapas do básico ao avançado. Nada é criado antes de você clicar em Confirmar; aí a trilha aparece na aba “Trilha”.',
   },
   {
     icone: BadgeCheck,
@@ -68,7 +69,7 @@ const PASSOS: { icone: typeof Route; titulo: string; onde: string; texto: ReactN
 ]
 
 const EXTRAS = [
-  { icone: FileText, titulo: 'Seus materiais', texto: 'Aba “Materiais” da categoria: envie PDF, Word, PowerPoint ou texto e a tutora responde com base neles, dizendo o arquivo e a página.' },
+  { icone: FileText, titulo: 'Seus materiais', texto: 'Aba “Materiais” da categoria: envie PDF, Word, PowerPoint ou texto e a tutora responde com base neles, dizendo o arquivo e a página. Peça “resuma meus materiais” para uma visão geral ou pergunte sobre um tema específico, como “explique a fase de especificação”.' },
   { icone: Timer, titulo: 'Cronômetro de foco', texto: 'Ícone de relógio no topo: ciclos de 25 minutos de foco e 5 de pausa. O tempo vai para o calendário.' },
   { icone: Target, titulo: 'Meta da semana', texto: 'Na tela Hoje, defina quantos dias por semana quer estudar e acompanhe o andamento.' },
   { icone: Layers, titulo: 'Flashcards', texto: 'Vire o cartão, responda se lembrou e a revisão espaçada cuida do resto.' },
@@ -78,6 +79,9 @@ const EXTRAS = [
 
 const PERGUNTAS = [
   ['A IA pode inventar links?', 'Não. A IA só escolhe materiais pelo número de uma lista que a plataforma já pesquisou e verificou; ela nem vê as URLs. Vídeos são confirmados na API oficial do YouTube.'],
+  ['Pedi uma trilha no chat e a aba Trilha continua vazia. Por quê?', 'A tutora só conversa: ela não cria trilhas. Quando você pede uma, aparece um cartão com o botão “Montar trilha de estudo” logo abaixo da resposta. Clique nele (ou no botão abaixo do chat), confira o objetivo e confirme a proposta. Só então a trilha aparece na aba Trilha.'],
+  ['A trilha usa os PDFs que eu enviei?', 'Ainda não. A trilha é montada com vídeos e sites da internet, conferidos pela plataforma. Seus arquivos são usados na conversa: a tutora procura os trechos certos e diz de qual arquivo e página tirou a resposta.'],
+  ['A tutora leu meus arquivos inteiros?', 'Não. A cada pergunta, ela recebe a lista de todos os arquivos e os trechos que mais combinam com o que você perguntou. Para uma visão geral, peça “resuma meus materiais”; para detalhes, pergunte sobre o tema.'],
   ['Preciso montar uma trilha para usar?', 'Não. Você pode estudar só pela conversa com a tutora. A trilha serve para organizar materiais e liberar exercícios, flashcards e simulados.'],
   ['Por que o nível intermediário está bloqueado?', 'Ele libera quando você acerta 80% de pelo menos 3 exercícios do básico, ou quando marca “já sei este conteúdo” na etapa.'],
   ['As respostas da IA estão sempre certas?', 'Não. A IA pode errar. Use as fontes indicadas para conferir pontos importantes.'],
