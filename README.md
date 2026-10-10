@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/Maickon0709/estudos-ia/actions/workflows/ci.yml/badge.svg)
 
-API (Flask + Supabase) de uma plataforma de estudos com IA tutora. O estudante cria
+API (Flask + Supabase) e site (React) de uma plataforma de estudos com IA tutora. O estudante cria
 **categorias** (ex.: Português, SQL), conversa com a IA, recebe uma **trilha** montada só
 com **material real e verificado** da web e do YouTube, marca o progresso num **checklist**,
 pratica com **exercícios por nível** corrigidos automaticamente, revisa o que errou com
@@ -17,7 +17,8 @@ pratica com **exercícios por nível** corrigidos automaticamente, revisa o que 
 | IA sem alucinar link | A IA escolhe materiais **por número** de uma lista verificada e nem vê as URLs |
 | Banco | Funções SQL **atômicas** (confirmar proposta, registrar resposta), views do painel |
 | Regras de negócio | Trilha adaptativa, revisão espaçada e sequência de dias como funções puras |
-| Qualidade | ~420 testes; SQL testado em **Postgres real**; regras críticas validadas por **mutação** |
+| Qualidade | ~430 testes; SQL testado em **Postgres real**; regras críticas validadas por **mutação** |
+| Front-end | React + TypeScript + Tailwind + shadcn/ui, animações do React Bits, CSP e testes no navegador |
 | Entrega | CI no GitHub Actions com Postgres de serviço, Docker multi-stage, deploy na Vercel |
 
 ## Arquitetura
@@ -33,6 +34,18 @@ migrations/    SQL versionado (rodar em ordem)
 ```
 
 Fluxo: `route → service → repository → Supabase (Postgres com RLS)`.
+
+## Front-end
+
+Site em `frontend/` (Vite + React + TypeScript + Tailwind + shadcn/ui). Detalhes em
+[`frontend/README.md`](frontend/README.md); identidade visual em [`frontend/DESIGN.md`](frontend/DESIGN.md).
+
+```bash
+# terminal 1: API
+flask --app app:create_app run --debug
+# terminal 2: site (http://localhost:5173), o Vite repassa /api para o Flask
+cd frontend && npm install && npm run dev
+```
 
 ## Fluxo do estudante
 
@@ -104,6 +117,9 @@ flask --app app:create_app run --debug
 1. `schema_supabase.sql` — tabelas, RLS e views
 2. `migrations/002_propostas.sql` — confirmação atômica de propostas
 3. `migrations/003_exercicios_revisoes.sql` — respostas, revisão espaçada e views do painel
+4. `migrations/004_flashcards_simulados_estudo.sql` — flashcards, simulados, cronômetro, metas e calendário
+5. `migrations/005_consentimento_exclusao_conta.sql` — aceite dos termos e exclusão da conta (LGPD)
+6. `migrations/006_foto_perfil.sql` — bucket privado de fotos de perfil (Storage) e suas políticas
 
 As migrações são idempotentes (podem rodar de novo sem quebrar).
 

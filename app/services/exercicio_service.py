@@ -9,12 +9,19 @@
 from app.core.errors import EstadoInvalidoError, NaoEncontradoError, ValidacaoError
 from app.core.validacao import hoje_brasil, validar_uuid
 from app.repositories.exercicio_repository import COLUNAS_PUBLICAS
-from app.services.exercicio_parser import interpretar_correcao, letra, montar_exercicios
+from app.services.exercicio_parser import (
+    interpretar_correcao,
+    letra,
+    limpar_reexplicacao,
+    montar_exercicios,
+)
 from app.services.prompts import (
     mensagem_correcao,
     mensagem_exercicios,
+    mensagem_reexplicar,
     prompt_correcao,
     prompt_exercicios,
+    prompt_reexplicar,
 )
 from app.services.proposta_parser import extrair_json
 from app.services.regras.adaptacao import ORDEM_NIVEIS, avaliar, niveis_liberados
@@ -74,6 +81,25 @@ class ExercicioService:
             nivel = _validar_nivel(nivel)
         etapa = self._obter_etapa(etapa_id)
         return [publico(e) for e in self._exercicios.listar(etapa["id"], nivel)]
+
+    # ---------- "não entendi" ----------
+    def explicar(self, exercicio_id: str) -> dict:
+        """Outra explicação, mais simples, de um exercício JÁ respondido.
+
+        Só depois da resposta: a explicação usa o gabarito, e ele nunca sai antes.
+        """
+        exercicio_id = validar_uuid(exercicio_id, "exercício")
+        exercicio = self._exercicios.obter_completo(exercicio_id)
+        if exercicio is None:
+            raise NaoEncontradoError("Exercício não encontrado.")
+        ultima = self._respostas.ultima(exercicio_id)
+        if ultima is None:
+            raise EstadoInvalidoError("Responda o exercício antes de pedir outra explicação.")
+        texto = self._llm.responder([
+            {"role": "system", "content": prompt_reexplicar()},
+            {"role": "user", "content": mensagem_reexplicar(exercicio, ultima)},
+        ])
+        return {"explicacao": limpar_reexplicacao(texto)}
 
     # ---------- responder ----------
     def responder(self, exercicio_id: str, resposta) -> dict:

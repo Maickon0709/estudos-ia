@@ -23,6 +23,12 @@ def listar(etapa_id):
     return jsonify(dependencies.get_exercicio_service().listar(etapa_id, request.args.get("nivel")))
 
 
+@bp.post("/exercicios/<exercicio_id>/explicar")
+@login_required
+def explicar(exercicio_id):
+    return jsonify(dependencies.get_exercicio_service().explicar(exercicio_id))
+
+
 @bp.post("/exercicios/<exercicio_id>/responder")
 @login_required
 def responder(exercicio_id):

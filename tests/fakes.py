@@ -27,3 +27,13 @@ class LLMFalso:
         if self.erro is not None:
             raise self.erro
         return self.resposta
+
+    def responder_stream(self, mensagens):
+        """Entrega a resposta em pedaços de até 5 caracteres; o erro sai no meio."""
+        self.chamadas.append(mensagens)
+        for i in range(0, len(self.resposta), 5):
+            if self.erro is not None and i >= 5:
+                raise self.erro
+            yield self.resposta[i:i + 5]
+        if self.erro is not None:
+            raise self.erro

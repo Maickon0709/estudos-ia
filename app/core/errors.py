@@ -26,6 +26,13 @@ class NaoEncontradoError(AppError):
     codigo = "nao_encontrado"
 
 
+class ProibidoError(AppError):
+    """Requisição recusada por regra de segurança (ex.: sem o cabeçalho anti-CSRF)."""
+
+    status_code = 403
+    codigo = "proibido"
+
+
 class DuplicadoError(AppError):
     status_code = 409
     codigo = "duplicado"
@@ -69,3 +76,10 @@ class YouTubeIndisponivelError(BuscaIndisponivelError):
     elegância: os vídeos seguem, só que marcados como não verificados."""
 
     codigo = "youtube_indisponivel"
+
+
+class ArmazenamentoIndisponivelError(AppError):
+    """O Supabase Storage (fotos de perfil) falhou ou não respondeu (502)."""
+
+    status_code = 502
+    codigo = "armazenamento_indisponivel"

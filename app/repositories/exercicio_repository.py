@@ -65,6 +65,14 @@ class RespostaRepository:
         dados.setdefault("niveis", {})
         return dados
 
+    def ultima(self, exercicio_id: str) -> str | None:
+        """Última resposta do usuário logado a este exercício (o RLS filtra o dono)."""
+        dados = (
+            self._client.table("respostas").select("resposta")
+            .eq("exercicio_id", exercicio_id).order("created_at", desc=True).limit(1).execute().data
+        )
+        return dados[0]["resposta"] if dados else None
+
 
 class RevisaoRepository:
     def __init__(self, client):

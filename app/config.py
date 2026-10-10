@@ -22,6 +22,10 @@ class Config:
     # YouTube Data API: OPCIONAL. Sem chave, vídeos saem como "nao_verificado".
     YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
 
+    # Cookies da sessão só trafegam em HTTPS. O Chrome/Edge aceitam em http://localhost;
+    # se o seu navegador não aceitar no desenvolvimento, use COOKIE_SEGURO=0 no .env.
+    COOKIE_SEGURO = os.environ.get("COOKIE_SEGURO", "1") != "0"
+
     @classmethod
     def validar(cls) -> None:
         faltando = [

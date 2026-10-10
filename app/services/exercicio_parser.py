@@ -102,3 +102,35 @@ def _texto(valor, limite: int) -> str:
     if not isinstance(valor, str):
         return ""
     return " ".join(valor.split())[:limite]
+
+
+FRENTE_MAX = 300
+VERSO_MAX = 600
+REEXPLICACAO_MAX = 2000
+
+
+def montar_flashcards(dados: dict, quantidade: int) -> list[dict]:
+    itens = dados.get("cartoes")
+    if not isinstance(itens, list):
+        raise IAIndisponivelError("A IA devolveu os flashcards num formato inválido. Tente novamente.")
+    cartoes, vistos = [], set()
+    for item in itens:
+        if len(cartoes) == quantidade:
+            break
+        if not isinstance(item, dict):
+            continue
+        frente = _texto(item.get("frente"), FRENTE_MAX)
+        verso = _texto(item.get("verso"), VERSO_MAX)
+        if frente and verso and frente.lower() not in vistos:
+            vistos.add(frente.lower())
+            cartoes.append({"frente": frente, "verso": verso})
+    if not cartoes:
+        raise IAIndisponivelError("A IA não gerou nenhum flashcard válido. Tente novamente.")
+    return cartoes
+
+
+def limpar_reexplicacao(texto) -> str:
+    """Texto livre da IA (markdown). Corta o tamanho; o front exibe sem HTML e sem links."""
+    if not isinstance(texto, str) or not texto.strip():
+        raise IAIndisponivelError("A IA não conseguiu explicar agora. Tente novamente.")
+    return texto.strip()[:REEXPLICACAO_MAX]

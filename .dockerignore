@@ -13,3 +13,6 @@ __pycache__
 .idea
 .vscode
 .vercel
+
+# Front-end tem build e deploy próprios; a imagem é só da API.
+frontend

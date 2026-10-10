@@ -122,6 +122,18 @@ def test_painel_junta_progresso_niveis_fracos_revisoes_e_sequencia(painel):
     assert revisoes.pendentes_chamadas[-1] == ("2026-10-09", cid)
 
 
+def test_pontos_fracos_so_mostra_etapas_abaixo_de_80(painel):
+    servico, repo, _, categoria = painel
+    cid = categoria["id"]
+    repo.fracos_por_categoria[cid] = [
+        {"etapa_id": "e1", "etapa": "JOIN", "tentativas": 5, "taxa_acerto": "20.00"},
+        {"etapa_id": "e2", "etapa": "GROUP BY", "tentativas": 5, "taxa_acerto": "79.99"},
+        {"etapa_id": "e3", "etapa": "SELECT", "tentativas": 5, "taxa_acerto": "80.00"},
+        {"etapa_id": "e4", "etapa": "WHERE", "tentativas": 1, "taxa_acerto": "100.00"},
+    ]
+    assert [p["etapa"] for p in servico.painel(cid)["pontos_fracos"]] == ["JOIN", "GROUP BY"]
+
+
 def test_painel_de_categoria_sem_atividade(painel):
     servico, _, _, categoria = painel
     p = servico.painel(categoria["id"])

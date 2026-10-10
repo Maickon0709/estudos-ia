@@ -25,7 +25,8 @@ from tests.integracao.apoio import (
 # ---------------------------------------------------------------------------
 def test_trigger_cria_profiles(url_banco):
     with psycopg.connect(url_banco) as conn:
-        nomes = [r[0] for r in conn.execute("select nome from profiles order by nome")]
+        nomes = [r[0] for r in conn.execute(
+            "select nome from profiles where id in (%s, %s) order by nome", (ANA, BRUNO))]
     assert nomes == ["Ana", "bruno"]  # sem nome nos metadados: usa o início do e-mail
 
 
