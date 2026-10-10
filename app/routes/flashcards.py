@@ -3,12 +3,14 @@ from flask import Blueprint, jsonify, request
 
 from app.core import dependencies
 from app.core.auth import login_required
+from app.core.limite import consome
 
 bp = Blueprint("flashcards", __name__)
 
 
 @bp.post("/etapas/<etapa_id>/flashcards")
 @login_required
+@consome("ia")
 def gerar(etapa_id):
     corpo = request.get_json(silent=True) or {}
     return jsonify(dependencies.get_flashcard_service().gerar(etapa_id, corpo.get("quantidade"))), 201

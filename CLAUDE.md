@@ -38,9 +38,11 @@ quando precisar do contexto exato de um pedido do Maickon.
 - Escrita que mexe em várias tabelas vai numa **função SQL atômica** (`SECURITY INVOKER`),
   não em várias chamadas REST seguidas. Única exceção a `SECURITY INVOKER`: `excluir_minha_conta()`
   (`SECURITY DEFINER`, `search_path=''`), porque a chave anon não apaga `auth.users`; ela só apaga
-  `auth.uid()`, nunca um id recebido por parâmetro.
+  `auth.uid()`, nunca um id recebido por parâmetro. Segunda exceção: `consumir_uso()` (migração 007),
+  porque o usuário só LÊ `uso_diario` (se pudesse escrever, zeraria o próprio contador).
 - Testes de SQL locais sem Docker: um Postgres portátil (`embedded-postgres` do npm) na porta 5433
-  com `TEST_DATABASE_URL=postgresql://postgres:pg@localhost:5433/postgres`.
+  com `TEST_DATABASE_URL=postgresql://postgres:pg@localhost:5433/postgres`. Inicialize com
+  `initdbFlags: ['--encoding=UTF8', '--locale=C']`: no Windows o padrão é WIN1252 e os testes com "ã" quebram.
 - Testes unitários usam dublês (`tests/fakes*.py`) e um transporte HTTP simulado; nada de rede.
 - Mudou SQL? Adicione ou ajuste teste em `tests/integracao/` (roda em Postgres real).
 - Regra crítica nova: valide por mutação, quebrando a regra de propósito e confirmando que um teste falha.
@@ -69,13 +71,15 @@ quando precisar do contexto exato de um pedido do Maickon.
 7. Respostas da IA são validadas por parsers (`proposta_parser.py`, `exercicio_parser.py`) antes de qualquer gravação.
 8. Simulado: gabarito só depois de finalizar; "Não entendi" só depois de responder; chat ao vivo só grava no fim.
 9. Cadastro exige aceite dos termos (versão em `TERMOS_VERSAO` no `auth.py` = `VERSAO_TERMOS` no front).
+10. Rota que chama IA ou busca leva `@consome("chat"|"ia"|"pesquisa")` (`app/core/limite.py`) depois de
+    `@login_required`; a correção de resposta aberta conta no service. Estourou: 429 `limite_uso`.
 
 ## Estado atual
 
 - Roadmap do back-end completo: auth, categorias, chat, pesquisa verificada, propostas com
   confirmação atômica, trilha e checklist, exercícios por nível, correção, trilha adaptativa,
   revisão espaçada, painel, CI e Docker.
-- ~589 testes: 538 unitários + 51 de SQL em Postgres real.
+- ~619 testes: 560 unitários + 59 de SQL em Postgres real.
 - Repositório no GitHub (`Maickon0709/estudos-ia`); o CI passou, inclusive o build real do Docker.
 - **Testado ao vivo em 09/10/2026** contra o Supabase, a Groq e o Tavily reais: cadastro, login,
   RLS entre dois usuários, chat, pesquisa, proposta, confirmação (com clique duplo recusado),
@@ -97,7 +101,8 @@ quando precisar do contexto exato de um pedido do Maickon.
   Back-end e SQL testados; **telas logadas novas ainda não testadas ao vivo** (dependem das migrações 004 e 005).
 - No Supabase, rodar nesta ordem: `schema_supabase.sql`, `migrations/002_propostas.sql`,
   `migrations/003_exercicios_revisoes.sql`, `migrations/004_flashcards_simulados_estudo.sql`,
-  `migrations/005_consentimento_exclusao_conta.sql`, `migrations/006_foto_perfil.sql`.
+  `migrations/005_consentimento_exclusao_conta.sql`, `migrations/006_foto_perfil.sql`,
+  `migrations/007_limite_uso.sql` (sem a 007, toda rota de IA/pesquisa dá erro 500).
 - Ao vivo em 10/10/2026: migrações 004 e 005 já aplicadas no Supabase do Maickon; `/hoje`, `/conta`,
   aceite dos termos e **exclusão de conta** confirmados (login falha depois de excluir).
   Falta rodar a 006 (foto de perfil): sem ela o Storage responde "Bucket not found".
@@ -118,6 +123,5 @@ quando precisar do contexto exato de um pedido do Maickon.
 
 1. Deploy (Vercel) do site e da API, aplicando `cabecalhos-seguranca.json`.
 2. Upload de PDFs/documentos como fonte (RAG com busca textual do Postgres).
-3. Limite de uso por usuário e cache de pesquisas (Tavily gratuito: 1.000 créditos/mês; cada
-   pesquisa ou proposta gasta 2).
+3. Cache de pesquisas (o limite por usuário já existe: `LIMITE_*_DIA`, migração 007).
 4. Endurecer escritas e leituras sensíveis com funções `SECURITY DEFINER` (ver "Limites conhecidos" no README).

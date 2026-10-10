@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Download, GraduationCap, LogOut, ShieldCheck, Trash2, UserRound } from '@/lib/icones'
+import { ChartColumn, Download, GraduationCap, LogOut, ShieldCheck, Trash2, UserRound } from '@/lib/icones'
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { toast } from 'sonner'
@@ -13,7 +13,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { api } from '@/lib/api'
+import { Progress } from '@/components/ui/progress'
+import { api, type UsoDiario } from '@/lib/api'
 import { definirLogado } from '@/lib/sessao'
 import { useTitulo } from '@/lib/titulo'
 
@@ -66,6 +67,8 @@ export function PaginaConta() {
         </CardContent>
       </Card>
 
+      <UsoDeHoje />
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 font-heading text-xl"><ShieldCheck className="size-5 text-primary" /> Seus dados</CardTitle>
@@ -93,6 +96,47 @@ export function PaginaConta() {
         <CardContent><ExcluirConta /></CardContent>
       </Card>
     </div>
+  )
+}
+
+const ROTULOS_USO: Record<keyof UsoDiario, string> = {
+  chat: 'Mensagens para a tutora',
+  ia: 'Exercícios, flashcards e correções com IA',
+  pesquisa: 'Pesquisas de materiais e trilhas',
+}
+
+/** Quanto da cota diária já foi usado. Some em silêncio se a API não responder. */
+function UsoDeHoje() {
+  const uso = useQuery({ queryKey: ['uso'], queryFn: api.uso })
+  if (!uso.data) return null
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 font-heading text-xl"><ChartColumn className="size-5 text-primary" /> Uso de hoje</CardTitle>
+        <CardDescription>
+          A IA e a busca têm uma cota gratuita dividida entre todos. Cada pessoa tem um limite por dia,
+          que volta a zero à meia-noite (horário de Brasília).
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="flex flex-col gap-4">
+          {(Object.keys(ROTULOS_USO) as (keyof UsoDiario)[]).map((tipo) => {
+            const { usado, limite } = uso.data[tipo]
+            return (
+              <li key={tipo} className="flex flex-col gap-1.5">
+                <div className="flex items-baseline justify-between gap-3 text-sm">
+                  <span>{ROTULOS_USO[tipo]}</span>
+                  <span className={'font-mono tabular-nums ' + (usado >= limite ? 'text-destructive' : 'text-muted-foreground')}>
+                    {usado} de {limite}
+                  </span>
+                </div>
+                <Progress value={Math.min(100, (usado / limite) * 100)} aria-label={`${ROTULOS_USO[tipo]}: ${usado} de ${limite}`} />
+              </li>
+            )
+          })}
+        </ul>
+      </CardContent>
+    </Card>
   )
 }
 

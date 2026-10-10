@@ -3,12 +3,14 @@ from flask import Blueprint, jsonify, request
 
 from app.core import dependencies
 from app.core.auth import login_required
+from app.core.limite import consome
 
 bp = Blueprint("propostas", __name__)
 
 
 @bp.post("/categorias/<categoria_id>/propostas")
 @login_required
+@consome("pesquisa")
 def gerar(categoria_id):
     corpo = request.get_json(silent=True) or {}
     proposta = dependencies.get_proposta_service().gerar(categoria_id, corpo.get("objetivo"))

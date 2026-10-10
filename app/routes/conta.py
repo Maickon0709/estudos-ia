@@ -16,6 +16,12 @@ def resumo():
     return jsonify(dependencies.get_conta_service().resumo())
 
 
+@bp.get("/uso")
+@login_required
+def uso():
+    return jsonify(dependencies.get_uso_service().resumo())
+
+
 @bp.patch("")
 @login_required
 def renomear():

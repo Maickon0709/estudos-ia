@@ -83,3 +83,10 @@ class ArmazenamentoIndisponivelError(AppError):
 
     status_code = 502
     codigo = "armazenamento_indisponivel"
+
+
+class LimiteUsoError(AppError):
+    """O usuário gastou a cota de hoje de chat, IA ou pesquisa (429)."""
+
+    status_code = 429
+    codigo = "limite_uso"

@@ -17,3 +17,20 @@ def app():
 @pytest.fixture
 def client(app):
     return app.test_client()
+
+
+class UsoLivre:
+    """Dublê do limite de uso que libera tudo (os testes de limite usam o de verdade)."""
+
+    def consumir(self, tipo):
+        pass
+
+    def resumo(self):
+        return {}
+
+
+@pytest.fixture(autouse=True)
+def _limite_liberado(monkeypatch):
+    from app.core import dependencies
+
+    monkeypatch.setattr(dependencies, "get_uso_service", lambda: UsoLivre())
