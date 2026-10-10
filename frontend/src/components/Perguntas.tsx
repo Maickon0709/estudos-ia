@@ -24,9 +24,9 @@ export function Perguntas({ itens }: { itens: Pergunta[] }) {
                 onClick={() => setAberta(ativa ? null : i)}
                 className="group flex w-full items-center gap-4 py-5 text-left text-lg font-medium"
               >
-                <span className="mr-auto transition-colors group-hover:text-primary">{pergunta}</span>
+                <span className="mr-auto transition-colors group-hover:text-destaque">{pergunta}</span>
                 <Plus
-                  className={cn('size-5 shrink-0 text-primary transition-transform duration-300 motion-reduce:transition-none', ativa && 'rotate-45')}
+                  className={cn('size-5 shrink-0 text-destaque transition-transform duration-300 motion-reduce:transition-none', ativa && 'rotate-45')}
                   weight="bold"
                 />
               </button>

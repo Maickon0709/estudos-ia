@@ -39,7 +39,7 @@ export function DemoHero() {
 
   return (
     <div
-      className="borda-viva relative rounded-3xl p-px sombra-alta"
+      className="relative rounded-3xl bg-border p-px sombra-alta"
       onPointerEnter={(e) => e.pointerType === 'mouse' && setPausado(true)}
       onPointerLeave={() => setPausado(false)}
       role="group"
@@ -70,7 +70,7 @@ export function DemoHero() {
                 {ativo && !parado && (
                   <span
                     key={`${ato}-${pausado}`}
-                    className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-primary to-destaque"
+                    className="absolute bottom-0 left-0 h-0.5 bg-destaque"
                     style={{ animation: `progresso ${DURACAO}ms linear both`, animationPlayState: pausado ? 'paused' : 'running' }}
                   />
                 )}
@@ -180,7 +180,7 @@ function AtoTrilha() {
       <ol className="relative flex flex-col gap-2.5 pl-1">
         <motion.span
           aria-hidden
-          className="absolute top-4 bottom-4 left-[1.05rem] w-0.5 origin-top bg-gradient-to-b from-primary to-destaque"
+          className="absolute top-4 bottom-4 left-[1.05rem] w-0.5 origin-top bg-destaque"
           initial={{ scaleY: 0 }}
           animate={{ scaleY: 1 }}
           transition={{ duration: 1.4, ease: 'easeInOut' }}
@@ -203,7 +203,7 @@ function AtoTrilha() {
             </span>
             <span className="flex-1 rounded-xl bg-muted/60 px-3 py-2 text-sm">
               {etapa}
-              {i === 0 && <span className="ml-2 text-xs font-medium text-primary">você começa aqui</span>}
+              {i === 0 && <span className="ml-2 text-xs font-medium text-destaque">você começa aqui</span>}
             </span>
           </motion.li>
         ))}

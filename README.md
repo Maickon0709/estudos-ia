@@ -250,6 +250,22 @@ plataforma segurar a resposta, ela aparece inteira no fim, sem erro.
 - O fluxo completo foi testado ao vivo contra o Supabase, a Groq, o Tavily e o YouTube reais.
   O build do Docker roda no CI.
 
+## Créditos das imagens
+
+Fotos do [Unsplash](https://unsplash.com), sob a [Licença Unsplash](https://unsplash.com/license): uso gratuito,
+inclusive comercial, sem atribuição obrigatória. Mesmo assim, os créditos:
+
+| Arquivo (`frontend/public/imagens/`) | Foto | Autor |
+|---|---|---|
+| `portugues.webp` | [Caneta vermelha num caderno](https://unsplash.com/photos/333oj7zFsdg) | lilartsy |
+| `matematica.webp` | [Fórmulas no quadro-negro](https://unsplash.com/photos/NpHSRakEYPM) | Vitaly Gariev |
+| `programacao.webp` | [Programando no notebook](https://unsplash.com/photos/FCHlYvR5gJI) | Danial Igdery |
+| `ingles.webp` | [Livro "Everyday English"](https://unsplash.com/photos/ucUB9wxkPgY) | Ivan Shilov |
+| `quimica.webp` | [Pipeta e tubos de ensaio](https://unsplash.com/photos/RlOAwXt2fEA) | Julia Koblitz |
+| `fisica.webp` | [Professor no quadro de física](https://unsplash.com/photos/TVSRWmnW8Us) | Tra Nguyen |
+| `estudante.webp` | [Estudando com notebook e caderno](https://unsplash.com/photos/hC_796Wu-VY) | Microsoft 365 |
+| `livros.webp` | [Livros abertos empilhados](https://unsplash.com/photos/LUGuCtvlk1Q) | Gülfer ERGİN |
+
 ## Roadmap
 
 - [x] Auth + categorias
