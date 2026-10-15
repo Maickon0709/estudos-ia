@@ -9,10 +9,10 @@ import { cn } from '@/lib/utils'
 type Rgb = [number, number, number]
 type Particula = { x: number; y: number; vida: number; calor: number }
 
-const DENSIDADE = 9000 // px² por partícula
-const MAXIMO = 650
+const DENSIDADE = 3800 // px² por partícula (mais denso: com 9000 o efeito sumia no quadriculado da landing)
+const MAXIMO = 900
 const VELOCIDADE = 0.55
-const ALCANCE = 190 // raio do redemoinho em volta do cursor
+const ALCANCE = 230 // raio do redemoinho em volta do cursor
 const APAGAR = 0.045 // quanto do rastro some por quadro (maior = rastro mais curto)
 
 /** Converte qualquer cor CSS (inclusive oklch) para [r, g, b] pintando 1 pixel. */
@@ -121,7 +121,8 @@ export function FundoFluido({ className, fixo = false }: { className?: string; f
         const r = lr + (dr - lr) * k
         const g = lg + (dg - lg) * k
         const b = lb + (db - lb) * k
-        ctx!.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${0.16 + 0.55 * k})`
+        ctx!.strokeStyle = `rgba(${r | 0},${g | 0},${b | 0},${0.24 + 0.7 * k})`
+        ctx!.lineWidth = 1 + 0.8 * k
         ctx!.beginPath()
         ctx!.moveTo(x0, y0)
         ctx!.lineTo(p.x, p.y)
