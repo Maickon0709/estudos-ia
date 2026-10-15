@@ -3,6 +3,7 @@ import { ArrowLeft, BadgeCheck, BookOpenText, Route, Sparkles } from '@/lib/icon
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import BlurText from '@/components/BlurText'
+import { FundoFluido } from '@/components/FundoFluido'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -78,7 +79,9 @@ export function PaginaEntrar() {
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
-      <section className="textura pontilhado flex flex-col justify-center gap-8 bg-secondary/70 px-8 py-12 lg:px-16">
+      {/* mesmo fundo fluido da página inicial, atrás das duas colunas */}
+      <FundoFluido fixo className="-z-10" />
+      <section className="textura flex flex-col justify-center gap-8 bg-secondary/40 px-8 py-12 backdrop-blur-[1px] lg:px-16">
         <Link to="/" aria-label="Estudos IA: início" className="flex w-fit items-center gap-2 font-heading text-lg font-semibold">
           <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
             <BookOpenText className="size-4" />

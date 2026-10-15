@@ -3,6 +3,11 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
+/* Fontes do tema "caderno" da landing, servidas pelo próprio site (a CSP só aceita font-src 'self') */
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/dm-sans";
+@import "@fontsource/dm-mono/400.css";
+@import "@fontsource/dm-mono/500.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -288,6 +293,58 @@
 .foto-pb { filter: grayscale(1) contrast(1.05); transition: filter 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 .group:hover .foto-pb, .group:focus-visible .foto-pb { filter: grayscale(0); transform: scale(1.04); }
 @media (hover: none) { .foto-pb { filter: none; } }
+
+/* ---------- Tema "caderno" da landing (mockup A1, valores em DESIGN.md) ----------
+   Papel bege com quadriculado, títulos em Bricolage Grotesque, texto em DM Sans, números em DM Mono.
+   Redefine os tokens só dentro de .tema-caderno: o resto do app continua no tema padrão.
+   No escuro vira o "quadro" do mockup (grafite com pontinhos). */
+.tema-caderno {
+  --background: #F6F4EE;
+  --foreground: #1B1A17;
+  --card: #FFFFFF;
+  --card-foreground: #1B1A17;
+  --primary: #1B1A17;
+  --primary-foreground: #F6F4EE;
+  --muted: #FBFAF6;
+  --muted-foreground: #64615A;
+  --secondary: #FBFAF6;
+  --border: #E3DFD4;
+  --accent: #FBE9E5;
+  --accent-foreground: #9E3128;
+  --destaque: #D9473B;
+  --sucesso: #1F7A4D;
+  --escuro: #1B1A17; /* blocos escuros (cartão de fontes, chamada final) */
+  --font-heading: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-sans: 'DM Sans Variable', system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background-color: var(--background);
+  background-image: linear-gradient(#E9E5DB 1px, transparent 1px), linear-gradient(90deg, #E9E5DB 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.dark .tema-caderno {
+  --background: #111110;
+  --foreground: #F2F1EE;
+  --card: #1A1A19;
+  --card-foreground: #F2F1EE;
+  --primary: #F2F1EE;
+  --primary-foreground: #111110;
+  --muted: #161615;
+  --muted-foreground: #A4A29C;
+  --secondary: #161615;
+  --border: rgb(255 255 255 / 0.1);
+  --accent: rgb(240 122 110 / 0.13);
+  --accent-foreground: #F5A69D;
+  --destaque: #F07A6E;
+  --sucesso: #7FD1A5;
+  --escuro: #242422;
+  background-image: radial-gradient(rgb(255 255 255 / 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.tema-caderno h1, .tema-caderno h2, .tema-caderno h3 { font-family: var(--font-heading); font-weight: 700; letter-spacing: -0.045em; }
+.tema-caderno h3 { letter-spacing: -0.02em; }
+.tema-caderno .font-mono { font-family: var(--font-mono); }
 
 @media (prefers-reduced-motion: reduce) {
   .grifo, .pulso-suave, .faixa-rolando { animation: none; }

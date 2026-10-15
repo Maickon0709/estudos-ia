@@ -39,11 +39,17 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
 
 ## Landing
 
+- Tema "caderno" (mockup A1, 15/10/2026), só na landing (`.tema-caderno` em `index.css`): papel `#F6F4EE`
+  com quadriculado de 28px, tinta `#1B1A17`, vermelho `#D9473B`, títulos em Bricolage Grotesque 700
+  (`-0.045em`), texto em DM Sans e números em DM Mono. No escuro vira o "quadro" (`#111110`, pontinhos, `#F07A6E`).
+  Fontes via `@fontsource` (a CSP só aceita `font-src 'self'`, então nada de Google Fonts).
+- Hero centralizado com o produto embaixo (`JanelaProduto`: tela de trilha com dados fictícios fiéis ao app;
+  link descartado NÃO aparece nela, porque no app ele nunca chega ao aluno; a conferência fica no bento).
+- Ordem: hero → faixa de assuntos → números → fotos por matéria → três armadilhas → quatro passos → tour →
+  "escolha como estudar" → bento de recursos → comparação → perguntas → chamada final. Seções em cartões
+  brancos com borda fina (`rounded-[18px] ring-1`), títulos com `TituloRevelado`.
 - Fotos reais (Unsplash) em `public/imagens/*.webp`, sem metadados, com `alt` descritivo, `loading="lazy"` e
   largura/altura fixas (sem pulo de layout). Créditos no README.
-
-- Hero dividido: texto à esquerda, componentes REAIS do app à direita (nada de prévia falsa feita com divs).
-- Cada seção com um layout diferente (lista dividida, linha do tempo, tour, bento assimétrico).
 - No máximo um rótulo pequeno acima de título a cada três seções.
 - Um texto só para a mesma ação ("Criar conta grátis").
 - Números e comparações só com dados verdadeiros do produto (conferidos no código). Sem depoimento inventado.
@@ -53,7 +59,8 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
 - Motivado: entrada de página/aba (`.surgir`), cascata em listas (`.cascata`), tour que avança sozinho.
 - Botões afundam de leve ao clicar. Tudo desligado com `prefers-reduced-motion`.
 - Interativo na landing (inspirado no React Bits e no 21st.dev, recolorido para a paleta):
-  fundo da página toda (`FundoPontos fixo`: grade cinza que foge do cursor e acende em vermelho),
+  fundo da landing e do cadastro (`FundoFluido fixo`: linhas finas cinza numa correnteza lenta que vira redemoinho
+  e acende em vermelho perto do cursor; `FundoPontos` continua no projeto como alternativa),
   `DemoHero` (pedido → links conferidos, com um descartado → trilha), `EscolhaJeito` (três jeitos clicáveis,
   com demonstração; a de prática é uma questão de verdade), `TituloRevelado` (títulos palavra por palavra),
   faixa infinita de assuntos, `.grifo` (marca-texto vermelho que se desenha), `.foto-pb` (foto em preto e
