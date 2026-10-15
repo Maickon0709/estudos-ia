@@ -299,6 +299,9 @@
    Redefine os tokens só dentro de .tema-caderno: o resto do app continua no tema padrão.
    No escuro vira o "quadro" do mockup (grafite com pontinhos). */
 .tema-caderno {
+  /* contexto de empilhamento próprio: o FundoFluido (-z-10) fica entre o papel e o conteúdo, não atrás do papel */
+  position: relative;
+  isolation: isolate;
   --background: #F6F4EE;
   --foreground: #1B1A17;
   --card: #FFFFFF;
