@@ -8,6 +8,8 @@
 @import "@fontsource-variable/dm-sans";
 @import "@fontsource/dm-mono/400.css";
 @import "@fontsource/dm-mono/500.css";
+/* Gloock: serifa de alto contraste, só na palavra que troca no hero (subconjunto latino: tem ã, ç, é) */
+@import "@fontsource/gloock/latin-400.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -399,6 +401,7 @@ a[data-slot="card"]:hover, button[data-slot="card"]:hover, [data-slot="card"]:ha
   --font-heading: 'Bricolage Grotesque Variable', system-ui, sans-serif;
   --font-sans: 'DM Sans Variable', system-ui, sans-serif;
   --font-mono: 'DM Mono', ui-monospace, monospace;
+  --font-destaque: 'Gloock', Georgia, serif;
   font-family: var(--font-sans);
   color: var(--foreground);
   background-color: var(--background);
@@ -423,6 +426,7 @@ a[data-slot="card"]:hover, button[data-slot="card"]:hover, [data-slot="card"]:ha
 .tema-caderno h1, .tema-caderno h2, .tema-caderno h3 { font-family: var(--font-heading); font-weight: 700; letter-spacing: -0.045em; }
 .tema-caderno h3 { letter-spacing: -0.02em; }
 .tema-caderno .font-mono { font-family: var(--font-mono); }
+.tema-caderno .font-destaque { font-family: var(--font-destaque); font-weight: 400; } /* Gloock só tem peso 400: sem negrito falso */
 
 @media (prefers-reduced-motion: reduce) {
   .grifo, .pulso-suave, .faixa-rolando { animation: none; }

@@ -43,7 +43,10 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
   liso (sem quadriculado: a textura é o `FundoFluido`), tinta `#1B1A17`, vermelho `#D9473B`, títulos em Bricolage Grotesque 700
   (`-0.045em`), texto em DM Sans e números em DM Mono. No escuro vira o "quadro" (`#111110`, `#F07A6E`).
   Fontes via `@fontsource` (a CSP só aceita `font-src 'self'`, então nada de Google Fonts).
-- Hero centralizado com o produto embaixo (`JanelaProduto`: tela de trilha com dados fictícios fiéis ao app;
+- Hero editorial (15/10/2026): "Estude" em Bricolage gigante + matéria que troca em **Gloock** vermelha (serifa de
+  alto contraste, reta, pouco usada; só peso 400, só nessa palavra). Embaixo, fio fino e duas colunas: o resto da
+  frase à esquerda e, numa coluna estreita com fio à esquerda, texto, botões e três provas em mono.
+- Produto embaixo do hero (`JanelaProduto`: tela de trilha com dados fictícios fiéis ao app;
   link descartado NÃO aparece nela, porque no app ele nunca chega ao aluno; a conferência fica no bento).
 - Ordem: hero → faixa de assuntos → números → fotos por matéria → três armadilhas → quatro passos → tour →
   "escolha como estudar" → bento de recursos → comparação → perguntas → chamada final. Seções em cartões
