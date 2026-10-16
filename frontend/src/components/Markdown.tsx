@@ -47,8 +47,8 @@ export function Markdown({ texto, className }: { texto: string; className?: stri
         '[&_h1]:font-heading [&_h1]:text-base [&_h1]:font-semibold [&_h2]:font-heading [&_h2]:text-base [&_h2]:font-semibold',
         '[&_h3]:font-semibold [&_strong]:font-semibold',
         '[&_blockquote]:border-l-2 [&_blockquote]:border-primary/40 [&_blockquote]:pl-3 [&_blockquote]:italic',
-        // fórmula em destaque: rola para o lado no celular em vez de estourar a bolha
-        '[&_.katex-display]:my-3 [&_.katex-display]:overflow-x-auto [&_.katex-display]:overflow-y-hidden [&_.katex-display]:py-1 [&_.katex]:text-[1.08em]',
+        // fórmula em destaque vira um quadro (.quadro-formula em index.css); a do meio da frase cresce um pouco
+        'quadro-formula [&_.katex]:text-[1.08em]',
         className,
       )}
     >

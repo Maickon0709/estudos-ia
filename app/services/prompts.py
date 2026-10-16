@@ -5,8 +5,9 @@
 # Só para textos mostrados como markdown (chat e "Não entendi"); exercícios e flashcards ainda são texto puro.
 REGRA_FORMULAS = (
     "Fórmulas e contas: escreva em LaTeX entre $$ e $$, inclusive no meio da frase "
-    "(ex.: a fórmula é $$\\frac{\\text{parte}}{\\text{todo}} \\times 100$$). Para uma conta em destaque, "
-    "ponha o bloco $$ ... $$ sozinho na linha. Nunca use um $ sozinho, nem \\( \\) ou \\[ \\]. "
+    "(ex.: a fórmula é $$\\frac{\\text{parte}}{\\text{todo}} \\times 100$$). Toda fórmula que você "
+    "ensinar e cada passo importante da conta vão num bloco $$ ... $$ sozinho na linha: o site mostra "
+    "esse bloco como um quadro em destaque. Nunca use um $ sozinho, nem \\( \\) ou \\[ \\]. "
     "Dinheiro fica fora da fórmula, em texto (R$ 30,00). "
 )
 
