@@ -1,5 +1,9 @@
-import ReactMarkdown, { type Components } from 'react-markdown'
+import 'katex/dist/katex.min.css'
+import ReactMarkdown, { type Components, type Options } from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import { prepararFormulas } from '@/lib/formulas'
 import { cn } from '@/lib/utils'
 
 /**
@@ -7,7 +11,13 @@ import { cn } from '@/lib/utils'
  * - HTML cru é ignorado (sem rehype-raw): nada que a IA escreva vira tag.
  * - Links viram texto: a IA não pode criar link (invariante 2 do projeto).
  * - Imagens viram o texto alternativo: nada é carregado de fora.
+ * - Fórmulas (LaTeX entre $$) viram desenho com o KaTeX. trust: false barra \href, \url e afins
+ *   (nada vira link); maxSize/maxExpand evitam que uma fórmula gigante trave a página. Erro de LaTeX
+ *   aparece como o próprio texto, sem quebrar a mensagem. Um $ sozinho não abre fórmula (é o "R$").
  */
+const MATEMATICA: Options['remarkPlugins'] = [remarkGfm, [remarkMath, { singleDollarTextMath: false }]]
+const KATEX: Options['rehypePlugins'] = [[rehypeKatex, { throwOnError: false, trust: false, strict: 'ignore', maxSize: 20, maxExpand: 200 }]]
+
 const COMPONENTES: Components = {
   a: ({ children }) => <span className="underline decoration-dotted underline-offset-2">{children}</span>,
   img: ({ alt }) => (alt ? <span>[{alt}]</span> : null),
@@ -37,11 +47,13 @@ export function Markdown({ texto, className }: { texto: string; className?: stri
         '[&_h1]:font-heading [&_h1]:text-base [&_h1]:font-semibold [&_h2]:font-heading [&_h2]:text-base [&_h2]:font-semibold',
         '[&_h3]:font-semibold [&_strong]:font-semibold',
         '[&_blockquote]:border-l-2 [&_blockquote]:border-primary/40 [&_blockquote]:pl-3 [&_blockquote]:italic',
+        // fórmula em destaque: rola para o lado no celular em vez de estourar a bolha
+        '[&_.katex-display]:my-3 [&_.katex-display]:overflow-x-auto [&_.katex-display]:overflow-y-hidden [&_.katex-display]:py-1 [&_.katex]:text-[1.08em]',
         className,
       )}
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={COMPONENTES} skipHtml>
-        {texto}
+      <ReactMarkdown remarkPlugins={MATEMATICA} rehypePlugins={KATEX} components={COMPONENTES} skipHtml>
+        {prepararFormulas(texto)}
       </ReactMarkdown>
     </div>
   )
