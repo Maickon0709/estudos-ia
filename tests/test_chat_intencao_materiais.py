@@ -9,7 +9,8 @@ import pytest
 from app.repositories.documento_repository import DocumentoRepository
 from app.services.documento_service import DOCUMENTOS_NA_AMOSTRA
 from app.services.prompts import (
-    AMOSTRA_NO_PROMPT, MATERIAIS_MAX, REGRA_FORMULAS, prompt_materiais, prompt_reexplicar, prompt_tutor,
+    AMOSTRA_NO_PROMPT, MATERIAIS_MAX, REGRA_FORMULAS, REGRAS_ENSINO, prompt_materiais, prompt_reexplicar,
+    prompt_tutor,
 )
 from app.services.regras.intencao import acao_sugerida, pede_visao_geral
 from tests.test_documentos import chat_com
@@ -132,6 +133,18 @@ def test_tutora_nao_finge_criar_trilha_nem_repete_opcoes():
     assert "Nunca diga que algo foi criado" in prompt
     assert "Tudo junto" in prompt and "Só meus arquivos" in prompt and "Você não pesquisa nada" in prompt
     assert "Sem emojis" in prompt
+
+
+def test_tutora_usa_as_respostas_do_aluno_ao_ensinar():
+    # Chat real: pediu porcentagem e área "para fazer de cabeça", disse "não sei nada", e a tutora chutou o
+    # nível, deu fórmula, repetiu a aula com mais fórmulas e esqueceu a área.
+    prompt = prompt_tutor("Matemática")
+    assert REGRAS_ENSINO in prompt
+    assert "não chute" in REGRAS_ENSINO                       # pergunta sem resposta: pergunta de novo
+    assert "\"De cabeça\"" in REGRAS_ENSINO and "sem fórmula" in REGRAS_ENSINO  # objetivo decide o método
+    assert "NUNCA repita a" in REGRAS_ENSINO                  # "do zero" recomeça mais simples
+    assert "espere a resposta" in REGRAS_ENSINO               # uma pergunta de treino por vez
+    assert "Não esqueça os outros" in REGRAS_ENSINO           # vários assuntos pedidos
 
 
 def test_formulas_so_entre_dois_cifroes_no_chat_e_no_nao_entendi():
