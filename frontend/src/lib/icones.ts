@@ -1,8 +1,26 @@
 // Ícones do Phosphor com os nomes usados no código (antes Lucide, o padrão de todo site feito por IA).
 // Um lugar só: trocar a família de ícones de novo é editar este arquivo.
+import {
+  ArrowLeft as SetaEsquerda,
+  ArrowRight as SetaDireita,
+  ArrowUpRight as SetaFora,
+  type Icon,
+  type IconProps,
+} from '@phosphor-icons/react'
+import { createElement, forwardRef } from 'react'
+
+// Setas marcadas com data-seta: o CSS (index.css) faz a seta andar na direção dela quando o link ou
+// botão em volta recebe o mouse, em todo o site, sem classe extra em cada tela.
+function seta(Base: Icon, direcao: 'frente' | 'tras' | 'fora'): Icon {
+  const Seta = forwardRef<SVGSVGElement, IconProps>((props, ref) => createElement(Base, { ...props, ref, 'data-seta': direcao } as IconProps))
+  Seta.displayName = Base.displayName
+  return Seta as Icon
+}
+export const ArrowRight = seta(SetaDireita, 'frente')
+export const ArrowLeft = seta(SetaEsquerda, 'tras')
+export const ExternalLink = seta(SetaFora, 'fora')
+
 export {
-  ArrowLeft,
-  ArrowRight,
   SealCheck as BadgeCheck,
   BookOpen,
   BookOpenText,
@@ -25,7 +43,6 @@ export {
   Compass,
   DownloadSimple as Download,
   Barbell as Dumbbell,
-  ArrowUpRight as ExternalLink,
   FileText,
   Fire as Flame,
   FolderPlus,

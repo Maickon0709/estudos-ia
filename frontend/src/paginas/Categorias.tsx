@@ -99,7 +99,7 @@ export function PaginaCategorias() {
                 <CardHeader>
                   <CardTitle className="font-heading text-xl">{c.nome}</CardTitle>
                   <CardDescription className="flex items-center gap-1">
-                    Abrir <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                    Abrir <ArrowRight className="size-3.5" />
                   </CardDescription>
                 </CardHeader>
               </Card>

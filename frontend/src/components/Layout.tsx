@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { BookOpenText, House, Library, Moon, RotateCcw, Sun } from '@/lib/icones'
+import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { Link, NavLink } from 'react-router'
 import { Avatar } from '@/components/Avatar'
@@ -11,6 +12,9 @@ import { api } from '@/lib/api'
 import { trocarTema, useTema } from '@/lib/tema'
 import { cn } from '@/lib/utils'
 
+// Mola curta: chega rápido e assenta sem quicar demais
+const MOLA = { type: 'spring', stiffness: 420, damping: 34 } as const
+
 function ItemMenu({ to, icone, rotulo, extra }: { to: string; icone: ReactNode; rotulo: string; extra?: ReactNode }) {
   return (
     <NavLink
@@ -20,14 +24,20 @@ function ItemMenu({ to, icone, rotulo, extra }: { to: string; icone: ReactNode; 
       title={rotulo}
       className={({ isActive }) =>
         cn(
-          'flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm transition-colors sm:px-3 [&_svg]:size-4',
-          isActive ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground',
+          'relative flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm transition-colors duration-300 sm:px-3 [&_svg]:size-4',
+          isActive ? 'text-accent-foreground' : 'text-muted-foreground hover:text-foreground',
         )
       }
     >
-      {icone}
-      <span className="hidden sm:inline">{rotulo}</span>
-      {extra}
+      {({ isActive }) => (
+        <>
+          {/* a pílula do item ativo desliza de um item para o outro (layoutId compartilhado) */}
+          {isActive && <motion.span layoutId="menu-ativo" className="absolute inset-0 -z-10 rounded-full bg-accent" transition={MOLA} />}
+          {icone}
+          <span className="hidden sm:inline">{rotulo}</span>
+          {extra}
+        </>
+      )}
     </NavLink>
   )
 }
@@ -65,7 +75,7 @@ export function Layout({ children }: { children: ReactNode }) {
             </span>
             <span className="sm:max-md:hidden">Estudos IA</span>
           </Link>
-          <nav className="hidden items-center gap-1 sm:flex" aria-label="Menu principal">
+          <nav className="isolate hidden items-center gap-1 sm:flex" aria-label="Menu principal">
             <ItemMenu to="/" icone={<House />} rotulo="Hoje" />
             <ItemMenu to="/categorias" icone={<Library />} rotulo="Categorias" />
             <ItemMenu to="/revisoes" icone={<RotateCcw />} rotulo="Revisões" extra={selo} />
@@ -97,9 +107,14 @@ function BarraInferior({ selo }: { selo: ReactNode }) {
         isActive ? 'text-primary' : 'text-muted-foreground',
       )}
     >
-      {icone}
-      {rotulo}
-      {extra && <span className="absolute top-0.5 left-1/2 ml-2">{extra}</span>}
+      {({ isActive }) => (
+        <>
+          {isActive && <motion.span layoutId="barra-ativa" className="absolute inset-x-3 inset-y-0 -z-10 rounded-xl bg-accent" transition={MOLA} />}
+          {icone}
+          {rotulo}
+          {extra && <span className="absolute top-0.5 left-1/2 ml-2">{extra}</span>}
+        </>
+      )}
     </NavLink>
   )
   return (
@@ -107,7 +122,7 @@ function BarraInferior({ selo }: { selo: ReactNode }) {
       aria-label="Menu principal"
       className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur sm:hidden"
     >
-      <div className="flex">
+      <div className="isolate flex">
         {item('/', 'Hoje', <House />)}
         {item('/categorias', 'Categorias', <Library />)}
         {item('/revisoes', 'Revisões', <RotateCcw />, selo)}
