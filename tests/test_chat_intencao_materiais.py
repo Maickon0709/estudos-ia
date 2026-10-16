@@ -8,7 +8,9 @@ import pytest
 
 from app.repositories.documento_repository import DocumentoRepository
 from app.services.documento_service import DOCUMENTOS_NA_AMOSTRA
-from app.services.prompts import AMOSTRA_NO_PROMPT, MATERIAIS_MAX, prompt_materiais, prompt_tutor
+from app.services.prompts import (
+    AMOSTRA_NO_PROMPT, MATERIAIS_MAX, REGRA_FORMULAS, prompt_materiais, prompt_reexplicar, prompt_tutor,
+)
 from app.services.regras.intencao import acao_sugerida, pede_visao_geral
 from tests.test_documentos import chat_com
 from tests.test_repositorios_estudo import Cadeia
@@ -130,6 +132,15 @@ def test_tutora_nao_finge_criar_trilha_nem_repete_opcoes():
     assert "Nunca diga que algo foi criado" in prompt
     assert "Tudo junto" in prompt and "Só meus arquivos" in prompt and "Você não pesquisa nada" in prompt
     assert "Sem emojis" in prompt
+
+
+def test_formulas_so_entre_dois_cifroes_no_chat_e_no_nao_entendi():
+    # O site só desenha LaTeX entre $$ (um $ sozinho é o "R$" do dinheiro). Nasceu de um chat real de
+    # porcentagem em que \[ \] e o % viraram texto cru na tela.
+    for prompt in (prompt_tutor("Matemática"), prompt_reexplicar()):
+        assert REGRA_FORMULAS in prompt
+    assert "entre $$ e $$" in REGRA_FORMULAS and "Nunca use um $ sozinho" in REGRA_FORMULAS
+    assert "R$ 30,00" in REGRA_FORMULAS
 
 
 # ---------- repository ----------
