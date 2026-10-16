@@ -14,6 +14,10 @@ const MAXIMO = 900
 const VELOCIDADE = 0.55
 const ALCANCE = 230 // raio do redemoinho em volta do cursor
 const APAGAR = 0.045 // quanto do rastro some por quadro (maior = rastro mais curto)
+// O apagar parcial nunca zera os traços mais fracos (arredondamento de 8 bits): eles se acumulam numa
+// trama de fios. Sozinha ela leva minutos para aparecer; ao abrir, simulamos esse tempo em poucos quadros.
+const AQUECER = 1500 // passos simulados ao abrir (~25 s de correnteza)
+const POR_QUADRO = 150 // passos simulados por quadro durante o aquecimento (não trava a página)
 
 /** Converte qualquer cor CSS (inclusive oklch) para [r, g, b] pintando 1 pixel. */
 function rgbDe(cor: string, reserva: Rgb): Rgb {
@@ -61,6 +65,7 @@ export function FundoFluido({ className, fixo = false }: { className?: string; f
     let quadro = 0
     let visivel = true
     let inicio = performance.now()
+    let aquecer = 0 // passos simulados que faltam
 
     const nova = (): Particula => ({ x: Math.random() * largura, y: Math.random() * altura, vida: 200 + Math.random() * 400, calor: 0 })
 
@@ -76,7 +81,32 @@ export function FundoFluido({ className, fixo = false }: { className?: string; f
       particulas = Array.from({ length: total }, nova)
       if (parado) {
         for (let i = 0; i < 90; i++) passo(inicio + i * 16, false) // um quadro "congelado" com rastros
+      } else {
+        aquecer = AQUECER
       }
+    }
+
+    /** Um passo sem cursor e sem cor de destaque: todas as linhas num caminho só (um stroke por passo). */
+    function passoRapido(t: number) {
+      ctx!.globalCompositeOperation = 'destination-out'
+      ctx!.fillStyle = `rgba(0,0,0,${APAGAR})`
+      ctx!.fillRect(0, 0, largura, altura)
+      ctx!.globalCompositeOperation = 'source-over'
+      const [lr, lg, lb] = cores.linha
+      ctx!.strokeStyle = `rgba(${lr},${lg},${lb},0.24)`
+      ctx!.lineWidth = 1
+      ctx!.beginPath()
+      for (const p of particulas) {
+        const a = angulo(p.x, p.y, t)
+        ctx!.moveTo(p.x, p.y)
+        p.x += Math.cos(a) * VELOCIDADE
+        p.y += Math.sin(a) * VELOCIDADE
+        ctx!.lineTo(p.x, p.y)
+        p.vida -= 1
+        p.calor = 0
+        if (p.vida <= 0 || p.x < -10 || p.y < -10 || p.x > largura + 10 || p.y > altura + 10) Object.assign(p, nova())
+      }
+      ctx!.stroke()
     }
 
     function passo(agora: number, apagar = true) {
@@ -135,7 +165,14 @@ export function FundoFluido({ className, fixo = false }: { className?: string; f
     function animar(agora: number) {
       quadro = 0
       if (!visivel || document.hidden) return
-      passo(agora)
+      if (aquecer > 0) {
+        // tempos negativos: o aquecimento é o "passado" da correnteza, que continua sem emenda
+        const n = Math.min(POR_QUADRO, aquecer)
+        for (let i = 0; i < n; i++) passoRapido(agora - inicio - (aquecer - i) * 16)
+        aquecer -= n
+      } else {
+        passo(agora)
+      }
       quadro = requestAnimationFrame(animar)
     }
     function acordar() {
@@ -165,6 +202,7 @@ export function FundoFluido({ className, fixo = false }: { className?: string; f
       cores = coresDoTema()
       ctx.clearRect(0, 0, largura, altura)
       inicio = performance.now()
+      if (!parado) aquecer = AQUECER
     })
     tema.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
     window.addEventListener('pointermove', aoMover, { passive: true })

@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { Link, NavLink } from 'react-router'
 import { Avatar } from '@/components/Avatar'
 import { Cronometro } from '@/components/Cronometro'
+import { FundoFluido } from '@/components/FundoFluido'
 import { Rodape } from '@/components/Rodape'
 import { BoasVindas } from '@/components/Tutorial'
 import { Button } from '@/components/ui/button'
@@ -67,6 +68,8 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-svh flex-col">
+      {/* mesmo fundo do login e da landing: linhas finas em correnteza que viram redemoinho perto do mouse */}
+      <FundoFluido fixo className="-z-10" />
       <header className="sticky top-0 z-20 border-b bg-background/85 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-5xl items-center gap-1 px-4 sm:gap-2">
           <Link to="/" aria-label="Estudos IA: início" className="mr-auto flex items-center gap-2 font-heading text-lg font-semibold">

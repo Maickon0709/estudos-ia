@@ -40,8 +40,8 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
 ## Landing
 
 - Tema "caderno" (mockup A1, 15/10/2026), só na landing (`.tema-caderno` em `index.css`): papel `#F6F4EE`
-  com quadriculado de 28px, tinta `#1B1A17`, vermelho `#D9473B`, títulos em Bricolage Grotesque 700
-  (`-0.045em`), texto em DM Sans e números em DM Mono. No escuro vira o "quadro" (`#111110`, pontinhos, `#F07A6E`).
+  liso (sem quadriculado: a textura é o `FundoFluido`), tinta `#1B1A17`, vermelho `#D9473B`, títulos em Bricolage Grotesque 700
+  (`-0.045em`), texto em DM Sans e números em DM Mono. No escuro vira o "quadro" (`#111110`, `#F07A6E`).
   Fontes via `@fontsource` (a CSP só aceita `font-src 'self'`, então nada de Google Fonts).
 - Hero centralizado com o produto embaixo (`JanelaProduto`: tela de trilha com dados fictícios fiéis ao app;
   link descartado NÃO aparece nela, porque no app ele nunca chega ao aluno; a conferência fica no bento).
@@ -68,8 +68,11 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
 - Landing: hero em cascata, CTAs magnéticos (`Magnetico`), produto do hero deitado em 3D que fica de pé
   com a rolagem e inclina com o mouse (`CartaoBrilho`), brilho em todos os cartões das seções.
 - Interativo na landing (inspirado no React Bits e no 21st.dev, recolorido para a paleta):
-  fundo da landing e do cadastro (`FundoFluido fixo`: linhas finas cinza numa correnteza lenta que vira redemoinho
-  e acende em vermelho perto do cursor; `FundoPontos` continua no projeto como alternativa),
+  fundo da landing, do login e de todas as telas logadas (`FundoFluido fixo`, no `Layout`): linhas finas cinza numa correnteza lenta que vira redemoinho
+  e acende em vermelho perto do cursor. Os rastros mais fracos nunca somem e formam uma trama de fios; ao
+  abrir, ~25 s de correnteza são simulados em poucos quadros (`AQUECER`) para a trama já aparecer.
+  O contêiner da página precisa de `isolation: isolate` se tiver fundo opaco, senão o canvas fica atrás dele;
+  `FundoPontos` continua no projeto como alternativa),
   `DemoHero` (pedido → links conferidos, com um descartado → trilha), `EscolhaJeito` (três jeitos clicáveis,
   com demonstração; a de prática é uma questão de verdade), `TituloRevelado` (títulos palavra por palavra),
   faixa infinita de assuntos, `.grifo` (marca-texto vermelho que se desenha), `.foto-pb` (foto em preto e
