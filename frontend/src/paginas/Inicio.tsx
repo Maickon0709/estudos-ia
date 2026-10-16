@@ -10,17 +10,22 @@ import { JanelaProduto } from '@/components/JanelaProduto'
 import { BotaoTema } from '@/components/Layout'
 import { Magnetico } from '@/components/Magnetico'
 import { Rodape } from '@/components/Rodape'
+import RotatingText from '@/components/RotatingText'
 import { TelaInclinada } from '@/components/TelaInclinada'
 import { TituloRevelado } from '@/components/TituloRevelado'
 import { TourProduto } from '@/components/TourProduto'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, BookOpenText, Brain, Compass, ShieldAlert } from '@/lib/icones'
+import { ArrowRight, BookOpenText, Brain, Check, Compass, ShieldAlert } from '@/lib/icones'
 import { useTitulo } from '@/lib/titulo'
 import { cn } from '@/lib/utils'
 
 // Landing no tema "caderno" (mockup A1: produto no centro). Tokens em .tema-caderno (index.css).
 
 const CTA = 'Criar conta grátis' // um texto só para a mesma ação, em toda a página
+
+// Matérias que trocam no título do hero (curtas: cabem numa linha em letra gigante)
+const MATERIAS_HERO = ['Python', 'Crase', 'SQL', 'Derivadas', 'Inglês', 'Física', 'Redação', 'Excel']
+const PROVAS_HERO = ['100% dos links conferidos', 'Grátis, sem cartão', 'Funciona no celular']
 
 // Fotos do Unsplash (licença livre para uso comercial, sem atribuição obrigatória; créditos no README),
 // guardadas em public/imagens em WebP, sem metadados. A CSP só aceita imagens do próprio site.
@@ -150,26 +155,52 @@ export function PaginaInicio() {
       </header>
 
       <main>
-        {/* ---------- hero: texto centralizado e o produto embaixo ---------- */}
-        <section className="cascata mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 pt-16 text-center sm:px-6 sm:pt-22">
-          <h1 className="max-w-[15ch] text-[clamp(2.7rem,6.4vw,5rem)] leading-[0.98]">
-            Estude qualquer assunto com uma tutora <span className="text-destaque">que pesquisa por você.</span>
+        {/* ---------- hero editorial: "Estude" + matéria que troca (Gloock), e embaixo duas colunas:
+            o resto da frase à esquerda e, numa coluna estreita com fio à esquerda, texto, botões e provas ---------- */}
+        <section className="mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-20">
+          <h1 className="cascata flex flex-col lg:flex-row lg:flex-wrap lg:items-baseline lg:gap-x-[0.22em] text-[clamp(3.6rem,9.5vw,7.6rem)]">
+            <span className="leading-[0.95] tracking-[-0.055em]">Estude</span>
+            <RotatingText
+              texts={MATERIAS_HERO}
+              mainClassName="font-destaque text-destaque leading-[1.02] tracking-[-0.02em] font-normal overflow-hidden pb-[0.08em]"
+              splitLevelClassName="overflow-hidden pb-[0.08em]"
+              staggerFrom="first"
+              staggerDuration={0.018}
+              rotationInterval={2600}
+              transition={{ type: 'spring', damping: 34, stiffness: 560 }} // mola rápida: a troca não deixa a linha vazia
+            />
+            <span className="sr-only">qualquer assunto, com uma tutora que pesquisa por você.</span>
           </h1>
-          <p className="max-w-[52ch] text-lg leading-relaxed text-muted-foreground sm:text-[19px]">
-            A plataforma busca vídeos e sites reais, confere cada link e monta sua trilha do básico ao avançado.
-            Você aprova antes de começar.
-          </p>
-          <div ref={ctaTopo} className="flex flex-wrap justify-center gap-3">
-            <Magnetico>
-              <Button asChild size="lg" className="h-12 rounded-xl px-6 text-base">
-                <Link to="/entrar?modo=cadastrar">{CTA} <ArrowRight weight="bold" /></Link>
-              </Button>
-            </Magnetico>
-            <Button asChild size="lg" variant="outline" className="h-12 rounded-xl bg-card px-5 text-base">
-              <a href="#tour">Ver por dentro</a>
-            </Button>
+
+          <div className="cascata mt-8 grid gap-10 border-t pt-8 lg:mt-10 lg:grid-cols-[1.25fr_1fr] lg:gap-16 lg:pt-10">
+            <p aria-hidden className="max-w-[16ch] font-heading text-[clamp(1.9rem,3.4vw,2.9rem)] leading-[1.02] font-bold tracking-[-0.04em]">
+              Qualquer assunto, com uma tutora <span className="text-muted-foreground">que pesquisa por você.</span>
+            </p>
+            <div className="flex flex-col gap-6 lg:border-l lg:pl-10">
+              <p className="max-w-[44ch] text-[17px] leading-relaxed text-muted-foreground">
+                A plataforma busca vídeos e sites reais, confere cada link e monta sua trilha do básico ao avançado.
+                Você aprova antes de começar.
+              </p>
+              <div ref={ctaTopo} className="flex flex-wrap items-center gap-3">
+                <Magnetico>
+                  <Button asChild size="lg" className="h-12 rounded-xl px-6 text-base">
+                    <Link to="/entrar?modo=cadastrar">{CTA} <ArrowRight weight="bold" /></Link>
+                  </Button>
+                </Magnetico>
+                <Button asChild size="lg" variant="outline" className="h-12 rounded-xl bg-card px-5 text-base">
+                  <a href="#tour">Ver por dentro</a>
+                </Button>
+              </div>
+              <ul className="flex flex-wrap gap-x-5 gap-y-2 font-mono text-[12.5px] text-muted-foreground">
+                {PROVAS_HERO.map((prova) => (
+                  <li key={prova} className="flex items-center gap-1.5">
+                    <Check className="size-3.5 text-destaque" weight="bold" aria-hidden /> {prova}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <p className="text-[13px] text-muted-foreground">Grátis, sem cartão. Funciona no navegador do celular.</p>
+
           <ProdutoEmPe>
             <CartaoBrilho className="rounded-[20px]">
               <JanelaProduto />
