@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Link } from 'react-router'
 import AnimatedContent from '@/components/AnimatedContent'
+import { CartaoBrilho } from '@/components/CartaoBrilho'
 import CountUp from '@/components/CountUp'
 import { EscolhaJeito } from '@/components/EscolhaJeito'
 import { FundoFluido } from '@/components/FundoFluido'
 import { JanelaProduto } from '@/components/JanelaProduto'
 import { BotaoTema } from '@/components/Layout'
+import { Magnetico } from '@/components/Magnetico'
 import { Rodape } from '@/components/Rodape'
 import { TelaInclinada } from '@/components/TelaInclinada'
 import { TituloRevelado } from '@/components/TituloRevelado'
@@ -148,7 +151,7 @@ export function PaginaInicio() {
 
       <main>
         {/* ---------- hero: texto centralizado e o produto embaixo ---------- */}
-        <section className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 pt-16 text-center sm:px-6 sm:pt-22">
+        <section className="cascata mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 pt-16 text-center sm:px-6 sm:pt-22">
           <h1 className="max-w-[15ch] text-[clamp(2.7rem,6.4vw,5rem)] leading-[0.98]">
             Estude qualquer assunto com uma tutora <span className="text-destaque">que pesquisa por você.</span>
           </h1>
@@ -157,17 +160,21 @@ export function PaginaInicio() {
             Você aprova antes de começar.
           </p>
           <div ref={ctaTopo} className="flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg" className="h-12 rounded-xl px-6 text-base">
-              <Link to="/entrar?modo=cadastrar">{CTA} <ArrowRight weight="bold" /></Link>
-            </Button>
+            <Magnetico>
+              <Button asChild size="lg" className="h-12 rounded-xl px-6 text-base">
+                <Link to="/entrar?modo=cadastrar">{CTA} <ArrowRight weight="bold" /></Link>
+              </Button>
+            </Magnetico>
             <Button asChild size="lg" variant="outline" className="h-12 rounded-xl bg-card px-5 text-base">
               <a href="#tour">Ver por dentro</a>
             </Button>
           </div>
           <p className="text-[13px] text-muted-foreground">Grátis, sem cartão. Funciona no navegador do celular.</p>
-          <AnimatedContent distance={40} className="mt-10 w-full">
-            <JanelaProduto />
-          </AnimatedContent>
+          <ProdutoEmPe>
+            <CartaoBrilho className="rounded-[20px]">
+              <JanelaProduto />
+            </CartaoBrilho>
+          </ProdutoEmPe>
         </section>
 
         {/* ---------- faixa infinita de assuntos ---------- */}
@@ -246,12 +253,14 @@ export function PaginaInicio() {
           <ul className="flex flex-col gap-4">
             {ARMADILHAS.map(({ icone: Icone, titulo, texto }, i) => (
               <AnimatedContent key={titulo} distance={30} delay={i * 0.06}>
-                <li className={cn(CARTAO, 'flex gap-5 p-6')}>
-                  <Icone className="mt-1 size-6 shrink-0 text-destaque" />
-                  <div>
-                    <h3 className="text-xl">{titulo}</h3>
-                    <p className="mt-2 max-w-[52ch] text-muted-foreground">{texto}</p>
-                  </div>
+                <li>
+                  <CartaoBrilho className={cn(CARTAO, 'group flex gap-5 p-6')}>
+                    <Icone className="mt-1 size-6 shrink-0 text-destaque transition-transform duration-500 ease-[var(--mola)] group-hover:scale-110 group-hover:-rotate-6" />
+                    <div>
+                      <h3 className="text-xl">{titulo}</h3>
+                      <p className="mt-2 max-w-[52ch] text-muted-foreground">{texto}</p>
+                    </div>
+                  </CartaoBrilho>
                 </li>
               </AnimatedContent>
             ))}
@@ -264,10 +273,12 @@ export function PaginaInicio() {
           <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {PASSOS.map(({ titulo, texto }, i) => (
               <AnimatedContent key={titulo} distance={24} delay={i * 0.06}>
-                <li className={cn(CARTAO, 'flex h-full flex-col gap-2.5 p-6')}>
-                  <span className="font-mono text-[13px] text-accent-foreground">{String(i + 1).padStart(2, '0')}</span>
-                  <h3 className="text-[19px]">{titulo}</h3>
-                  <p className="text-[15px] text-muted-foreground">{texto}</p>
+                <li className="h-full">
+                  <CartaoBrilho className={cn(CARTAO, 'flex h-full flex-col gap-2.5 p-6')}>
+                    <span className="font-mono text-[13px] text-accent-foreground">{String(i + 1).padStart(2, '0')}</span>
+                    <h3 className="text-[19px]">{titulo}</h3>
+                    <p className="text-[15px] text-muted-foreground">{texto}</p>
+                  </CartaoBrilho>
                 </li>
               </AnimatedContent>
             ))}
@@ -295,7 +306,7 @@ export function PaginaInicio() {
         <section id="recursos" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-24 sm:px-6">
           <TituloRevelado texto="Tudo o que um chat solto não faz por você." className={TITULO_SECAO} />
           <div className="mt-12 grid gap-4 lg:grid-cols-6">
-            <div className="flex min-h-[280px] flex-col gap-5 rounded-3xl bg-[var(--escuro)] p-8 text-[#F4F3EF] ring-1 ring-border lg:col-span-4">
+            <CartaoBrilho className="flex min-h-[280px] flex-col gap-5 rounded-3xl bg-[var(--escuro)] p-8 text-[#F4F3EF] ring-1 ring-border lg:col-span-4">
               <h3 className="text-[26px]">Fontes conferidas</h3>
               <p className="max-w-[44ch] text-[#F4F3EF]/75">
                 A IA escolhe materiais por número numa lista já verificada. Ela nem vê as URLs, então não tem como inventar um link.
@@ -308,8 +319,8 @@ export function PaginaInicio() {
                   </li>
                 ))}
               </ul>
-            </div>
-            <div className="flex flex-col gap-3 rounded-3xl bg-card p-7 ring-1 ring-border lg:col-span-2">
+            </CartaoBrilho>
+            <CartaoBrilho className="flex flex-col gap-3 rounded-3xl bg-card p-7 ring-1 ring-border lg:col-span-2">
               <h3 className="text-[21px]">Revisão espaçada</h3>
               <p className="text-[15px] text-muted-foreground">O conteúdo volta no dia certo, antes de você esquecer.</p>
               <ul className="mt-auto flex flex-wrap gap-1.5 font-mono text-[13px]" aria-label="Intervalos de revisão">
@@ -317,25 +328,25 @@ export function PaginaInicio() {
                   <li key={d} className="rounded-[7px] bg-accent px-2.5 py-1.5 text-accent-foreground">{d}d</li>
                 ))}
               </ul>
-            </div>
-            <div className="flex flex-col gap-3 rounded-3xl bg-card p-7 ring-1 ring-border lg:col-span-2">
+            </CartaoBrilho>
+            <CartaoBrilho className="flex flex-col gap-3 rounded-3xl bg-card p-7 ring-1 ring-border lg:col-span-2">
               <h3 className="text-[21px]">Flashcards</h3>
               <p className="text-[15px] text-muted-foreground">Gerados dos materiais da etapa, com revisão espaçada.</p>
-            </div>
-            <div className="flex flex-col gap-3 rounded-3xl bg-card p-7 ring-1 ring-border lg:col-span-2">
+            </CartaoBrilho>
+            <CartaoBrilho className="flex flex-col gap-3 rounded-3xl bg-card p-7 ring-1 ring-border lg:col-span-2">
               <h3 className="text-[21px]">Simulados</h3>
               {/* gabarito só depois de finalizar (invariante 8): nada de "correção na hora" */}
               <p className="text-[15px] text-muted-foreground">Prova com tempo marcado. Ao finalizar, você vê os acertos, o gabarito e a explicação de cada questão.</p>
               <span className="mt-auto font-mono text-[28px] font-medium tabular-nums" aria-hidden>24:59</span>
-            </div>
-            <div className="flex flex-col gap-3 rounded-3xl bg-card p-7 ring-1 ring-border lg:col-span-2">
+            </CartaoBrilho>
+            <CartaoBrilho className="flex flex-col gap-3 rounded-3xl bg-card p-7 ring-1 ring-border lg:col-span-2">
               <h3 className="text-[21px]">Cronômetro de foco</h3>
               <p className="text-[15px] text-muted-foreground">Ciclos de 25 minutos que entram no seu calendário.</p>
-            </div>
-            <div className="flex flex-col gap-3 rounded-3xl bg-accent p-7 text-accent-foreground lg:col-span-6 lg:flex-row lg:items-baseline lg:gap-8">
+            </CartaoBrilho>
+            <CartaoBrilho className="flex flex-col gap-3 rounded-3xl bg-accent p-7 text-accent-foreground lg:col-span-6 lg:flex-row lg:items-baseline lg:gap-8">
               <h3 className="shrink-0 text-[21px]">Trilha que se adapta</h3>
               <p className="text-[15px]">Três níveis de exercício. Errou muito, a trilha reforça. Acertou, ela avança.</p>
-            </div>
+            </CartaoBrilho>
           </div>
         </section>
 
@@ -349,7 +360,7 @@ export function PaginaInicio() {
               <span role="columnheader" className="text-accent-foreground">Estudos IA</span>
             </div>
             {COMPARACAO.map(({ tema, comum, nosso }, i) => (
-              <div key={tema} role="row" className={cn('grid gap-2 py-4.5 sm:grid-cols-[9rem_1fr_1fr] sm:gap-6', i > 0 ? 'border-t' : 'sm:border-t')}>
+              <div key={tema} role="row" className={cn('-mx-3 grid gap-2 rounded-xl px-3 py-4.5 transition-colors duration-300 hover:bg-muted sm:grid-cols-[9rem_1fr_1fr] sm:gap-6', i > 0 ? 'border-t' : 'sm:border-t')}>
                 <span role="rowheader" className="font-semibold">{tema}</span>
                 <span role="cell" className="text-muted-foreground"><span className="sm:sr-only">Chat de IA comum: </span>{comum}</span>
                 <span role="cell"><span className="font-medium text-accent-foreground sm:sr-only">Estudos IA: </span>{nosso}</span>
@@ -362,11 +373,13 @@ export function PaginaInicio() {
         <section id="perguntas" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-24 sm:px-6">
           <TituloRevelado texto="Perguntas frequentes" className={TITULO_SECAO} />
           <div className="mt-10 grid gap-4 md:grid-cols-2">
-            {PERGUNTAS.map(({ pergunta, resposta }) => (
-              <div key={pergunta} className={cn(CARTAO, 'p-6')}>
-                <h3 className="font-sans text-[17px] font-semibold tracking-normal">{pergunta}</h3>
-                <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground">{resposta}</p>
-              </div>
+            {PERGUNTAS.map(({ pergunta, resposta }, i) => (
+              <AnimatedContent key={pergunta} distance={20} delay={(i % 2) * 0.06}>
+                <CartaoBrilho className={cn(CARTAO, 'h-full p-6')}>
+                  <h3 className="font-sans text-[17px] font-semibold tracking-normal">{pergunta}</h3>
+                  <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground">{resposta}</p>
+                </CartaoBrilho>
+              </AnimatedContent>
             ))}
           </div>
         </section>
@@ -380,9 +393,11 @@ export function PaginaInicio() {
               </h2>
               <p className="mt-3 text-[#F4F3EF]/75">Grátis, sem cartão. Código aberto no GitHub.</p>
             </div>
-            <Button asChild size="lg" className="h-12 rounded-xl bg-[#F4F3EF] px-6 text-base text-[#151514] hover:bg-[#F4F3EF]/90">
-              <Link to="/entrar?modo=cadastrar">{CTA} <ArrowRight weight="bold" /></Link>
-            </Button>
+            <Magnetico>
+              <Button asChild size="lg" className="h-12 rounded-xl bg-[#F4F3EF] px-6 text-base text-[#151514] hover:bg-[#F4F3EF]/90">
+                <Link to="/entrar?modo=cadastrar">{CTA} <ArrowRight weight="bold" /></Link>
+              </Button>
+            </Magnetico>
           </div>
         </section>
       </main>
@@ -401,6 +416,21 @@ export function PaginaInicio() {
           <Link to="/entrar?modo=cadastrar">{CTA} <ArrowRight weight="bold" /></Link>
         </Button>
       </div>
+    </div>
+  )
+}
+
+/** O produto do hero começa levemente deitado em 3D e fica de pé conforme a rolagem. */
+function ProdutoEmPe({ children }: { children: ReactNode }) {
+  const caixa = useRef<HTMLDivElement>(null)
+  const parado = useReducedMotion()
+  const { scrollYProgress } = useScroll({ target: caixa, offset: ['start end', 'start 0.35'] })
+  const rotateX = useTransform(scrollYProgress, [0, 1], [14, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [0.94, 1])
+  const opacity = useTransform(scrollYProgress, [0, 0.4], [0.6, 1])
+  return (
+    <div ref={caixa} className="mt-10 w-full" style={{ perspective: 1400 }}>
+      <motion.div style={parado ? undefined : { rotateX, scale, opacity, transformOrigin: 'center top' }}>{children}</motion.div>
     </div>
   )
 }

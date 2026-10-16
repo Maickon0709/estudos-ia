@@ -170,18 +170,18 @@
    Leve e rápido: ajuda a perceber a mudança sem atrasar o uso. Quem pede
    "menos movimento" no sistema não vê nenhuma destas animações. */
 @keyframes surgir {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: none; }
+  from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: none; }
 }
 
-/* Página nova (o wrapper muda de "key" a cada rota) */
-.surgir { animation: surgir 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+/* Página nova (o wrapper muda de "key" a cada rota): sobe e ganha foco */
+.surgir { animation: surgir 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 /* Conteúdo de aba ao trocar */
 [data-slot="tabs-content"][data-state="active"] { animation: surgir 0.26s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 /* Listas em cascata: cada filho atrasa um pouco (até o 12º) */
-.cascata > * { animation: surgir 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.cascata > * { animation: surgir 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
 .cascata > *:nth-child(2)  { animation-delay: 40ms; }
 .cascata > *:nth-child(3)  { animation-delay: 80ms; }
 .cascata > *:nth-child(4)  { animation-delay: 120ms; }
@@ -199,6 +199,85 @@
 @media (prefers-reduced-motion: reduce) {
   .surgir, .cascata > *, [data-slot="tabs-content"][data-state="active"] { animation: none; }
   .cartao-vivo, .cartao-vivo:hover { transition: none; transform: none; }
+}
+
+/* ---------- Fluidez em todo o site (botões, cartões, campos, abas) ----------
+   Feito por atributos data-slot do shadcn: vale para todas as telas sem mexer em cada uma.
+   Só transform, opacity e sombra (a GPU anima sem recalcular layout). Tudo some com "reduzir movimento". */
+:root {
+  --mola: cubic-bezier(0.34, 1.56, 0.64, 1);  /* passa um tiquinho do ponto e volta: sensação de mola */
+  --suave: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Botões: sobem de leve, afundam ao clicar e a seta do fim anda para a frente */
+[data-slot="button"] {
+  transition: transform 0.35s var(--mola), background-color 0.25s ease, color 0.25s ease,
+    box-shadow 0.3s var(--suave), border-color 0.25s ease, opacity 0.2s ease;
+}
+[data-slot="button"]:not(:disabled):hover { transform: translateY(-1px); }
+[data-slot="button"][data-variant="default"]:not(:disabled):hover {
+  box-shadow: 0 6px 18px -8px color-mix(in oklch, var(--primary) 70%, transparent);
+}
+[data-slot="button"]:not(:disabled):active { transform: translateY(0) scale(0.97); transition-duration: 0.08s; }
+/* Setas (data-seta, em lib/icones.ts) andam na direção delas quando o link ou botão recebe o mouse */
+[data-seta] { transition: transform 0.35s var(--mola); }
+:is(a, button):hover [data-seta="frente"] { transform: translateX(3px); }
+:is(a, button):hover [data-seta="tras"] { transform: translateX(-3px); }
+:is(a, button):hover [data-seta="fora"] { transform: translate(2px, -2px); }
+/* ícone sozinho (tema, fechar, cronômetro): gira/cresce um pouco */
+[data-slot="button"][data-size^="icon"] > svg { transition: transform 0.4s var(--mola); }
+[data-slot="button"][data-size^="icon"]:hover > svg { transform: scale(1.12) rotate(-8deg); }
+
+/* Brilho que atravessa o botão principal no hover */
+[data-slot="button"][data-variant="default"] { position: relative; overflow: hidden; isolation: isolate; }
+[data-slot="button"][data-variant="default"]::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.22) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+[data-slot="button"][data-variant="default"]:not(:disabled):hover::after { transform: translateX(120%); transition: transform 0.7s var(--suave); }
+
+/* Cartões: entram suaves e reagem ao mouse; os clicáveis sobem */
+[data-slot="card"] {
+  /* "backwards": depois de entrar a animação solta o transform, senão o hover não consegue mover o cartão */
+  animation: surgir 0.45s var(--suave) backwards;
+  transition: transform 0.35s var(--suave), box-shadow 0.35s var(--suave);
+}
+[data-slot="card"]:hover { box-shadow: 0 10px 30px -18px hsl(var(--sombra) / 0.35); }
+a[data-slot="card"]:hover, button[data-slot="card"]:hover, [data-slot="card"]:has(> a:only-child):hover { transform: translateY(-3px); }
+:is(.grid, .flex, ul, ol) > [data-slot="card"]:nth-child(2), :is(.grid, ul, ol) > :nth-child(2) > [data-slot="card"] { animation-delay: 50ms; }
+:is(.grid, .flex, ul, ol) > [data-slot="card"]:nth-child(3), :is(.grid, ul, ol) > :nth-child(3) > [data-slot="card"] { animation-delay: 100ms; }
+:is(.grid, .flex, ul, ol) > [data-slot="card"]:nth-child(4), :is(.grid, ul, ol) > :nth-child(4) > [data-slot="card"] { animation-delay: 150ms; }
+:is(.grid, .flex, ul, ol) > [data-slot="card"]:nth-child(n+5), :is(.grid, ul, ol) > :nth-child(n+5) > [data-slot="card"] { animation-delay: 200ms; }
+
+/* Campos: o anel de foco cresce em vez de aparecer seco */
+[data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"] {
+  transition: box-shadow 0.25s var(--suave), border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Abas: troca de cor suave e a aba ativa "assenta" */
+[data-slot="tabs-trigger"] { transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.3s var(--suave), transform 0.3s var(--mola); }
+[data-slot="tabs-trigger"]:active { transform: scale(0.96); }
+
+/* Checkbox: o visto aparece com um pulinho */
+@keyframes marcar { from { transform: scale(0.3) rotate(-20deg); opacity: 0; } to { transform: none; opacity: 1; } }
+[data-slot="checkbox"] { transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.3s var(--mola); }
+[data-slot="checkbox"]:active { transform: scale(0.88); }
+[data-slot="checkbox"][data-state="checked"] svg { animation: marcar 0.35s var(--mola) both; }
+
+/* Barras de progresso enchem devagar */
+[data-slot="progress-indicator"] { transition: transform 0.8s var(--suave) !important; }
+
+/* Selos (badges) e avatares ganham leve escala no hover */
+[data-slot="badge"] { transition: transform 0.3s var(--mola), background-color 0.2s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="card"] { animation: none; }
+  [data-slot="button"], [data-slot="button"] > svg, [data-slot="card"], [data-slot="checkbox"], [data-slot="tabs-trigger"] { transition: none; }
+  [data-slot="button"]:hover, [data-slot="button"]:active, [data-slot="card"]:hover,
+  [data-slot="button"]:hover > svg, :is(a, button):hover [data-seta] { transform: none !important; }
+  [data-slot="button"][data-variant="default"]::after { display: none; }
+  [data-slot="checkbox"][data-state="checked"] svg { animation: none; }
 }
 
 /* Barra de progresso do tour automático da landing */

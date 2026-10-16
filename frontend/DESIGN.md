@@ -58,6 +58,15 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
 
 - Motivado: entrada de página/aba (`.surgir`), cascata em listas (`.cascata`), tour que avança sozinho.
 - Botões afundam de leve ao clicar. Tudo desligado com `prefers-reduced-motion`.
+- Fluidez global por `data-slot` do shadcn (`index.css`, "Fluidez em todo o site"), sem mexer em cada tela:
+  botões sobem 1px com mola (`--mola`) e o principal ganha sombra e um brilho que atravessa; ícone sozinho
+  cresce e gira um pouco; setas (`data-seta`, marcadas em `lib/icones.ts`) andam na direção delas no hover
+  de qualquer link ou botão; cartões entram em cascata (`backwards`, para não travar o transform do hover)
+  e os clicáveis sobem; campos, abas, checkbox (visto com pulinho) e barra de progresso com transição.
+  No menu, a pílula do item ativo desliza entre os itens (`layoutId` do motion), no topo e na barra do celular.
+  Troca de página: sobe e ganha foco (blur 4px → 0).
+- Landing: hero em cascata, CTAs magnéticos (`Magnetico`), produto do hero deitado em 3D que fica de pé
+  com a rolagem e inclina com o mouse (`CartaoBrilho`), brilho em todos os cartões das seções.
 - Interativo na landing (inspirado no React Bits e no 21st.dev, recolorido para a paleta):
   fundo da landing e do cadastro (`FundoFluido fixo`: linhas finas cinza numa correnteza lenta que vira redemoinho
   e acende em vermelho perto do cursor; `FundoPontos` continua no projeto como alternativa),
