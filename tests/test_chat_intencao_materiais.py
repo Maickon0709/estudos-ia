@@ -153,6 +153,7 @@ def test_formulas_so_entre_dois_cifroes_no_chat_e_no_nao_entendi():
     for prompt in (prompt_tutor("Matemática"), prompt_reexplicar()):
         assert REGRA_FORMULAS in prompt
     assert "entre $$ e $$" in REGRA_FORMULAS and "Nunca use um $ sozinho" in REGRA_FORMULAS
+    assert "Toda fórmula que você ensinar" in REGRA_FORMULAS and "sozinho na linha" in REGRA_FORMULAS
     assert "R$ 30,00" in REGRA_FORMULAS
 
 
