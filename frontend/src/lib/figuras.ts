@@ -21,6 +21,7 @@ export type Figura =
   | { tipo: 'poligono'; lados: number; lado: number | null; unidade: string; centro: string }
   | { tipo: 'angulo'; graus: number; rotulo: string }
   | { tipo: 'pizza'; titulo: string; itens: { rotulo: string; valor: number }[] }
+  | { tipo: 'fracao'; partes: number; destaque: number; rotulo: string }
   // sólidos (perspectiva simples, arestas de trás tracejadas)
   | { tipo: 'cilindro'; raio: number; altura: number; unidade: string; centro: string }
   | { tipo: 'cone'; raio: number; altura: number; unidade: string; centro: string }
@@ -37,6 +38,7 @@ const BARRAS_MAX = 8
 const PARTES_MAX = 100
 const LINHAS_MAX = 4
 const PONTOS_MAX = 30
+const FATIAS_MAX = 24
 
 function texto(valor: unknown, padrao = ''): string {
   if (typeof valor !== 'string' && typeof valor !== 'number') return padrao
@@ -119,7 +121,7 @@ const APELIDOS: Record<string, string> = {
   cubo: 'caixa', paralelepipedo: 'caixa', bloco: 'caixa', volume: 'caixa',
   regua: 'segmento', linha: 'segmento', comprimento: 'segmento', medida: 'segmento',
   circunferencia: 'circulo', grafico: 'barras', barra: 'barras', grafico_de_barras: 'barras',
-  fracao: 'partes', probabilidade: 'partes', porcentagem: 'partes', grade: 'partes',
+  fracao: 'fracao', fracoes: 'fracao', pizza_fracao: 'fracao', probabilidade: 'partes', porcentagem: 'partes', grade: 'partes',
   regra_de_3: 'proporcao', regra_de_tres: 'proporcao', regra_de_tres_simples: 'proporcao',
   rombo: 'losango', trapezoide: 'trapezio', poligono_regular: 'poligono',
   triangulo_retangulo: 'triangulo', pitagoras: 'triangulo',
@@ -154,6 +156,22 @@ function lerJson(bruto: string): unknown {
       return null
     }
   }
+}
+
+/** Quantas partes estão pintadas: a IA usa vários nomes ("destaque", "comidas", "numerador"...). */
+function pintadas(d: Record<string, unknown>): unknown {
+  return d.destaque ?? d.pintadas ?? d.numerador ?? d.comidas ?? d.selecionadas ?? d.usadas ?? d.parte ?? 0
+}
+
+/** Fração como pizza: um todo cortado em partes iguais, com algumas pintadas (3/8 = 3 de 8 fatias). */
+function lerFracao(d: Record<string, unknown>): Figura | null {
+  const partes = inteiro(d.partes ?? d.fatias ?? d.total ?? d.denominador, 1, FATIAS_MAX)
+  if (!partes) return null
+  const destaque = Math.min(inteiro(pintadas(d), 0, FATIAS_MAX) ?? 0, partes)
+  const conta = `${destaque}/${partes} = ${formatar((destaque / partes) * 100)}%`
+  // rótulo sem número ("pizza") não pode esconder a fração: ela vem junto
+  const rotulo = texto(d.rotulo)
+  return { tipo: 'fracao', partes, destaque, rotulo: !rotulo ? conta : /\d/.test(rotulo) ? rotulo : `${rotulo}: ${conta}` }
 }
 
 export function lerFigura(bruto: string): Figura | null {
@@ -253,7 +271,10 @@ export function lerFigura(bruto: string): Figura | null {
       const graus = numero(d.graus ?? d.valor, 360)
       return graus ? { tipo: 'angulo', graus, rotulo: texto(d.rotulo, `${formatar(graus)}°`) } : null
     }
+    case 'fracao':
+      return lerFracao(d)
     case 'pizza': {
+      if (!Array.isArray(d.itens)) return lerFracao(d) // {"tipo": "pizza", "fatias": 8, "comidas": 3}
       const itens = listaValores(d.itens)
       return itens.length ? { tipo: 'pizza', titulo: texto(d.titulo), itens } : null
     }
@@ -309,7 +330,7 @@ export function lerFigura(bruto: string): Figura | null {
     case 'partes': {
       const total = numero(d.total, PARTES_MAX)
       if (!total || !Number.isInteger(total)) return null
-      const destaque = typeof d.destaque === 'number' && Number.isInteger(d.destaque) ? Math.min(Math.max(d.destaque, 0), total) : 0
+      const destaque = Math.min(inteiro(pintadas(d), 0, PARTES_MAX) ?? 0, total)
       return { tipo: 'partes', total, destaque, rotulo: texto(d.rotulo, `${destaque} de ${total}`) }
     }
     case 'proporcao': {

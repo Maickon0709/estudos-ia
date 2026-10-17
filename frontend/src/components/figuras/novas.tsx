@@ -198,6 +198,39 @@ export function DesenhoNovo({ dados }: { dados: Figura }) {
       )
     }
 
+    case 'fracao': {
+      const { partes, destaque } = dados
+      const cx = 200
+      const cy = 100
+      const r = 82
+      const ponto = (i: number) => {
+        const a = -Math.PI / 2 + (2 * Math.PI * i) / partes
+        return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }
+      }
+      return (
+        <Svg largura={400} altura={225} titulo={dados.rotulo}>
+          {partes === 1 ? (
+            <circle cx={cx} cy={cy} r={r} className={destaque ? 'fill-primary stroke-primary' : FORMA} strokeWidth={2} />
+          ) : (
+            Array.from({ length: partes }, (_, i) => {
+              const a = ponto(i)
+              const b = ponto(i + 1)
+              return (
+                <path
+                  key={i}
+                  d={`M${cx} ${cy} L${a.x} ${a.y} A${r} ${r} 0 ${partes === 2 ? 1 : 0} 1 ${b.x} ${b.y} z`}
+                  className={i < destaque ? 'fill-primary stroke-card' : 'fill-primary/10 stroke-primary/50'}
+                  strokeWidth={2}
+                />
+              )
+            })
+          )}
+          <circle cx={cx} cy={cy} r={r} className="stroke-primary" fill="none" strokeWidth={2} />
+          <text x={cx} y={cy + r + 28} textAnchor="middle" className="fill-primary text-[14px] font-semibold">{dados.rotulo}</text>
+        </Svg>
+      )
+    }
+
     case 'cilindro':
     case 'cone': {
       const cone = dados.tipo === 'cone'
