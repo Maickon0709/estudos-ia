@@ -174,7 +174,7 @@ def test_todo_tipo_de_figura_do_prompt_o_site_sabe_desenhar():
     leitor = (Path(__file__).parents[1] / "frontend" / "src" / "lib" / "figuras.ts").read_text(encoding="utf-8")
     tipos = re.findall(r"^- ([a-z_]+)(?: e ([a-z_]+))?:", REGRA_FIGURAS, re.M)
     nomes = {nome for par in tipos for nome in par if nome}
-    assert len(nomes) == 22
+    assert len(nomes) == 23
     for nome in nomes:
         assert f"case '{nome}'" in leitor, nome
 

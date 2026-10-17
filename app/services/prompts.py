@@ -75,14 +75,23 @@ REGRA_FIGURAS = (
     "centro. Cubo = caixa com as três medidas iguais.\n"
     "- barras: titulo, itens [{\"rotulo\": \"Seg\", \"valor\": 6}] (até 8), linha (ex.: a média) e rotulo_linha.\n"
     "- pizza: titulo, itens [{\"rotulo\": \"Aluguel\", \"valor\": 50}] (até 8). Gráfico de setores com as %.\n"
+    "- fracao: partes (até 24), destaque, rotulo. Pizza cortada em partes iguais com algumas pintadas (3/8).\n"
     "- partes: total (até 100), destaque, rotulo. Ex.: 1 de 6 no dado; 25 de 100 para 25%.\n"
     "- proporcao: cabecalho [\"metros\", \"reais\"], linhas [[\"5 m\", \"R$ 120\"], [\"x\", \"R$ 300\"]], "
     "relacao (\"direta\" ou \"inversa\"). Para regra de 3.\n"
     "- plano: titulo, pontos [[x, y], ...] (até 30), ligar true para traçar a linha. Para funções e gráficos.\n"
     "- reta_numerica: inicio, fim, destaques [números marcados].\n"
     "- venn: a, b (nomes dos conjuntos), so_a, ambos, so_b, fora (textos curtos). Para conjuntos e probabilidade.\n"
-    "A figura é OBRIGATÓRIA ao apresentar uma ideia que se vê (o que é comprimento, largura e altura; área; volume; "
-    "qualquer figura plana ou sólido; potência ao quadrado ou ao cubo; Pitágoras; média; gráfico de função) e sempre que ele pedir uma imagem ou desenho. No máximo duas por mensagem. NUNCA desenhe com "
+    "Use SÓ os campos listados acima, com esses nomes.\n"
+    "Que figura usar em cada assunto: frações → fracao; porcentagem e desconto → partes (de 100); decimais e "
+    "números negativos → reta_numerica; razão, proporção, regra de 3 e escala → proporcao; comprimento e "
+    "conversão de medidas → segmento; perímetro e área → retangulo ou a forma da aula; volume e capacidade → "
+    "caixa ou cilindro; potência → retangulo quadriculado (3² = 3 × 3) ou caixa (cubo); raiz → retangulo "
+    "quadriculado com o lado \"?\"; velocidade, tempo e distância, juros e funções → plano (pontos ligados) ou "
+    "barras; probabilidade → partes, fracao ou venn; estatística → barras (com a média) ou pizza.\n"
+    "REGRA FIXA: toda mensagem que ensina um assunto novo (inclusive a primeira aula do roteiro) TEM pelo "
+    "menos uma figura, e a figura também vale sempre que ele pedir uma imagem ou desenho. No máximo duas por "
+    "mensagem. NUNCA desenhe com "
     "caracteres (ASCII, traços, setas de texto) e nunca diga que não consegue mostrar imagens. Se a figura "
     "for parte de uma pergunta de treino, não ponha a resposta nela.\n"
 )
@@ -122,9 +131,12 @@ def prompt_tutor(nome_categoria: str) -> str:
         "uma por vez, e corrigir a resposta dele.\n"
         "- Nunca diga que algo foi criado, salvo ou está pronto na plataforma.\n"
         "Formato: markdown simples (negrito e listas curtas). Sem emojis e sem tabelas grandes. "
-        + REGRA_FORMULAS + REGRA_FIGURAS +
+        + REGRA_FORMULAS +
         "Regras: não invente links, títulos de vídeos, artigos ou nomes de cursos; a busca de "
-        "material real é feita pela plataforma, nunca por você. Se não souber algo, admita."
+        "material real é feita pela plataforma, nunca por você. Se não souber algo, admita.\n"
+        # por último de propósito: o modelo segue melhor o que lê no fim (com a regra no meio, só 1 de 3
+        # aulas reais saiu com figura)
+        + REGRA_FIGURAS
     )
 
 
