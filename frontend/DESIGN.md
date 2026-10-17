@@ -87,11 +87,17 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
 ## Fórmulas e figuras no chat
 
 - Fórmula em LaTeX entre `$$` vira desenho (KaTeX); a que fica sozinha na linha ganha o quadro `.quadro-formula`.
-- Figura: a IA escreve um bloco ` ```figura ` com um JSON curto (tipo + medidas) e o site desenha em SVG
-  (`lib/figuras.ts` valida, `components/Figura.tsx` desenha) no quadro `.quadro-figura`. Tipos: segmento (régua),
-  retangulo (com quadriculado para m²), caixa (comprimento × largura × altura), circulo, triangulo, barras (com
-  linha da média), partes (dado, 25 de 100) e proporcao (regra de 3 direta/inversa). Nada de imagem de fora,
-  link ou HTML: tipo desconhecido não desenha. Enquanto a resposta chega aparece "Desenhando a figura…".
+- Figura: a IA escreve um bloco ` ```figura ` com um JSON curto (tipo + medidas) e o site desenha em SVG no quadro
+  `.quadro-figura` (`lib/figuras.ts` lê e valida; `components/Figura.tsx` e `components/figuras/` desenham). São 22 tipos:
+  - planas: segmento (régua), retangulo (quadriculado para m²), triangulo (qualquer, retângulo, equilátero, isósceles),
+    losango, paralelogramo, trapezio, poligono (3 a 12 lados), circulo, angulo (agudo/reto/obtuso);
+  - sólidos, com as arestas de trás tracejadas: caixa/cubo, prisma e piramide (base de 3 a 8 lados), cilindro, cone, esfera;
+  - dados: barras (com a linha da média), pizza, partes (dado, 25 de 100), proporcao (regra de 3), plano (cartesiano,
+    funções), reta_numerica e venn.
+- O leitor perdoa a IA: aceita nomes naturais ("quadrado", "cubo", "hexágono", "regra de 3"), acento, vírgula sobrando
+  e medida desconhecida ("?") em retângulo, caixa e triângulo. Tipo desconhecido não desenha e some em silêncio.
+  Nada de imagem de fora, link ou HTML. Enquanto a resposta chega aparece "Desenhando a figura…".
+- O teste `test_todo_tipo_de_figura_do_prompt_o_site_sabe_desenhar` garante que o prompt e o leitor têm a mesma lista.
 
 ## Voz
 
