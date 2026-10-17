@@ -4,6 +4,9 @@ Nasceu de um teste real: o aluno pediu "analise os materiais" (a IA viu 5 trecho
 "faça uma trilha" (ela repetiu as opções e depois escreveu uma trilha falsa no chat, com vídeos
 inventados) e a aba Trilha continuou vazia.
 """
+import re
+from pathlib import Path
+
 import pytest
 
 from app.repositories.documento_repository import DocumentoRepository
@@ -162,8 +165,18 @@ def test_tutora_desenha_figura_pelo_site_e_nunca_em_ascii():
     for prompt in (prompt_tutor("Matemática"), prompt_reexplicar()):
         assert REGRA_FIGURAS in prompt
     assert "```figura" in REGRA_FIGURAS and "NUNCA desenhe com" in REGRA_FIGURAS
-    for tipo in ("segmento", "retangulo", "caixa", "circulo", "triangulo", "barras", "partes", "proporcao"):
-        assert f"- {tipo}:" in REGRA_FIGURAS  # mesma lista que lib/figuras.ts sabe desenhar
+    assert "- cilindro e cone:" in REGRA_FIGURAS and "- prisma e piramide:" in REGRA_FIGURAS
+
+
+def test_todo_tipo_de_figura_do_prompt_o_site_sabe_desenhar():
+    # O prompt e o front precisam da MESMA lista: tipo que o site não conhece vira figura que some
+    # (chat real: {"tipo": "quadrado"} saiu como "Não consegui desenhar esta figura").
+    leitor = (Path(__file__).parents[1] / "frontend" / "src" / "lib" / "figuras.ts").read_text(encoding="utf-8")
+    tipos = re.findall(r"^- ([a-z_]+)(?: e ([a-z_]+))?:", REGRA_FIGURAS, re.M)
+    nomes = {nome for par in tipos for nome in par if nome}
+    assert len(nomes) == 22
+    for nome in nomes:
+        assert f"case '{nome}'" in leitor, nome
 
 
 def test_tutora_faz_roteiro_e_nao_entrega_a_resposta_no_treino():

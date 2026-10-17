@@ -1,17 +1,21 @@
-import type { ReactNode } from 'react'
+import { Centro, Cota, Svg } from '@/components/figuras/base'
+import { DesenhoNovo } from '@/components/figuras/novas'
+import { COTA, escala, FORMA, LINHA, TEXTO, TEXTO_SUAVE } from '@/components/figuras/estilo'
 import { type Figura as Dados, formatar, lerFigura, medida } from '@/lib/figuras'
 
 /**
  * Desenha em SVG a figura que a IA descreveu em JSON (bloco ```figura). Só tipos fixos; todo texto entra
  * como texto do SVG (o React escapa), sem imagem de fora e sem link. Enquanto a resposta chega aos
- * pedaços o JSON ainda está incompleto: mostra "desenhando…" até fechar.
+ * pedaços o JSON ainda está incompleto: mostra "desenhando…" até fechar; se no fim não valer, não mostra nada.
  */
 export function Figura({ codigo, escrevendo }: { codigo: string; escrevendo?: boolean }) {
   const dados = lerFigura(codigo)
   if (!dados) {
+    // resposta pronta e figura inválida: some em silêncio (um aviso de erro no meio da aula só atrapalha)
+    if (escrevendo === false) return null
     return (
       <div className="quadro-figura text-center text-xs text-muted-foreground" role="status">
-        {escrevendo === false ? 'Não consegui desenhar esta figura.' : 'Desenhando a figura…'}
+        Desenhando a figura…
       </div>
     )
   }
@@ -20,62 +24,6 @@ export function Figura({ codigo, escrevendo }: { codigo: string; escrevendo?: bo
       <Desenho dados={dados} />
     </figure>
   )
-}
-
-const LINHA = 'stroke-foreground/70'
-const FORMA = 'fill-primary/15 stroke-primary'
-const COTA = 'stroke-muted-foreground'
-const TEXTO = 'fill-foreground text-[13px] font-medium'
-const TEXTO_SUAVE = 'fill-muted-foreground text-[11px]'
-
-function Svg({ largura, altura, titulo, children }: { largura: number; altura: number; titulo: string; children: ReactNode }) {
-  return (
-    <svg viewBox={`0 0 ${largura} ${altura}`} role="img" aria-label={titulo} className="mx-auto block h-auto w-full" style={{ maxWidth: largura }}>
-      <title>{titulo}</title>
-      <defs>
-        <marker id="fig-seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0 1 L9 5 L0 9 z" className="fill-muted-foreground" />
-        </marker>
-      </defs>
-      {children}
-    </svg>
-  )
-}
-
-/** Linha de cota: setas nas duas pontas e o rótulo no meio. */
-function Cota({ x1, y1, x2, y2, rotulo, lado = -1 }: { x1: number; y1: number; x2: number; y2: number; rotulo: string; lado?: number }) {
-  const mx = (x1 + x2) / 2
-  const my = (y1 + y2) / 2
-  const vertical = Math.abs(x2 - x1) < Math.abs(y2 - y1)
-  return (
-    <g>
-      <line x1={x1} y1={y1} x2={x2} y2={y2} className={COTA} strokeWidth={1.2} markerStart="url(#fig-seta)" markerEnd="url(#fig-seta)" />
-      <text
-        x={vertical ? mx + lado * 8 : mx}
-        y={vertical ? my : my + (lado < 0 ? -8 : 17)}
-        textAnchor={vertical ? (lado < 0 ? 'end' : 'start') : 'middle'}
-        dominantBaseline={vertical ? 'middle' : 'auto'}
-        className={TEXTO}
-      >
-        {rotulo}
-      </text>
-    </g>
-  )
-}
-
-function Centro({ x, y, texto }: { x: number; y: number; texto: string }) {
-  if (!texto) return null
-  return (
-    <text x={x} y={y} textAnchor="middle" dominantBaseline="middle" className="fill-primary text-[14px] font-semibold">
-      {texto}
-    </text>
-  )
-}
-
-/** Ajusta as medidas reais numa caixa de desenho, mantendo a proporção (com um mínimo para não sumir). */
-function escala(a: number, b: number, maxA: number, maxB: number) {
-  const k = Math.min(maxA / a, maxB / b)
-  return [Math.max(a * k, maxA * 0.18), Math.max(b * k, maxB * 0.18)]
 }
 
 function Desenho({ dados }: { dados: Dados }) {
@@ -202,16 +150,27 @@ function Desenho({ dados }: { dados: Dados }) {
       const [w, h] = escala(dados.base, dados.altura, 240, 140)
       const x = (400 - w) / 2
       const y = 20
-      const topo = x + w * 0.35
+      const reto = dados.forma === 'retangulo'
+      // retângulo: ângulo reto embaixo à esquerda; equilátero e isósceles: topo no meio
+      const topo = reto ? x : dados.forma === 'qualquer' ? x + w * 0.35 : x + w / 2
+      const base = dados.rotuloBase
+      const altura = dados.rotuloAltura
       return (
-        <Svg largura={400} altura={h + (dados.centro ? 92 : 70)} titulo={`triângulo de base ${medida(dados.base, dados.unidade)} e altura ${medida(dados.altura, dados.unidade)}`}>
+        <Svg largura={400} altura={h + (dados.centro ? 92 : 70)} titulo={`triângulo ${reto ? 'retângulo ' : ''}de base ${base} e altura ${altura}`}>
           <path d={`M${x} ${y + h} L${topo} ${y} L${x + w} ${y + h} z`} className={FORMA} strokeWidth={2} />
-          <line x1={topo} y1={y} x2={topo} y2={y + h} className="stroke-foreground" strokeDasharray="5 4" strokeWidth={1.4} />
+          {!reto && <line x1={topo} y1={y} x2={topo} y2={y + h} className="stroke-foreground" strokeDasharray="5 4" strokeWidth={1.4} />}
           <path d={`M${topo} ${y + h - 10} h10 v10`} className="stroke-foreground" fill="none" strokeWidth={1} />
-          <text x={topo + 8} y={y + h / 2} className={TEXTO}>
-            altura {medida(dados.altura, dados.unidade)}
-          </text>
-          <Cota x1={x} y1={y + h + 16} x2={x + w} y2={y + h + 16} rotulo={`base ${medida(dados.base, dados.unidade)}`} lado={1} />
+          {reto ? (
+            <>
+              <Cota x1={x - 16} y1={y} x2={x - 16} y2={y + h} rotulo={`cateto ${altura}`} />
+              <text x={x + w / 2 + 10} y={y + h / 2 - 8} className={TEXTO}>
+                {dados.hipotenusa || 'hipotenusa'}
+              </text>
+            </>
+          ) : (
+            <Cota x1={x + w + 18} y1={y} x2={x + w + 18} y2={y + h} rotulo={`altura ${altura}`} lado={1} />
+          )}
+          <Cota x1={x} y1={y + h + 16} x2={x + w} y2={y + h + 16} rotulo={`${reto ? 'cateto' : 'base'} ${base}`} lado={1} />
           <Centro x={200} y={y + h + 64} texto={dados.centro} />
         </Svg>
       )
@@ -323,5 +282,8 @@ function Desenho({ dados }: { dados: Dados }) {
         </Svg>
       )
     }
+
+    default:
+      return <DesenhoNovo dados={dados} />
   }
 }
