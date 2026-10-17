@@ -1,8 +1,10 @@
 import 'katex/dist/katex.min.css'
+import type { Element } from 'hast'
 import ReactMarkdown, { type Components, type Options } from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
+import { Figura } from '@/components/Figura'
 import { prepararFormulas } from '@/lib/formulas'
 import { cn } from '@/lib/utils'
 
@@ -14,20 +16,33 @@ import { cn } from '@/lib/utils'
  * - Fórmulas (LaTeX entre $$) viram desenho com o KaTeX. trust: false barra \href, \url e afins
  *   (nada vira link); maxSize/maxExpand evitam que uma fórmula gigante trave a página. Erro de LaTeX
  *   aparece como o próprio texto, sem quebrar a mensagem. Um $ sozinho não abre fórmula (é o "R$").
+ * - Bloco ```figura (JSON) vira um desenho em SVG feito pelo site (ver lib/figuras.ts), nunca imagem de fora.
  */
 const MATEMATICA: Options['remarkPlugins'] = [remarkGfm, [remarkMath, { singleDollarTextMath: false }]]
 const KATEX: Options['rehypePlugins'] = [[rehypeKatex, { throwOnError: false, trust: false, strict: 'ignore', maxSize: 20, maxExpand: 200 }]]
+
+/** Texto de um bloco ```figura, ou null se o bloco de código for de outra linguagem. */
+function codigoFigura(no: Element | undefined): string | null {
+  const codigo = no?.children[0]
+  if (!codigo || codigo.type !== 'element' || codigo.tagName !== 'code') return null
+  const classes = codigo.properties.className
+  if (!Array.isArray(classes) || !classes.includes('language-figura')) return null
+  return codigo.children.map((filho) => (filho.type === 'text' ? filho.value : '')).join('')
+}
+
+function componentes(escrevendo: boolean): Components {
+  return { ...COMPONENTES, pre: ({ node, children }) => {
+    const figura = codigoFigura(node)
+    if (figura !== null) return <Figura codigo={figura} escrevendo={escrevendo} />
+    return <pre className="overflow-x-auto rounded-xl bg-background/60 p-3 text-xs [&_code]:bg-transparent [&_code]:p-0">{children}</pre>
+  } }
+}
 
 const COMPONENTES: Components = {
   a: ({ children }) => <span className="underline decoration-dotted underline-offset-2">{children}</span>,
   img: ({ alt }) => (alt ? <span>[{alt}]</span> : null),
   code: ({ children }) => (
     <code className="rounded-md bg-background/60 px-1.5 py-0.5 font-mono text-[0.9em]">{children}</code>
-  ),
-  pre: ({ children }) => (
-    <pre className="overflow-x-auto rounded-xl bg-background/60 p-3 text-xs [&_code]:bg-transparent [&_code]:p-0">
-      {children}
-    </pre>
   ),
   table: ({ children }) => (
     <div className="overflow-x-auto">
@@ -38,7 +53,10 @@ const COMPONENTES: Components = {
   td: ({ children }) => <td className="border-b border-border/50 px-2 py-1">{children}</td>,
 }
 
-export function Markdown({ texto, className }: { texto: string; className?: string }) {
+const PRONTO = componentes(false)
+const AO_VIVO = componentes(true)
+
+export function Markdown({ texto, className, escrevendo = false }: { texto: string; className?: string; escrevendo?: boolean }) {
   return (
     <div
       className={cn(
@@ -52,7 +70,7 @@ export function Markdown({ texto, className }: { texto: string; className?: stri
         className,
       )}
     >
-      <ReactMarkdown remarkPlugins={MATEMATICA} rehypePlugins={KATEX} components={COMPONENTES} skipHtml>
+      <ReactMarkdown remarkPlugins={MATEMATICA} rehypePlugins={KATEX} components={escrevendo ? AO_VIVO : PRONTO} skipHtml>
         {prepararFormulas(texto)}
       </ReactMarkdown>
     </div>
