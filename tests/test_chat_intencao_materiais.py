@@ -9,7 +9,7 @@ import pytest
 from app.repositories.documento_repository import DocumentoRepository
 from app.services.documento_service import DOCUMENTOS_NA_AMOSTRA
 from app.services.prompts import (
-    AMOSTRA_NO_PROMPT, MATERIAIS_MAX, REGRA_FORMULAS, REGRAS_ENSINO, prompt_materiais, prompt_reexplicar,
+    AMOSTRA_NO_PROMPT, MATERIAIS_MAX, REGRA_FIGURAS, REGRA_FORMULAS, REGRAS_ENSINO, prompt_materiais, prompt_reexplicar,
     prompt_tutor,
 )
 from app.services.regras.intencao import acao_sugerida, pede_visao_geral
@@ -144,7 +144,7 @@ def test_tutora_usa_as_respostas_do_aluno_ao_ensinar():
     assert "\"De cabeça\"" in REGRAS_ENSINO and "sem fórmula" in REGRAS_ENSINO  # objetivo decide o método
     assert "NUNCA repita a" in REGRAS_ENSINO                  # "do zero" recomeça mais simples
     assert "espere a resposta" in REGRAS_ENSINO               # uma pergunta de treino por vez
-    assert "Não esqueça os outros" in REGRAS_ENSINO           # vários assuntos pedidos
+    assert "não esqueça os outros" in REGRAS_ENSINO           # vários assuntos pedidos
 
 
 def test_formulas_so_entre_dois_cifroes_no_chat_e_no_nao_entendi():
@@ -155,6 +155,24 @@ def test_formulas_so_entre_dois_cifroes_no_chat_e_no_nao_entendi():
     assert "entre $$ e $$" in REGRA_FORMULAS and "Nunca use um $ sozinho" in REGRA_FORMULAS
     assert "Toda fórmula que você ensinar" in REGRA_FORMULAS and "sozinho na linha" in REGRA_FORMULAS
     assert "R$ 30,00" in REGRA_FORMULAS
+
+
+def test_tutora_desenha_figura_pelo_site_e_nunca_em_ascii():
+    # Chat real: explicou "comprimento" só em texto e, pedida uma imagem, desenhou com caracteres.
+    for prompt in (prompt_tutor("Matemática"), prompt_reexplicar()):
+        assert REGRA_FIGURAS in prompt
+    assert "```figura" in REGRA_FIGURAS and "NUNCA desenhe com" in REGRA_FIGURAS
+    for tipo in ("segmento", "retangulo", "caixa", "circulo", "triangulo", "barras", "partes", "proporcao"):
+        assert f"- {tipo}:" in REGRA_FIGURAS  # mesma lista que lib/figuras.ts sabe desenhar
+
+
+def test_tutora_faz_roteiro_e_nao_entrega_a_resposta_no_treino():
+    # Mesmo chat: pediu vários assuntos "e veja se tem mais", não disse o objetivo, e o treino foi
+    # "tem 29,7 cm de comprimento; qual é o comprimento?".
+    assert "**Roteiro:**" in REGRAS_ENSINO and "(sugestão)" in REGRAS_ENSINO
+    assert "perguntando de novo o que faltou" in REGRAS_ENSINO
+    assert "não pode trazer a resposta pronta" in REGRAS_ENSINO
+    assert "não tem fórmula" in REGRAS_ENSINO
 
 
 # ---------- repository ----------

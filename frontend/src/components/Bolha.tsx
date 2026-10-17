@@ -20,7 +20,7 @@ export function Bolha({ mensagem, escrevendo = false }: { mensagem: Pick<Mensage
         )}
       >
         {/* Mensagem do estudante: texto puro. Da IA: markdown seguro (sem HTML e sem links). */}
-        {usuario ? mensagem.conteudo : <Markdown texto={mensagem.conteudo} />}
+        {usuario ? mensagem.conteudo : <Markdown texto={mensagem.conteudo} escrevendo={escrevendo} />}
         {escrevendo && <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-primary align-text-bottom" aria-hidden />}
       </div>
     </div>

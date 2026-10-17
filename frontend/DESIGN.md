@@ -84,6 +84,15 @@ Fundos grandes ganham grão sutil (`.textura`) ou grade pontilhada (`.pontilhado
   seguem o mouse, leve inclinação) e `CountUp` nos números. Efeitos de mouse ignoram toque.
 - Sem WebGL nem biblioteca nova: só `motion`, `gsap` (já instalados), CSS e canvas.
 
+## Fórmulas e figuras no chat
+
+- Fórmula em LaTeX entre `$$` vira desenho (KaTeX); a que fica sozinha na linha ganha o quadro `.quadro-formula`.
+- Figura: a IA escreve um bloco ` ```figura ` com um JSON curto (tipo + medidas) e o site desenha em SVG
+  (`lib/figuras.ts` valida, `components/Figura.tsx` desenha) no quadro `.quadro-figura`. Tipos: segmento (régua),
+  retangulo (com quadriculado para m²), caixa (comprimento × largura × altura), circulo, triangulo, barras (com
+  linha da média), partes (dado, 25 de 100) e proporcao (regra de 3 direta/inversa). Nada de imagem de fora,
+  link ou HTML: tipo desconhecido não desenha. Enquanto a resposta chega aparece "Desenhando a figura…".
+
 ## Voz
 
 - Português do Brasil, frases curtas e diretas. Sem exclamação, sem travessão, sem jargão de marketing

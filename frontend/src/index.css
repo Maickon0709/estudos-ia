@@ -453,3 +453,17 @@ a[data-slot="card"]:hover, button[data-slot="card"]:hover, [data-slot="card"]:ha
 .quadro-formula .katex-display > .katex { font-size: 1.4em; }
 @media (max-width: 640px) { .quadro-formula .katex-display > .katex { font-size: 1.2em; } }
 @media (prefers-reduced-motion: reduce) { .quadro-formula .katex-display { animation: none; } }
+
+/* Figura do chat (bloco ```figura desenhado em SVG por components/Figura.tsx): mesmo quadro da fórmula */
+.quadro-figura {
+  margin: 0.9rem 0;
+  padding: 1rem;
+  border-radius: 1rem;
+  background:
+    radial-gradient(120% 140% at 50% 0%, color-mix(in oklch, var(--destaque) 9%, transparent), transparent 70%),
+    var(--card);
+  border: 1px solid color-mix(in oklch, var(--destaque) 22%, var(--border));
+  box-shadow: 0 10px 28px -20px hsl(var(--sombra) / 0.5);
+  animation: surgir 0.45s var(--suave, ease) backwards;
+}
+@media (prefers-reduced-motion: reduce) { .quadro-figura { animation: none; } }
